@@ -25,6 +25,16 @@
 | --- | --- |
 | <img src="docs/screenshots/onyx-session.png" alt="会话视图" width="100%" /> | <img src="docs/screenshots/onyx-models.png" alt="模型选择" width="100%" /> |
 
+## 🎬 演示
+
+<div align="center">
+  <img src="docs/media/onyx-demo.gif" alt="Onyx 操作演示" width="80%" />
+</div>
+
+<p align="center">
+  <a href="docs/media/onyx-test-video.mp4">▶ 观看完整演示视频（15 秒，MP4）</a>
+</p>
+
 ## 它是什么
 
 Onyx 是一个 **AI 编程工作台**，提供浏览器界面与终端 Agent 两种形态：

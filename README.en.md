@@ -26,6 +26,16 @@
 | --- | --- |
 | <img src="docs/screenshots/onyx-session.png" alt="Conversation view" width="100%" /> | <img src="docs/screenshots/onyx-models.png" alt="Model picker" width="100%" /> |
 
+## 🎬 Demo
+
+<div align="center">
+  <img src="docs/media/onyx-demo.gif" alt="Onyx demo" width="80%" />
+</div>
+
+<p align="center">
+  <a href="docs/media/onyx-test-video.mp4">▶ Watch the full demo video (15s, MP4)</a>
+</p>
+
 ## What it is
 
 Onyx is an **AI coding workspace** with both a web interface and a terminal agent:
