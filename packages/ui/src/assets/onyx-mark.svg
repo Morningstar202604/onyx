@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="onyxGrad" x1="8" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#67e8f9"/>
+      <stop offset="0.45" stop-color="#38bdf8"/>
+      <stop offset="1" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="onyxCore" x1="26" y1="24" x2="40" y2="42" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.25"/>
+    </linearGradient>
+  </defs>
+  <!-- 黑曜石宝石主体：菱形切面 -->
+  <path d="M32 3 61 32 32 61 3 32Z" fill="url(#onyxGrad)"/>
+  <path d="M32 3 61 32 32 61 3 32Z" fill="none" stroke="#ffffff" stroke-opacity="0.35" stroke-width="1.5"/>
+  <!-- 内层切面 -->
+  <path d="M32 13 51 32 32 51 13 32Z" fill="#ffffff" fill-opacity="0.12"/>
+  <!-- 顶部高光棱 -->
+  <path d="M32 20 42.5 32 32 44 21.5 32Z" fill="url(#onyxCore)"/>
+  <path d="M32 3 32 13" stroke="#ffffff" stroke-opacity="0.55" stroke-width="1.5"/>
+</svg>

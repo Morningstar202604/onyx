@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Onyx — 属于你自己的 AI 编程工作台</title>
+<meta name="description" content="Onyx：去官方化、纯 API Key 直连的 AI 编程工作台。打开即用，配一个 Key 就开始干活。">
+<style>
+  :root {
+    --bg: #0b0e14;
+    --bg2: #11151f;
+    --card: #151a26;
+    --line: #232a3a;
+    --fg: #e8ecf4;
+    --dim: #8b93a7;
+    --accent: #6c8cff;
+    --accent2: #9db4ff;
+    --green: #34d399;
+    --radius: 16px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: radial-gradient(1200px 600px at 70% -10%, #1a2440 0%, var(--bg) 55%) fixed, var(--bg);
+    color: var(--fg);
+    line-height: 1.6;
+  }
+  a { color: var(--accent2); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+
+  /* ===== 导航 ===== */
+  header {
+    position: sticky; top: 0; z-index: 20;
+    backdrop-filter: blur(12px);
+    background: rgba(11,14,20,.75);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; letter-spacing: .5px; }
+  .logo {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--accent), #4a5fc1);
+    display: grid; place-items: center; font-size: 15px; font-weight: 800; color: #fff;
+  }
+  .nav-links { display: flex; gap: 24px; font-size: 14px; color: var(--dim); }
+  .nav-links a { color: var(--dim); }
+  .nav-links a:hover { color: var(--fg); }
+
+  /* ===== Hero ===== */
+  .hero { padding: 110px 0 70px; text-align: center; }
+  .hero h1 { font-size: clamp(38px, 6vw, 58px); font-weight: 800; letter-spacing: -1px; line-height: 1.15; }
+  .hero .grad {
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p { margin: 22px auto 0; max-width: 560px; color: var(--dim); font-size: 17px; }
+  .cta { margin-top: 36px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    display: inline-block; padding: 12px 26px; border-radius: 10px;
+    font-size: 15px; font-weight: 600; transition: .2s;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #7c98ff; text-decoration: none; transform: translateY(-1px); }
+  .btn-ghost { border: 1px solid var(--line); color: var(--fg); }
+  .btn-ghost:hover { border-color: var(--dim); text-decoration: none; transform: translateY(-1px); }
+  .badges { margin-top: 26px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .badge {
+    font-size: 12.5px; padding: 6px 14px; border-radius: 999px;
+    background: var(--card); border: 1px solid var(--line); color: var(--dim);
+  }
+  .badge b { color: var(--green); font-weight: 600; }
+
+  /* ===== 截图 ===== */
+  .shots { padding: 40px 0 80px; }
+  .shots img {
+    width: 100%; border-radius: var(--radius); border: 1px solid var(--line);
+    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    display: block;
+  }
+  .shots .row { display: grid; gap: 22px; margin-top: 22px; }
+  .shots .row:first-child { margin-top: 0; }
+  .shots .main { grid-column: 1 / -1; }
+  .shots .pair { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 760px) { .shots .pair { grid-template-columns: 1fr; } }
+
+  /* ===== 特性 ===== */
+  .feat { padding: 70px 0; border-top: 1px solid var(--line); }
+  .sec-title { font-size: clamp(24px, 3.5vw, 32px); font-weight: 700; text-align: center; }
+  .sec-sub { text-align: center; color: var(--dim); margin-top: 10px; font-size: 15px; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 42px; }
+  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 24px 22px; transition: .2s;
+  }
+  .card:hover { border-color: var(--accent); transform: translateY(-3px); }
+  .card .ic { font-size: 26px; }
+  .card h3 { font-size: 16px; margin-top: 12px; }
+  .card p { font-size: 13.5px; color: var(--dim); margin-top: 8px; }
+
+  /* ===== 快速开始 ===== */
+  .start { padding: 70px 0; border-top: 1px solid var(--line); }
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 42px; }
+  @media (max-width: 760px) { .steps { grid-template-columns: 1fr; } }
+  .step { background: var(--bg2); border: 1px solid var(--line); border-radius: var(--radius); padding: 26px; }
+  .step .n { font-size: 13px; color: var(--accent); font-weight: 700; letter-spacing: 1px; }
+  .step h3 { font-size: 15.5px; margin: 8px 0; }
+  .step p, .step code { font-size: 13px; color: var(--dim); }
+  .step code { background: #0d1220; border: 1px solid var(--line); padding: 2px 8px; border-radius: 6px; color: var(--accent2); word-break: break-all; }
+
+  /* ===== 仓库 ===== */
+  .repos { padding: 70px 0 90px; border-top: 1px solid var(--line); text-align: center; }
+  .repo-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 42px; text-align: left; }
+  @media (max-width: 760px) { .repo-cards { grid-template-columns: 1fr; } }
+  .repo {
+    background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 24px; display: block; transition: .2s;
+  }
+  .repo:hover { border-color: var(--accent); transform: translateY(-3px); text-decoration: none; }
+  .repo .rt { font-size: 15px; font-weight: 700; color: var(--fg); }
+  .repo .rp { font-size: 13px; color: var(--dim); margin-top: 6px; word-break: break-all; }
+
+  footer { border-top: 1px solid var(--line); padding: 34px 0; color: var(--dim); font-size: 13px; }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+</style>
+</head>
+<body>
+
+<!-- ===== 导航 ===== -->
+<header>
+  <div class="wrap nav">
+    <div class="brand"><span class="logo">O</span>Onyx</div>
+    <div class="nav-links">
+      <a href="#shots">界面</a>
+      <a href="#feat">特性</a>
+      <a href="#start">快速开始</a>
+      <a href="#repos">仓库</a>
+    </div>
+  </div>
+</header>
+
+<!-- ===== Hero ===== -->
+<section class="hero">
+  <div class="wrap">
+    <h1>属于你自己的<br><span class="grad">AI 编程工作台</span></h1>
+    <p>打开即是工作台。配一个 API Key 就开始干活 —— 没有登录墙，没有套餐，没有官方痕迹。</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="#start">快速开始</a>
+      <a class="btn btn-ghost" href="https://github.com/X33834/onyx" target="_blank" rel="noopener">GitHub 源码</a>
+    </div>
+    <div class="badges">
+      <span class="badge">纯 API Key 直连 <b>✓</b></span>
+      <span class="badge">去官方化 <b>✓</b></span>
+      <span class="badge">设置简单优先 <b>✓</b></span>
+      <span class="badge">12 个 Agnes 模型 <b>✓</b></span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 截图 ===== -->
+<section class="shots" id="shots">
+  <div class="wrap">
+    <div class="row main">
+      <img src="screenshots/onyx-main.png" alt="Onyx 主界面">
+    </div>
+    <div class="row pair">
+      <img src="screenshots/onyx-models.png" alt="Onyx 模型选择">
+      <img src="screenshots/onyx-session.png" alt="Onyx 会话结果">
+    </div>
+  </div>
+</section>
+
+<!-- ===== 特性 ===== -->
+<section class="feat" id="feat">
+  <div class="wrap">
+    <h2 class="sec-title">为什么是 Onyx</h2>
+    <p class="sec-sub">把上游的账号、套餐、登录墙全部砍掉，留下纯粹的工作台</p>
+    <div class="grid">
+      <div class="card">
+        <div class="ic">🔑</div>
+        <h3>纯 API Key 直连</h3>
+        <p>任意 OpenAI 兼容网关即插即用，一次配置，永久生效。余额即配额，透明简单。</p>
+      </div>
+      <div class="card">
+        <div class="ic">🗑️</div>
+        <h3>彻底去官方化</h3>
+        <p>官方界面、登录、套餐、遥测、账号链路全部移除，打开直进主界面。</p>
+      </div>
+      <div class="card">
+        <div class="ic">⚡</div>
+        <h3>设置简单优先</h3>
+        <p>常用项直接展示，复杂配置收进高级折叠。默认简单定义，也支持复杂规则。</p>
+      </div>
+      <div class="card">
+        <div class="ic">🤖</div>
+        <h3>12 个模型开箱即用</h3>
+        <p>flash / pro / image / video 系列预配置，对话、图像、视频一屏切换。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 快速开始 ===== -->
+<section class="start" id="start">
+  <div class="wrap">
+    <h2 class="sec-title">60 秒跑起来</h2>
+    <p class="sec-sub">克隆 → 装依赖 → 配 Key → 开干</p>
+    <div class="steps">
+      <div class="step">
+        <div class="n">STEP 01</div>
+        <h3>克隆仓库</h3>
+        <p><code>git clone https://github.com/X33834/onyx.git</code></p>
+      </div>
+      <div class="step">
+        <div class="n">STEP 02</div>
+        <h3>安装并启动</h3>
+        <p><code>pnpm install</code> → <code>pnpm dev:web</code></p>
+      </div>
+      <div class="step">
+        <div class="n">STEP 03</div>
+        <h3>配置 API Key</h3>
+        <p>设置 → 新供应商 → 填入你的 Key 与网关地址</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 仓库 ===== -->
+<section class="repos" id="repos">
+  <div class="wrap">
+    <h2 class="sec-title">获取源码</h2>
+    <p class="sec-sub">Onyx 已同步到三大平台，任选其一</p>
+    <div class="repo-cards">
+      <a class="repo" href="https://github.com/X33834/onyx" target="_blank" rel="noopener">
+        <div class="rt">GitHub</div>
+        <div class="rp">github.com/X33834/onyx</div>
+      </a>
+      <a class="repo" href="https://gitee.com/badhope/onyx" target="_blank" rel="noopener">
+        <div class="rt">Gitee</div>
+        <div class="rp">gitee.com/badhope/onyx</div>
+      </a>
+      <a class="repo" href="https://gitcode.com/badhope/onyx" target="_blank" rel="noopener">
+        <div class="rt">GitCode</div>
+        <div class="rp">gitcode.com/badhope/onyx</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Onyx · Apache-2.0</span>
+    <span>Built for people who just want to code.</span>
+  </div>
+</footer>
+
+</body>
+</html>
