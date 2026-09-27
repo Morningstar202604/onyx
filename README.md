@@ -1,7 +1,7 @@
 # Onyx · 黑曜石
 
 <div align="center">
-  <img src="public/logo/icons/512x512.png" alt="Onyx" width="128" height="128" />
+  <img src="public/logo/icons/onyx-logo.png" alt="Onyx" width="128" height="128" />
 </div>
 <p align="center">
   <strong>属于自己的 AI 编程工作台</strong>

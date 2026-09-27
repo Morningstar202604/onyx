@@ -1,7 +1,7 @@
 # Onyx
 
 <div align="center">
-  <img src="public/logo/icons/512x512.png" alt="Onyx" width="128" height="128" />
+  <img src="public/logo/icons/onyx-logo.png" alt="Onyx" width="128" height="128" />
 </div>
 <p align="center">
   <strong>Your own AI coding workspace</strong>
