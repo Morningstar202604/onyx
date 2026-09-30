@@ -21,6 +21,10 @@ export interface GatewayFailoverOptions {
   gateways: readonly ProviderFallbackGateway[];
   /** 底层 fetch（已含代理、业务错误包装等）。 */
   fetch: ProviderFetch;
+  /** 可选并发门（每供应商并发上限 + 队列）；提供时每次请求先 acquire 再发出。 */
+  concurrencyGate?: {
+    acquire(timeoutMs?: number): Promise<() => void>;
+  };
 }
 
 export function createGatewayFailoverFetch(options: GatewayFailoverOptions): ProviderFetch {
@@ -34,6 +38,22 @@ export function createGatewayFailoverFetch(options: GatewayFailoverOptions): Pro
   const allGateways = fallbackGateways;
 
   return async (input, init) => {
+    const release =
+      options.concurrencyGate === undefined ? undefined : await options.concurrencyGate.acquire();
+    try {
+      return await runFailover(input, init, options.fetch, allGateways);
+    } finally {
+      release?.();
+    }
+  };
+}
+
+async function runFailover(
+  input: Parameters<ProviderFetch>[0],
+  init: Parameters<ProviderFetch>[1] | undefined,
+  fetchImpl: ProviderFetch,
+  allGateways: readonly ProviderFallbackGateway[],
+): Promise<Response> {
     let currentIndex = 0;
     // 记录每次尝试的失败：最后一次响应/错误在全部网关失败后抛出，
     // 保持与单网关一致的错误语义（调用方依赖分类器识别）。
@@ -50,11 +70,11 @@ export function createGatewayFailoverFetch(options: GatewayFailoverOptions): Pro
         // 请求体已消费（Request.bodyUsed），无法重放：直接透传原始失败。
         if (lastError !== undefined) throw lastError;
         if (lastResponse !== undefined) return lastResponse;
-        return options.fetch(input, init);
+        return fetchImpl(input, init);
       }
 
       try {
-        const response = await options.fetch(rewritten.input, rewritten.init);
+        const response = await fetchImpl(rewritten.input, rewritten.init);
         if (response.ok || !isSwitchableHttpStatus(response.status)) {
           return response;
         }
@@ -71,12 +91,11 @@ export function createGatewayFailoverFetch(options: GatewayFailoverOptions): Pro
       if (nextIndex >= allGateways.length) {
         if (lastError !== undefined) throw lastError;
         if (lastResponse !== undefined) return lastResponse;
-        return options.fetch(input, init);
+        return fetchImpl(input, init);
       }
       currentIndex = nextIndex;
     }
-  };
-}
+  }
 
 function rewriteRequest(
   input: RequestInfo | URL,
