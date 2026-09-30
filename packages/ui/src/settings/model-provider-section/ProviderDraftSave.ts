@@ -1,4 +1,4 @@
-import { isApiKeyAccess, type ProviderApiType } from "@onyx/provider";
+import { isApiKeyAccess, type ProviderApiType, type ProviderFallbackGateway } from "@onyx/provider";
 import {
   getProviderFormLabel,
   type ProviderSettingsFormProvider,
@@ -9,6 +9,33 @@ export interface ProviderDraftValues {
   apiFormat: ProviderApiType;
   baseUrlValue: string;
   apiKeyValue: string;
+  fallbackGateways: ProviderFallbackGateway[];
+}
+
+/** 保存前清理：剔除空 baseUrl 的占位行；空数组不落库（等同未配置）。 */
+export function normalizeFallbackGateways(
+  gateways: readonly ProviderFallbackGateway[] | null | undefined,
+): ProviderFallbackGateway[] | undefined {
+  const cleaned = (gateways ?? [])
+    .filter((gateway) => gateway.baseUrl.trim().length > 0)
+    .map((gateway) => ({
+      baseUrl: gateway.baseUrl.trim(),
+      ...(gateway.apiKey?.trim() ? { apiKey: gateway.apiKey.trim() } : {}),
+    }));
+  return cleaned.length === 0 ? undefined : cleaned;
+}
+
+function fallbackGatewaysEqual(
+  left: readonly ProviderFallbackGateway[] | null | undefined,
+  right: readonly ProviderFallbackGateway[] | null | undefined,
+): boolean {
+  const normalizedLeft = normalizeFallbackGateways(left) ?? [];
+  const normalizedRight = normalizeFallbackGateways(right) ?? [];
+  if (normalizedLeft.length !== normalizedRight.length) return false;
+  return normalizedLeft.every((gateway, index) => {
+    const other = normalizedRight[index]!;
+    return gateway.baseUrl === other.baseUrl && gateway.apiKey === other.apiKey;
+  });
 }
 
 function normalizeConfiguredBaseUrl(value: string): string {
@@ -53,16 +80,22 @@ export function resolvePendingProviderDraftSave({
   const keyChanged =
     isApiKeyAccess(provider.config.access) &&
     draft.apiKeyValue !== (provider.config.access.apiKey ?? "");
-  if (!labelChanged && !typeChanged && !urlChanged && !keyChanged) return null;
+  const gatewaysChanged =
+    !readOnlyEndpoints &&
+    !fallbackGatewaysEqual(draft.fallbackGateways, provider.config.api?.fallbackGateways);
+  if (!labelChanged && !typeChanged && !urlChanged && !keyChanged && !gatewaysChanged) return null;
 
   // 表单只拥有名称、连接类型、地址和 Key；重建整个 api 会删除隐藏 headers，
   // 保存 Effective 对象又会把继承字段物化。分别在各自基线上只应用修改过的叶子。
   const apiChanges = {
     ...(typeChanged || (urlChanged && !provider.config.api?.type) ? { type: draft.apiFormat } : {}),
     ...(urlChanged ? { baseUrl: baseURL || undefined } : {}),
+    ...(gatewaysChanged ? { fallbackGateways: normalizeFallbackGateways(draft.fallbackGateways) } : {}),
   };
   const api =
-    typeChanged || urlChanged ? { ...provider.config.api, ...apiChanges } : provider.config.api;
+    typeChanged || urlChanged || gatewaysChanged
+      ? { ...provider.config.api, ...apiChanges }
+      : provider.config.api;
   const access =
     keyChanged && isApiKeyAccess(provider.config.access)
       ? { ...provider.config.access, apiKey: draft.apiKeyValue }
@@ -84,7 +117,7 @@ export function resolvePendingProviderDraftSave({
           },
         }
       : {}),
-    ...(typeChanged || urlChanged
+    ...(typeChanged || urlChanged || gatewaysChanged
       ? { api: { ...provider.personalConfig.api, ...apiChanges } }
       : {}),
   };

@@ -35,11 +35,29 @@ const completeProviderAccessDataSchema = z.discriminatedUnion("type", [
   completeApiKeyAccessDataSchema,
 ]);
 
+/**
+ * 备用网关（故障切换）：同一逻辑供应商可配置多个 endpoint。
+ * 主网关（baseUrl）失败（网络错误/5xx/429）时按顺序切换；apiKey 缺省复用主 key。
+ */
+export const providerFallbackGatewayDataSchema = z
+  .object({
+    baseUrl: z.string().url(),
+    apiKey: z.string().nullable().optional(),
+    headers: z.record(z.string(), z.string()).readonly().nullable().optional(),
+  })
+  .strict();
+
 export const completeProviderApiDataSchema = z
   .object({
     type: providerApiTypeDataSchema,
     baseUrl: nonBlankRequiredString.pipe(z.string().url()),
     headers: z.record(z.string(), z.string()).readonly().nullable().optional(),
+    fallbackGateways: z
+      .array(providerFallbackGatewayDataSchema)
+      .max(3)
+      .readonly()
+      .nullable()
+      .optional(),
   })
   .strict();
 export const providerApiDataSchema = z

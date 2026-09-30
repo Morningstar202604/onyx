@@ -12,7 +12,7 @@ import type {
   ProviderSettingsFormModel,
 } from "@/lib/providerSettingsFormTypes.js";
 import type { ModelConnectivityResult } from "@onyx/shared";
-import type { ProviderApiType } from "@onyx/provider";
+import type { ProviderApiType, ProviderFallbackGateway } from "@onyx/provider";
 import {
   TID_MODEL_PROVIDER_ADD_MODEL_BUTTON,
   TID_MODEL_PROVIDER_BASE_URL_INPUT,
@@ -22,7 +22,16 @@ import {
   TID_MODEL_PROVIDER_NAME_INPUT,
   testId,
 } from "@onyx/shared";
-import { InfoIcon, LockKeyholeIcon, Plus, Pencil, Trash2, MoreHorizontal } from "lucide-react";
+import {
+  InfoIcon,
+  LockKeyholeIcon,
+  Plus,
+  Pencil,
+  Trash2,
+  MoreHorizontal,
+  ChevronDown,
+  ChevronRight,
+} from "lucide-react";
 import { Button } from "@/components/ui/button.js";
 import { Input } from "@/components/ui/input.js";
 import {
@@ -182,28 +191,33 @@ export function ProviderConnectionSection({
   readOnly,
   apiFormat,
   baseUrlValue,
+  fallbackGateways,
   onApiFormatChange,
   onBaseUrlChange,
   onBaseUrlBlur,
   onBaseUrlKeyDown,
   onBaseUrlCompositionStart,
   onBaseUrlCompositionEnd,
+  onFallbackGatewaysChange,
 }: {
   provider: ProviderSettingsFormProvider;
   readOnly?: boolean;
   apiFormat: ProviderApiType;
   baseUrlValue: string;
+  fallbackGateways: readonly ProviderFallbackGateway[];
   onApiFormatChange: (value: ProviderApiType) => void;
   onBaseUrlChange: (value: string) => void;
   onBaseUrlBlur: () => void;
   onBaseUrlKeyDown?: (event: ReactKeyboardEvent<HTMLInputElement>) => void;
   onBaseUrlCompositionStart?: () => void;
   onBaseUrlCompositionEnd?: () => void;
+  onFallbackGatewaysChange?: (next: ProviderFallbackGateway[]) => void;
 }) {
   const { intl } = useZCodeIntl();
   const showApiFormat = shouldShowProviderApiFormat(provider);
   const readOnlyBaseUrl = provider.config.api?.baseUrl ?? "";
   const resolvedApiFormat = provider.config.api?.type ?? "anthropic-messages";
+  const [fallbackExpanded, setFallbackExpanded] = useState(false);
 
   const renderReadOnlyField = (label: string, value: string) => (
     <div>
@@ -269,6 +283,109 @@ export function ProviderConnectionSection({
             {intl.formatMessage({ id: "settings.modelProvider.apiFormat" })}
           </label>
           <ProviderApiFormatSelect value={apiFormat} onChange={onApiFormatChange} />
+        </div>
+      ) : null}
+
+      {onFallbackGatewaysChange ? (
+        <div className="rounded-lg border border-input-border">
+          <button
+            type="button"
+            className="flex w-full items-center justify-between gap-2 px-3 py-2 text-ui-base text-foreground"
+            aria-expanded={fallbackExpanded}
+            onClick={() => setFallbackExpanded((value) => !value)}
+          >
+            <span className="flex items-center gap-1.5">
+              {fallbackExpanded ? (
+                <ChevronDown className="size-4 text-foreground-subtle" aria-hidden="true" />
+              ) : (
+                <ChevronRight className="size-4 text-foreground-subtle" aria-hidden="true" />
+              )}
+              {intl.formatMessage({ id: "settings.modelProvider.fallbackGateways" })}
+              {fallbackGateways.length > 0 ? (
+                <span className="rounded bg-foreground-subtle/10 px-1.5 text-xs text-foreground-subtle">
+                  {fallbackGateways.length}
+                </span>
+              ) : null}
+            </span>
+            <InfoIcon className="size-3.5 shrink-0 text-foreground-subtle" aria-hidden="true" />
+          </button>
+          {fallbackExpanded ? (
+            <div className="space-y-2 border-t border-input-border px-3 py-2">
+              <p className="text-ui-sm text-foreground-subtle">
+                {intl.formatMessage({ id: "settings.modelProvider.fallbackGatewaysHint" })}
+              </p>
+              {fallbackGateways.length === 0 ? (
+                <p className="text-ui-sm text-foreground-subtle">
+                  {intl.formatMessage({ id: "settings.modelProvider.fallbackGatewaysEmpty" })}
+                </p>
+              ) : null}
+              {fallbackGateways.map((gateway, index) => (
+                <div key={index} className="flex items-start gap-2">
+                  <div className="min-w-0 flex-1 space-y-1.5">
+                    <Input
+                      {...TECHNICAL_INPUT_ATTRIBUTES}
+                      type="text"
+                      size="sm"
+                      value={gateway.baseUrl}
+                      placeholder={intl.formatMessage({
+                        id: "settings.modelProvider.fallbackGatewayBaseUrlPlaceholder",
+                      })}
+                      onChange={(event) => {
+                        const next = [...fallbackGateways];
+                        next[index] = { ...gateway, baseUrl: event.target.value };
+                        onFallbackGatewaysChange(next);
+                      }}
+                    />
+                    <Input
+                      {...TECHNICAL_INPUT_ATTRIBUTES}
+                      type="password"
+                      size="sm"
+                      value={gateway.apiKey ?? ""}
+                      placeholder={intl.formatMessage({
+                        id: "settings.modelProvider.fallbackGatewayApiKeyPlaceholder",
+                      })}
+                      onChange={(event) => {
+                        const next = [...fallbackGateways];
+                        next[index] = { ...gateway, apiKey: event.target.value };
+                        onFallbackGatewaysChange(next);
+                      }}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    aria-label={intl.formatMessage({
+                      id: "settings.modelProvider.fallbackGatewayRemove",
+                    })}
+                    onClick={() => {
+                      const next = fallbackGateways.filter((_, i) => i !== index);
+                      onFallbackGatewaysChange(next);
+                    }}
+                  >
+                    <Trash2 className="size-4" aria-hidden="true" />
+                  </Button>
+                </div>
+              ))}
+              {fallbackGateways.length < 3 ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-1"
+                  onClick={() => {
+                    onFallbackGatewaysChange([
+                      ...fallbackGateways,
+                      { baseUrl: "", apiKey: "" },
+                    ]);
+                  }}
+                >
+                  <Plus className="size-3.5" aria-hidden="true" />
+                  {intl.formatMessage({ id: "settings.modelProvider.fallbackGatewayAdd" })}
+                </Button>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       ) : null}
     </>

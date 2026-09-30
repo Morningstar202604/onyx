@@ -19,6 +19,7 @@ import {
   type ModelRequestAuth,
 } from "@onyx/contracts";
 import type { RegistryProviderConfig } from "@onyx/provider";
+import type { ProviderFallbackGateway } from "@onyx/provider";
 import { withOpenRouterAttributionHeaders } from "@onyx/shared";
 import { createAnthropicCompatFetch } from "./anthropic-stream-compat.js";
 import { createOpenAIResponsesJsonCompatFetch } from "./openai-responses-json-compat.js";
@@ -27,6 +28,7 @@ import { createNetworkProxyFetch } from "../network/proxy-fetch.js";
 import { createOfficialCodingPlanGatewayFetch } from "./official-coding-plan-gateway.js";
 import { normalizeModelTlsFailure } from "./failure-tls.js";
 import { mergeModelRequestHeaders } from "./model-request-headers.js";
+import { createGatewayFailoverFetch } from "./gateway-failover.js";
 
 export type AiSdkProviderKind = "openai" | "anthropic" | "openai-compatible";
 
@@ -40,6 +42,7 @@ interface AiSdkProviderConfig {
   headers?: Record<string, string>;
   providerOptions?: Record<string, unknown>;
   name?: string;
+  fallbackGateways?: readonly ProviderFallbackGateway[];
 }
 
 export interface AiSdkModelExecutionConfig {
@@ -263,20 +266,27 @@ export class AiSdkModelExecution {
     const apiKey = this.resolveApiKey(providerConfig);
     const headers = providerConfig.headers;
     const providerTransport = this.resolveProviderTransport(providerId);
-    const fetch = createProviderBusinessErrorFetch({
+    const businessErrorFetch = createProviderBusinessErrorFetch({
       fetch: providerTransport,
       providerId,
       providerKind: providerConfig.kind,
+    });
+    // 多网关 failover 包在业务错误包装外层：网络错误 / 429 / 5xx 按序切换备用网关，
+    // 4xx 语义错误（400/401/403）不切换，保持单网关一致的错误分类。
+    const failoverFetch = createGatewayFailoverFetch({
+      baseURL: providerConfig.baseURL ?? "",
+      gateways: providerConfig.fallbackGateways ?? [],
+      fetch: businessErrorFetch,
     });
     const optionFetch =
       optionMaps && optionValues
         ? createModelOptionMapFetch({
             capture: rawRequestBodyCapture,
-            fetch,
+            fetch: failoverFetch,
             maps: optionMaps,
             values: optionValues,
           })
-        : fetch;
+        : failoverFetch;
 
     switch (providerConfig.kind) {
       case "openai": {
@@ -357,6 +367,9 @@ function toAiSdkProviderConfig(
       : {}),
     baseURL: config.api.baseUrl,
     ...(config.api.headers ? { headers: { ...config.api.headers } } : {}),
+    ...(config.api.fallbackGateways
+      ? { fallbackGateways: config.api.fallbackGateways }
+      : {}),
     providerOptions: { apiFormat: config.api.type },
     access: config.access,
   };

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import type { ProviderSettingsFormModel } from "@/lib/providerSettingsFormTypes.js";
 import type { ModelConnectivityResult } from "@onyx/shared";
 import { Loader2Icon, Trash2, Unplug } from "lucide-react";
@@ -10,6 +10,7 @@ import { useProviderModelDraft } from "@/settings/model-provider-section/useProv
 import { ProviderModelMetadataDialog } from "@/settings/model-provider-section/ProviderModelMetadataDialog.js";
 import { formatModelContextWindowLabel } from "@/lib/tokenNumberFormat.js";
 import type { ModelConfigResolution } from "@onyx/provider";
+import { resolveModelCapabilities } from "@onyx/provider";
 import { useProviderDetailFeedback } from "@/settings/model-provider-section/ProviderDetailFeedback.js";
 
 export function ModelRowInput({
@@ -50,6 +51,10 @@ export function ModelRowInput({
   const metadataSavingRef = useRef(false);
   const [commitErrorMessage, setCommitErrorMessage] = useState<string | null>(null);
   const [draftBasedOnRevision, setDraftBasedOnRevision] = useState(settingsRevision);
+  const capabilities = useMemo(
+    () => resolveModelCapabilities(providerId, model.modelId),
+    [providerId, model.modelId],
+  );
   // 外部 View 每次投影会产生新对象；编辑事务固定打开时的模型与 revision，不能跟随对象刷新重置。
   const [editingModel, setEditingModel] = useState(model);
   const editor = useProviderModelDraft({
@@ -257,6 +262,19 @@ export function ModelRowInput({
             {contextWindowLabel}
           </span>
           {model.config.properties?.inputFormat?.supportsImage ? <ModelInputCapabilityBadge /> : null}
+          {capabilities.supportsVision ? (
+            <CapabilityBadge label={intl.formatMessage({ id: "settings.modelProvider.capabilityVision" })} />
+          ) : null}
+          {capabilities.supportsReasoning ? (
+            <CapabilityBadge
+              label={intl.formatMessage({ id: "settings.modelProvider.capabilityReasoning" })}
+            />
+          ) : null}
+          {capabilities.supportsToolCall ? (
+            <CapabilityBadge
+              label={intl.formatMessage({ id: "settings.modelProvider.capabilityToolCall" })}
+            />
+          ) : null}
         </div>
         {shouldShowTestButton ? (
           <Button
@@ -339,5 +357,16 @@ export function ModelRowInput({
         ) : null}
       </div>
     </div>
+  );
+}
+
+function CapabilityBadge({ label }: { label: string }) {
+  return (
+    <span
+      className="inline-flex h-5 shrink-0 items-center rounded-md border border-border bg-surface px-1.5 text-ui-sm text-foreground-subtle"
+      title={label}
+    >
+      {label}
+    </span>
   );
 }
