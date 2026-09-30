@@ -10,9 +10,9 @@
   <a href="README.md">简体中文</a> | English
 </p>
 
-> Onyx is deeply customized from ZCode: the official account, plans, subscriptions,
-> and telemetry systems are fully removed. It keeps only a clean experience —
-> plug in an API key and start working. No login wall, straight into the workspace.
+> Your own AI coding workspace: no login wall, no official accounts, no subscriptions.
+> Plug in an API key (any OpenAI-compatible provider) and start working.
+> Data and workspaces stay on your machine.
 
 ---
 
