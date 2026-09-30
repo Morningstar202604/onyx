@@ -31,8 +31,8 @@ export type ZCodeAutomationLocationKind = "local" | "remote";
 /** 触发来源：定时 or 立即运行。 */
 export type ZCodeAutomationTrigger = "schedule" | "manual";
 
-/** 触发方式：time=按调度规则（默认）；file-change=工作区文件变更触发（忽略 cron 到期，由 watcher 唤醒）。 */
-export type ZCodeAutomationTriggerKind = "time" | "file-change";
+/** 触发方式：time=按调度规则（默认）；file-change=工作区文件变更触发；git-event=Git 引用变更（commit/push）触发。后两者忽略 cron 到期，由 watcher 唤醒。 */
+export type ZCodeAutomationTriggerKind = "time" | "file-change" | "git-event";
 
 /** 自定义重复规则；cronExpr 保留为兼容展示，调度以本字段为权威。 */
 export interface ZCodeAutomationScheduleRule {

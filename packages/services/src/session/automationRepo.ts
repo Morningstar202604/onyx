@@ -138,10 +138,10 @@ function rowToAutomation(row: AutomationRow): ZCodeAutomation {
       ? (JSON.parse(row.schedule_rule) as ZCodeAutomation["scheduleRule"])
       : undefined,
     ...(row.schedule_edited_by_user === 1 ? { scheduleEditedByUser: true } : {}),
-    ...(row.trigger_kind === "file-change"
+    ...(row.trigger_kind === "file-change" || row.trigger_kind === "git-event"
       ? {
-          triggerKind: "file-change" as const,
-          fileChangePattern: row.file_change_pattern ?? undefined,
+          triggerKind: row.trigger_kind as "file-change" | "git-event",
+          fileChangePattern: row.trigger_kind === "file-change" ? (row.file_change_pattern ?? undefined) : undefined,
           fileChangeDebounceMs: row.file_change_debounce_ms ?? undefined,
           webhookUrl: row.webhook_url ?? null,
         }
@@ -389,10 +389,12 @@ export class AutomationRepo {
         max_runs: params.maxRuns ?? null,
         end_at: params.endAt ?? null,
         schedule_rule: params.scheduleRule ? JSON.stringify(params.scheduleRule) : null,
-        trigger_kind: params.triggerKind === "file-change" ? "file-change" : null,
+        trigger_kind: params.triggerKind === "time" ? null : (params.triggerKind ?? null),
         file_change_pattern: params.triggerKind === "file-change" ? (params.fileChangePattern ?? null) : null,
         file_change_debounce_ms:
-          params.triggerKind === "file-change" ? (params.fileChangeDebounceMs ?? null) : null,
+          params.triggerKind !== undefined && params.triggerKind !== "time"
+            ? (params.fileChangeDebounceMs ?? null)
+            : null,
         webhook_url: params.webhookUrl ?? null,
         enabled: options.lifecycleStatus === "completed" ? 0 : 1,
         lifecycle_status: options.lifecycleStatus ?? "active",
@@ -549,9 +551,9 @@ export class AutomationRepo {
       trigger_kind:
         params.triggerKind === undefined
           ? existing.trigger_kind
-          : params.triggerKind === "file-change"
-            ? "file-change"
-            : null,
+          : params.triggerKind === "time"
+            ? null
+            : params.triggerKind,
       file_change_pattern:
         params.triggerKind === undefined
           ? existing.file_change_pattern
@@ -561,9 +563,9 @@ export class AutomationRepo {
       file_change_debounce_ms:
         params.triggerKind === undefined
           ? existing.file_change_debounce_ms
-          : params.triggerKind === "file-change"
-            ? (params.fileChangeDebounceMs ?? null)
-            : null,
+          : params.triggerKind === "time"
+            ? null
+            : (params.fileChangeDebounceMs ?? existing.file_change_debounce_ms),
       webhook_url: params.webhookUrl === undefined ? existing.webhook_url : params.webhookUrl,
       next_run_at: options?.nextRunAt === undefined ? existing.next_run_at : options.nextRunAt,
       lifecycle_status: options?.lifecycleStatus ?? existing.lifecycle_status,

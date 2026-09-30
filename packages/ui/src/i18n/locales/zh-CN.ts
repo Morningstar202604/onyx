@@ -5804,6 +5804,8 @@ const zhCN: Record<string, string> = {
   "automations.form.triggerKind.time": "按时间调度",
   "automations.form.triggerKind.fileChange": "文件变更",
   "automations.form.triggerKind.fileChangeHint": "工作区内匹配的文件发生变更时自动运行（忽略时间调度）。",
+  "automations.form.triggerKind.gitEvent": "Git 事件",
+  "automations.form.triggerKind.gitEventHint": "工作区 Git 引用发生变化（commit / push）时自动运行（忽略时间调度）。",
   "automations.form.fileChangePattern.label": "文件匹配（glob）",
   "automations.form.fileChangePattern.hint": "相对工作区路径，如 **/*.ts 或 src/**/*.{ts,tsx}；留空匹配全部文件。",
   "automations.form.fileChangeDebounce.label": "防抖窗口（毫秒）",

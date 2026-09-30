@@ -344,8 +344,8 @@ export function computeAutomationNextRunAt(
   automation: Pick<ZCodeAutomation, "cronExpr" | "scheduleRule" | "triggerKind">,
   from?: number,
 ): number | null {
-  // file-change 触发不按调度排期：由 scheduler 的 watcher 在文件变更时写 nextRunAt=now 唤醒。
-  if (automation.triggerKind === "file-change") {
+  // file-change / git-event 触发不按调度排期：由 scheduler 的 watcher 在事件时写 nextRunAt=now 唤醒。
+  if (automation.triggerKind === "file-change" || automation.triggerKind === "git-event") {
     return null;
   }
   return automation.scheduleRule

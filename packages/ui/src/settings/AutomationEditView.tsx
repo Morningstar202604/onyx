@@ -1736,13 +1736,18 @@ export function AutomationEditView({
               fileChangePattern: fileChangePattern.trim(),
               fileChangeDebounceMs,
             }
-          : editing?.triggerKind === "file-change"
+          : triggerKind === "git-event"
             ? {
-                triggerKind: "time" as const,
-                fileChangePattern: undefined,
-                fileChangeDebounceMs: undefined,
+                triggerKind: "git-event" as const,
+                fileChangeDebounceMs,
               }
-            : {}),
+            : editing?.triggerKind && editing?.triggerKind !== "time"
+              ? {
+                  triggerKind: "time" as const,
+                  fileChangePattern: undefined,
+                  fileChangeDebounceMs: undefined,
+                }
+              : {}),
         webhookUrl: webhookUrl.trim() === "" ? null : webhookUrl.trim(),
       };
     },
@@ -2215,10 +2220,27 @@ export function AutomationEditView({
                 >
                   {intl.formatMessage({ id: "automations.form.triggerKind.fileChange" })}
                 </button>
+                <button
+                  type="button"
+                  data-testid="automation-trigger-kind-git-event"
+                  onClick={() => setTriggerKind("git-event")}
+                  className={cn(
+                    "flex h-9 items-center gap-1.5 rounded-xl border px-3 text-ui-base font-normal leading-5 transition-colors",
+                    triggerKind === "git-event"
+                      ? "border-input-border-focused bg-input-focused text-foreground"
+                      : "border-input-border bg-input text-foreground-subtle hover:text-foreground",
+                  )}
+                >
+                  {intl.formatMessage({ id: "automations.form.triggerKind.gitEvent" })}
+                </button>
               </div>
               {triggerKind === "file-change" ? (
                 <p className="mt-1 text-ui-sm text-foreground-subtle">
                   {intl.formatMessage({ id: "automations.form.triggerKind.fileChangeHint" })}
+                </p>
+              ) : triggerKind === "git-event" ? (
+                <p className="mt-1 text-ui-sm text-foreground-subtle">
+                  {intl.formatMessage({ id: "automations.form.triggerKind.gitEventHint" })}
                 </p>
               ) : null}
             </div>
@@ -2243,6 +2265,30 @@ export function AutomationEditView({
                     {intl.formatMessage({ id: "automations.form.fileChangePattern.hint" })}
                   </p>
                 </div>
+                <div className={AUTOMATION_FORM_FIELD_CLASSNAME}>
+                  <label
+                    className="text-ui-base font-normal leading-5 text-foreground-subtle"
+                    htmlFor="automation-file-change-debounce"
+                  >
+                    {intl.formatMessage({ id: "automations.form.fileChangeDebounce.label" })}
+                  </label>
+                  <input
+                    id="automation-file-change-debounce"
+                    type="number"
+                    min={500}
+                    max={60000}
+                    step={500}
+                    value={fileChangeDebounceMs}
+                    onChange={(event) => setFileChangeDebounceMs(Number(event.target.value) || 5000)}
+                    className="h-9 w-full rounded-xl border border-input-border bg-input px-3 text-ui-base text-foreground outline-none focus:border-input-border-focused"
+                  />
+                  <p className="mt-1 text-ui-sm text-foreground-subtle">
+                    {intl.formatMessage({ id: "automations.form.fileChangeDebounce.hint" })}
+                  </p>
+                </div>
+              </div>
+            ) : triggerKind === "git-event" ? (
+              <div className="space-y-3">
                 <div className={AUTOMATION_FORM_FIELD_CLASSNAME}>
                   <label
                     className="text-ui-base font-normal leading-5 text-foreground-subtle"

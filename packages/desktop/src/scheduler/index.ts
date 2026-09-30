@@ -29,7 +29,10 @@ import {
   type SchedulerResourceTelemetry,
 } from "./schedulerResourceTelemetry.js";
 import { FileChangeTriggerRegistry } from "./fileChangeTrigger.js";
+import { GitEventTriggerRegistry } from "./gitEventTrigger.js";
 import { notifyWebhookRunResult } from "./webhookNotify.js";
+
+/* eslint-disable max-lines -- scheduler 主入口，聚合 cron / off-peak / file-change / git-event / webhook 结算。 */
 
 /** 轮询间隔：cron 最小粒度是分钟，20s 轮询足以按时命中且开销低。 */
 const POLL_INTERVAL_MS = 20_000;
@@ -53,6 +56,13 @@ const inFlight = new Map<string, InFlight>();
 
 
 // ---- 文件变更触发（file-change automation）----
+const gitEventTrigger = new GitEventTriggerRegistry({
+  requestDispatch: async (automationId) => {
+    await repo.update(automationId, {}, { nextRunAt: Date.now() });
+    requestTick();
+  },
+  log,
+});
 const fileChangeTrigger = new FileChangeTriggerRegistry({
   requestDispatch: async (automationId, filePath) => {
     // 事件防抖到期：把该 automation 的 next_run_at 立即写为 now，claimDue 随即认领派发。
@@ -153,8 +163,9 @@ async function syncFileChangeWatchers(): Promise<void> {
   try {
     const automations = await repo.list();
     fileChangeTrigger.sync(automations);
+    gitEventTrigger.sync(automations);
   } catch (error) {
-    log("warn", `[file-change] sync watchers failed: ${error instanceof Error ? error.message : String(error)}`);
+    log("warn", `[watchers] sync failed: ${error instanceof Error ? error.message : String(error)}`);
   }
 }
 
@@ -388,6 +399,7 @@ async function dispose(): Promise<void> {
   }
   offPeakInFlight.clear();
   fileChangeTrigger.dispose();
+  gitEventTrigger.dispose();
   try {
     repo.close();
   } catch {

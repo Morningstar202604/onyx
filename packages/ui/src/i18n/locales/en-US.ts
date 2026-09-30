@@ -6073,6 +6073,8 @@ const enUS: Record<string, string> = {
   "automations.form.triggerKind.time": "By schedule",
   "automations.form.triggerKind.fileChange": "File change",
   "automations.form.triggerKind.fileChangeHint": "Runs when a matching file in the workspace changes (ignores time schedule).",
+  "automations.form.triggerKind.gitEvent": "Git event",
+  "automations.form.triggerKind.gitEventHint": "Runs when the workspace Git refs change (commit / push), ignoring the time schedule.",
   "automations.form.fileChangePattern.label": "File glob",
   "automations.form.fileChangePattern.hint": "Relative to workspace, e.g. **/*.ts or src/**/*.{ts,tsx}; empty matches all files.",
   "automations.form.fileChangeDebounce.label": "Debounce (ms)",
