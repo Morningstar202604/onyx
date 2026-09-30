@@ -3,7 +3,7 @@ import {
   type ProjectMemoryFileSummary,
   type ProjectMemoryWorkspaceSummary,
 } from "./memory.js";
-import { lstat, readdir, realpath } from "node:fs/promises";
+import { lstat, readdir, realpath, rm, writeFile } from "node:fs/promises";
 import { basename, isAbsolute, join, relative, sep } from "node:path";
 import { readProjectMemoryFileFromStableHandle } from "#src/memory/projectMemoryStableRead.js";
 import { getZCodeDataRootDir } from "#src/paths.js";
@@ -231,8 +231,62 @@ export function createMemoryService(): IMemoryService {
     });
   }
 
+  async function writeProjectMemoryFile(params: {
+    workspaceId: string;
+    fileName: string;
+    content: string;
+  }): Promise<void> {
+    if (
+      !isValidPathSegment(params.workspaceId) ||
+      !isValidPathSegment(params.fileName) ||
+      !isProjectMemoryFileName(params.fileName)
+    ) {
+      throw new Error("Invalid Project Memory path");
+    }
+    if (params.content.length > 256 * 1024) {
+      throw new Error("Project Memory file content exceeds 256 KiB limit");
+    }
+
+    const projectsRoot = await requireProjectMemoriesRoot();
+    const workspaceRoot = join(projectsRoot, params.workspaceId);
+    const memoryRoot = join(workspaceRoot, PROJECT_MEMORY_DIRECTORY_NAME);
+    await requirePlainDirectory(workspaceRoot);
+    await requirePlainDirectory(memoryRoot);
+    const targetPath = join(memoryRoot, params.fileName);
+    // fileName 已校验为单段安全段；对已存在的根目录做真实路径包含性校验，防御越界。
+    const memoryRootReal = await realpath(memoryRoot);
+    const rel = relative(memoryRootReal, targetPath);
+    if (rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel)) {
+      throw new Error(`Project Memory path is outside the local profile: ${targetPath}`);
+    }
+    await writeFile(targetPath, params.content, "utf8");
+  }
+
+  async function deleteProjectMemoryFile(params: {
+    workspaceId: string;
+    fileName: string;
+  }): Promise<void> {
+    if (
+      !isValidPathSegment(params.workspaceId) ||
+      !isValidPathSegment(params.fileName) ||
+      !isProjectMemoryFileName(params.fileName)
+    ) {
+      throw new Error("Invalid Project Memory path");
+    }
+    const projectsRoot = await requireProjectMemoriesRoot();
+    const workspaceRoot = join(projectsRoot, params.workspaceId);
+    const memoryRoot = join(workspaceRoot, PROJECT_MEMORY_DIRECTORY_NAME);
+    await requirePlainDirectory(workspaceRoot);
+    await requirePlainDirectory(memoryRoot);
+    const filePath = await requireExactProjectMemoryFile(memoryRoot, params.fileName);
+    await assertContainedProjectMemoryPath(projectsRoot, filePath);
+    await rm(filePath, { force: false });
+  }
+
   return {
     listProjectMemories,
     readProjectMemoryFile,
+    writeProjectMemoryFile,
+    deleteProjectMemoryFile,
   };
 }

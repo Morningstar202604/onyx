@@ -30,6 +30,19 @@ export interface IMemoryService {
     workspaceId: string;
     fileName: string;
   }): Promise<{ content: string; updatedAt: number }>;
+
+  /** 新建或覆盖一个 Project Memory Markdown 文件（内容 ≤ 256 KiB）。 */
+  writeProjectMemoryFile(params: {
+    workspaceId: string;
+    fileName: string;
+    content: string;
+  }): Promise<void>;
+
+  /** 删除一个 Project Memory Markdown 文件（仅限项目记忆根目录内，越界拒绝）。 */
+  deleteProjectMemoryFile(params: {
+    workspaceId: string;
+    fileName: string;
+  }): Promise<void>;
 }
 
 export const IMemoryService = createServiceDescriptor<IMemoryService>(ServiceChannels.Memory);

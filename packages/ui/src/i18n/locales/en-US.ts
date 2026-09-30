@@ -2112,6 +2112,12 @@ const enUS: Record<string, string> = {
   "settings.memory.viewer.projectsDescription":
     "Select a project to view all of its saved memories.",
   "settings.memory.viewer.refresh": "Refresh",
+  "settings.memory.viewer.newMemory": "New memory",
+  "settings.memory.viewer.newMemoryPlaceholder": "File name (.md added)",
+  "settings.memory.viewer.creating": "Creating…",
+  "settings.memory.viewer.deleteTitle": "Delete memory file {fileName}?",
+  "settings.memory.viewer.deleteDescription": "The file will be removed from project memory and cannot be recovered.",
+  "settings.memory.viewer.deleting": "Deleting…",
   "settings.memory.viewer.loading": "Loading memories…",
   "settings.memory.viewer.empty": "No saved workspace memories",
   "settings.memory.viewer.workspaces": "Workspaces",

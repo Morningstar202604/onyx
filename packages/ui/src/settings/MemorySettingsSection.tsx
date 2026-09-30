@@ -10,7 +10,10 @@ import {
 } from "@/settings/MemorySettingsViewer.js";
 import { SettingsGroupCard, SettingsRow } from "@/settings/SettingsPageParts.js";
 
-type MemoryCatalogService = Pick<IMemoryService, "listProjectMemories">;
+type MemoryCatalogService = Pick<
+  IMemoryService,
+  "listProjectMemories" | "writeProjectMemoryFile" | "deleteProjectMemoryFile"
+>;
 
 function normalizeWorkspaceDisplayName(value: string): string {
   const slug = value
@@ -199,6 +202,23 @@ export function MemorySettingsSection({
               failureStage: "local_commit",
             })
           }
+          onWriteFile={async (fileName, content) => {
+            if (!selectedWorkspace) return;
+            await memoryService.writeProjectMemoryFile({
+              workspaceId: selectedWorkspace.id,
+              fileName,
+              content,
+            });
+            await handleRefresh();
+          }}
+          onDeleteFile={async (fileName) => {
+            if (!selectedWorkspace) return;
+            await memoryService.deleteProjectMemoryFile({
+              workspaceId: selectedWorkspace.id,
+              fileName,
+            });
+            await handleRefresh();
+          }}
         />
       )}
     </div>

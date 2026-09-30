@@ -18,6 +18,19 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 import { FileDisplayIcon, resolveFileDisplayDescriptor } from "@/lib/fileDisplay.js";
+import { Button } from "@/components/ui/button.js";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog.js";
+import { PlusIcon, TrashIcon } from "lucide-react";
 import { PluginScopeMenu } from "@/settings/PluginScopeMenu.js";
 import { PluginSearchEmptyState } from "@/settings/PluginInstallEmptyState.js";
 import { SettingsSearchInput } from "@/settings/SettingsSearchInput.js";
@@ -34,6 +47,8 @@ export function MemorySettingsViewer({
   workspaces,
   onRefresh,
   onScopeKeyChange,
+  onWriteFile,
+  onDeleteFile,
 }: {
   catalogError: string | null;
   catalogState: MemoryViewerLoadingState;
@@ -41,6 +56,8 @@ export function MemorySettingsViewer({
   workspaces: ProjectMemoryWorkspaceSummary[];
   onRefresh: () => Promise<void>;
   onScopeKeyChange: (workspaceId: string) => void;
+  onWriteFile: (fileName: string, content: string) => Promise<void>;
+  onDeleteFile: (fileName: string) => Promise<void>;
 }) {
   const { intl, locale } = useZCodeIntl();
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,6 +81,46 @@ export function MemorySettingsViewer({
       ) ?? [],
     [normalizedSearchQuery, selectedWorkspace],
   );
+  const [creatingNewMemory, setCreatingNewMemory] = useState(false);
+  const [newMemoryFileName, setNewMemoryFileName] = useState("");
+  const [creatingBusy, setCreatingBusy] = useState(false);
+  const [deletingFileName, setDeletingFileName] = useState<string | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+
+  const handleCreateMemory = async () => {
+    const fileName = newMemoryFileName.trim();
+    if (!fileName || creatingBusy) {
+      return;
+    }
+    const normalizedName = fileName.endsWith(".md") ? fileName : `${fileName}.md`;
+    if (
+      normalizedName === "MEMORY.md" ||
+      selectedWorkspace?.files.some((f) => f.name === normalizedName)
+    ) {
+      return;
+    }
+    setCreatingBusy(true);
+    try {
+      await onWriteFile(normalizedName, `# ${normalizedName.replace(/\.md$/, "")}\n\n`);
+      setCreatingNewMemory(false);
+      setNewMemoryFileName("");
+    } finally {
+      setCreatingBusy(false);
+    }
+  };
+
+  const handleDeleteMemory = async () => {
+    if (!deletingFileName || deleteBusy) {
+      return;
+    }
+    setDeleteBusy(true);
+    try {
+      await onDeleteFile(deletingFileName);
+    } finally {
+      setDeleteBusy(false);
+      setDeletingFileName(null);
+    }
+  };
 
   if (catalogError) {
     return (
@@ -129,6 +186,49 @@ export function MemorySettingsViewer({
         </div>
       </div>
 
+{creatingNewMemory ? (
+            <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2">
+              <input
+                data-testid="settings-memory-new-file-input"
+                autoFocus
+                value={newMemoryFileName}
+                onChange={(event) => setNewMemoryFileName(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    void handleCreateMemory();
+                  }
+                }}
+                placeholder={intl.formatMessage({
+                  id: "settings.memory.viewer.newMemoryPlaceholder",
+                })}
+                className="h-8 min-w-0 flex-1 rounded-lg border border-border bg-background px-3 text-ui-sm outline-none focus:border-focus"
+              />
+              <Button
+                type="button"
+                size="sm"
+                className="h-8"
+                disabled={creatingBusy || !newMemoryFileName.trim()}
+                onClick={() => void handleCreateMemory()}
+              >
+                {creatingBusy
+                  ? intl.formatMessage({ id: "settings.memory.viewer.creating" })
+                  : intl.formatMessage({ id: "common.save" })}
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="h-8"
+                onClick={() => {
+                  setCreatingNewMemory(false);
+                  setNewMemoryFileName("");
+                }}
+              >
+                {intl.formatMessage({ id: "common.cancel" })}
+              </Button>
+            </div>
+          ) : null}
+
       {normalizedSearchQuery && visibleFiles.length === 0 ? (
         <PluginSearchEmptyState
           label={intl.formatMessage({
@@ -149,6 +249,19 @@ export function MemorySettingsViewer({
                 id: "settings.memory.viewer.refresh",
               })}
             />
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              className="h-8"
+              onClick={() => {
+                setCreatingNewMemory((value) => !value);
+                setNewMemoryFileName("");
+              }}
+            >
+              <PlusIcon className="size-4" />
+              {intl.formatMessage({ id: "settings.memory.viewer.newMemory" })}
+            </Button>
           </div>
           <div className="overflow-hidden rounded-xl bg-surface">
             {visibleFiles.map((file, index) => (
@@ -195,6 +308,56 @@ export function MemorySettingsViewer({
                   >
                     <WorkspaceEditorButtonGroup workspaceAbsPath={file.path} />
                   </span>
+                  <AlertDialog
+                    open={deletingFileName === file.name}
+                    onOpenChange={(openValue) => {
+                      if (!openValue) {
+                        setDeletingFileName(null);
+                      }
+                    }}
+                  >
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="mr-2 size-8 shrink-0 text-foreground-subtle hover:text-destructive"
+                        onClick={() => setDeletingFileName(file.name)}
+                      >
+                        <TrashIcon className="size-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>
+                          {intl.formatMessage(
+                            { id: "settings.memory.viewer.deleteTitle" },
+                            { fileName: file.name },
+                          )}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                          {intl.formatMessage({
+                            id: "settings.memory.viewer.deleteDescription",
+                          })}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel
+                          onClick={() => setDeletingFileName(null)}
+                        >
+                          {intl.formatMessage({ id: "common.cancel" })}
+                        </AlertDialogCancel>
+                        <AlertDialogAction
+                          disabled={deleteBusy}
+                          onClick={() => void handleDeleteMemory()}
+                        >
+                          {deleteBusy
+                            ? intl.formatMessage({ id: "settings.memory.viewer.deleting" })
+                            : intl.formatMessage({ id: "common.delete" })}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </Fragment>
             ))}
