@@ -77,6 +77,10 @@ export function createDesktopPlatform(options: {
       ? (sample) => window.zcode.reportRendererHeapSample!(sample)
       : undefined,
     showTaskNotification: (payload) => window.zcode.showTaskNotification(payload),
+    queryNotificationHistory: () =>
+      window.zcode.queryNotificationHistory ? window.zcode.queryNotificationHistory() : Promise.resolve([]),
+    clearNotificationHistory: () =>
+      window.zcode.clearNotificationHistory ? window.zcode.clearNotificationHistory() : Promise.resolve(),
     syncWindowTabs: (paths) => window.zcode.syncWindowTabs(paths),
     syncWindowUnreadCount: (count) => window.zcode.syncWindowUnreadCount(count),
     syncActiveTaskSession: (sessionId) => window.zcode.syncActiveTaskSession(sessionId),

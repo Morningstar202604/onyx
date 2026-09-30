@@ -13,7 +13,11 @@ import {
   type ArmsRumEnv,
   type RemoteTarget,
 } from "@onyx/shared";
-import { dispatchTaskNotification } from "./desktopNotifications.js";
+import {
+  clearNotificationHistory,
+  dispatchTaskNotification,
+  listNotificationHistory,
+} from "./desktopNotifications.js";
 import {
   clearOAuthRoutesForWindow,
   deliverPendingDeepLink,
@@ -361,6 +365,9 @@ export function registerRemoteIpcHandlers(options: {
   ipcMain.handle(PlatformChannels.ShowTaskNotification, (event, payload: unknown) =>
     dispatchTaskNotification({ event, payload, logger: options.logger }),
   );
+
+  ipcMain.handle(PlatformChannels.NotificationHistoryQuery, () => listNotificationHistory());
+  ipcMain.handle(PlatformChannels.NotificationHistoryClear, () => clearNotificationHistory());
 
   app.on("browser-window-created", (_, win) => {
     const windowWebContentsId = win.webContents.id;

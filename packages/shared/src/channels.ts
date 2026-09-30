@@ -51,6 +51,7 @@ import type {
   RemoteSessionClosedEvent,
   SSHConfigAliasOption,
   TaskNotificationPayload,
+  NotificationHistoryEntry,
   WSLDistro,
   UpdateCheckResultPayload,
   UpdateStatePayload,
@@ -324,6 +325,10 @@ export const PlatformChannels = {
   ConfigureFinalArmsCustomEventsE2E: "zcode:e2e:configure-final-arms-custom-events",
   /** Renderer → Main：触发任务完成/失败的系统通知 */
   ShowTaskNotification: "zcode:show-task-notification",
+  /** Renderer → Main：查询本地通知历史（invoke） */
+  NotificationHistoryQuery: "zcode:notification-history-query",
+  /** Renderer → Main：清空本地通知历史（invoke） */
+  NotificationHistoryClear: "zcode:notification-history-clear",
   /** Main → Preload：通知 renderer 播放任务通知提示音 */
   TaskNotificationSound: "zcode:task-notification-sound",
   /** Main → Preload：用户点击了系统通知，携带 taskId 让 renderer 跳转到对应任务 */
@@ -934,6 +939,14 @@ export interface PlatformChannelMap {
   };
   [PlatformChannels.ShowTaskNotification]: {
     request: TaskNotificationPayload;
+    response: void;
+  };
+  [PlatformChannels.NotificationHistoryQuery]: {
+    request: void;
+    response: readonly NotificationHistoryEntry[];
+  };
+  [PlatformChannels.NotificationHistoryClear]: {
+    request: void;
     response: void;
   };
   [PlatformChannels.TaskNotificationSound]: {

@@ -33,6 +33,7 @@ import {
   navigateTaskFindSelection,
 } from "@/quickpick/taskFindNavigationState.js";
 import { createQuickPickCommands } from "@/quickpick/quickPickCommands.js";
+import { NotificationCenter } from "@/components/NotificationCenter.js";
 import { CommandCenterDialog } from "@/command-center/CommandCenterDialog.js";
 import { FeedbackHost } from "@/feedback/FeedbackHost.js";
 import { useFeedbackStore } from "@/feedback/feedbackStore.js";
@@ -1108,6 +1109,7 @@ export function App({
 
   return (
     <>
+      <NotificationCenter />
       <CommandCenterDialog
         open={isQuickPickOpen}
         commands={quickPickCommands}

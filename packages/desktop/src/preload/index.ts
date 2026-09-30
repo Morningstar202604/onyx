@@ -53,6 +53,7 @@ import type {
   OpenInEditorOptions,
   RemoteTarget,
   TaskNotificationPayload,
+  NotificationHistoryEntry,
   TelemetryRendererContext,
   RendererActionTraceBatchV1,
   RendererActionTraceConfigV1,
@@ -676,6 +677,12 @@ contextBridge.exposeInMainWorld("zcode", {
   /** 通过 main process 触发原生任务通知 */
   showTaskNotification: (payload: TaskNotificationPayload) =>
     ipcRenderer.send(PlatformChannels.ShowTaskNotification, payload),
+  /** 查询本地通知历史 */
+  queryNotificationHistory: (): Promise<readonly NotificationHistoryEntry[]> =>
+    ipcRenderer.invoke(PlatformChannels.NotificationHistoryQuery),
+  /** 清空本地通知历史 */
+  clearNotificationHistory: (): Promise<void> =>
+    ipcRenderer.invoke(PlatformChannels.NotificationHistoryClear),
   /** 导出日志：打包 ~/.onyx/v2 及外部 agent 日志为 zip 并在 Finder 中显示 */
   exportLogs: (): Promise<{
     success: boolean;

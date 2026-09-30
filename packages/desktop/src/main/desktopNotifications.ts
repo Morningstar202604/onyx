@@ -1,12 +1,111 @@
 import { app, BrowserWindow, Notification } from "electron";
 import type { IpcMainEvent, IpcMainInvokeEvent } from "electron";
-import type { TaskNotificationPayload } from "@onyx/shared";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { randomUUID } from "node:crypto";
+import { dirname, join } from "node:path";
+import type { NotificationHistoryEntry, TaskNotificationPayload } from "@onyx/shared";
 import { formatZodError, PlatformChannels, taskNotificationPayloadSchema } from "@onyx/shared";
+import { getZCodeDataRootDir } from "@onyx/services/node";
 
 const TASK_NOTIFICATION_DEDUPE_WINDOW_MS = 3000;
 const MAX_ACTIVE_TASK_NOTIFICATIONS = 100;
+const MAX_NOTIFICATION_HISTORY_ENTRIES = 200;
 const recentTaskNotificationTimestamps = new Map<string, number>();
 const activeTaskNotifications = new Set<Notification>();
+
+let notificationHistory: NotificationHistoryEntry[] | null = null;
+
+function notificationHistoryFile(): string {
+  return join(getZCodeDataRootDir(), "v2", "notifications.jsonl");
+}
+
+function loadNotificationHistory(): NotificationHistoryEntry[] {
+  if (notificationHistory) {
+    return notificationHistory;
+  }
+  const file = notificationHistoryFile();
+  const entries: NotificationHistoryEntry[] = [];
+  try {
+    if (existsSync(file)) {
+      const raw = readFileSync(file, "utf8");
+      for (const line of raw.split("\n")) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        try {
+          const parsed = JSON.parse(trimmed) as NotificationHistoryEntry;
+          if (
+            parsed &&
+            typeof parsed.id === "string" &&
+            typeof parsed.timestamp === "number" &&
+            typeof parsed.taskId === "string" &&
+            typeof parsed.title === "string" &&
+            typeof parsed.body === "string" &&
+            typeof parsed.delivered === "boolean"
+          ) {
+            entries.push(parsed);
+          }
+        } catch {
+          // 单行损坏不影响其它条目。
+        }
+      }
+    }
+  } catch (error) {
+    console.error("[notification-history] failed to load history:", error);
+  }
+  notificationHistory = entries;
+  return entries;
+}
+
+function persistNotificationHistory(entries: NotificationHistoryEntry[]): void {
+  const file = notificationHistoryFile();
+  try {
+    mkdirSync(dirname(file), { recursive: true });
+    writeFileSync(file, `${entries.map((entry) => JSON.stringify(entry)).join("\n")}\n`, "utf8");
+  } catch (error) {
+    console.error("[notification-history] failed to persist history:", error);
+  }
+}
+
+function appendNotificationHistory(
+  entry: Omit<NotificationHistoryEntry, "id" | "timestamp">,
+): void {
+  const entries = loadNotificationHistory();
+  const fullEntry: NotificationHistoryEntry = {
+    ...entry,
+    id: randomUUID(),
+    timestamp: Date.now(),
+  };
+  entries.push(fullEntry);
+  if (entries.length > MAX_NOTIFICATION_HISTORY_ENTRIES) {
+    entries.splice(0, entries.length - MAX_NOTIFICATION_HISTORY_ENTRIES);
+  }
+  try {
+    appendFileSync(notificationHistoryFile(), `${JSON.stringify(fullEntry)}\n`, "utf8");
+  } catch (error) {
+    console.error("[notification-history] failed to append history:", error);
+  }
+  // 文件增长后重写裁剪到上限（低频操作，数据量小）。
+  if (entries.length >= MAX_NOTIFICATION_HISTORY_ENTRIES) {
+    persistNotificationHistory(entries);
+  }
+}
+
+export function listNotificationHistory(): readonly NotificationHistoryEntry[] {
+  // 新到旧返回，方便 UI 直接渲染。
+  return [...loadNotificationHistory()].reverse();
+}
+
+export function clearNotificationHistory(): void {
+  notificationHistory = [];
+  try {
+    const file = notificationHistoryFile();
+    if (existsSync(file)) {
+      writeFileSync(file, "", "utf8");
+    }
+  } catch (error) {
+    console.error("[notification-history] failed to clear history:", error);
+  }
+}
 
 function isAnyAppWindowFocused() {
   return BrowserWindow.getAllWindows().some(
@@ -96,10 +195,6 @@ export function dispatchTaskNotification(options: {
     return false;
   }
 
-  if (isAnyAppWindowFocused()) {
-    return false;
-  }
-
   const { taskId, status, requestId, title, body } = result.data;
   const notificationTitle = title.trim();
   const notificationBody = body.trim();
@@ -111,6 +206,18 @@ export function dispatchTaskNotification(options: {
       status,
       hasTitle: Boolean(notificationTitle),
       hasBody: Boolean(notificationBody),
+    });
+    return false;
+  }
+
+  // 窗口聚焦时不弹系统通知，但进入通知中心历史，避免任务状态丢失。
+  if (isAnyAppWindowFocused()) {
+    appendNotificationHistory({
+      taskId,
+      status,
+      title: notificationTitle,
+      body: notificationBody,
+      delivered: false,
     });
     return false;
   }
@@ -153,6 +260,13 @@ export function dispatchTaskNotification(options: {
   });
 
   notification.show();
+  appendNotificationHistory({
+    taskId,
+    status,
+    title: notificationTitle,
+    body: notificationBody,
+    delivered: true,
+  });
   options.event.sender.send(PlatformChannels.TaskNotificationSound);
   return true;
 }

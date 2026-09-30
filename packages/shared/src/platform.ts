@@ -44,6 +44,18 @@ export interface TaskNotificationPayload {
   body: string;
 }
 
+/** 通知中心条目：本地记录一次任务通知，无论是否真正弹出系统通知。 */
+export interface NotificationHistoryEntry {
+  id: string;
+  timestamp: number;
+  taskId: string;
+  status: TaskNotificationPayload["status"];
+  title: string;
+  body: string;
+  /** 是否真正弹出了系统通知（窗口聚焦时只记录不弹出）。 */
+  delivered: boolean;
+}
+
 /** Main 将一次能够定位真实 tab 的 browser-use 操作投递给其 origin renderer。 */
 export interface BrowserViewOperationPayload {
   workspaceKey: string;
@@ -685,6 +697,12 @@ export interface IPlatformService {
 
   /** 触发任务状态对应的系统通知，由宿主环境决定是否真正展示 */
   showTaskNotification(payload: TaskNotificationPayload): void;
+
+  /** 查询本地通知历史（新到旧）。 */
+  queryNotificationHistory?(): Promise<readonly NotificationHistoryEntry[]>;
+
+  /** 清空本地通知历史。 */
+  clearNotificationHistory?(): Promise<void>;
 
   /** 通过宿主环境统一上报 UI 侧 telemetry 事件 */
   reportTelemetryEvent(payload: RendererTelemetryEventPayload): Promise<void>;
