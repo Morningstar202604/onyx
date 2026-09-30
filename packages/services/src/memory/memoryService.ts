@@ -1,9 +1,11 @@
 import {
   type IMemoryService,
   type ProjectMemoryFileSummary,
+  type ProjectMemorySearchHit,
   type ProjectMemoryWorkspaceSummary,
 } from "./memory.js";
-import { lstat, readdir, realpath, rm, writeFile } from "node:fs/promises";
+import { lstat, readdir, readFile, realpath, rm, writeFile } from "node:fs/promises";
+import type { Dirent } from "node:fs";
 import { basename, isAbsolute, join, relative, sep } from "node:path";
 import { readProjectMemoryFileFromStableHandle } from "#src/memory/projectMemoryStableRead.js";
 import { getZCodeDataRootDir } from "#src/paths.js";
@@ -283,10 +285,155 @@ export function createMemoryService(): IMemoryService {
     await rm(filePath, { force: false });
   }
 
+  async function searchProjectMemories(params: {
+    query: string;
+    workspaceId?: string;
+    limit?: number;
+  }): Promise<ProjectMemorySearchHit[]> {
+    const query = params.query.trim().toLocaleLowerCase();
+    if (query.length === 0) {
+      return [];
+    }
+    const limit = Math.max(1, Math.min(params.limit ?? 50, 200));
+
+    // 枚举 workspace：与 listProjectMemories 同口径，支持 workspaceId 限定。
+    const projectsRoot = await requireProjectMemoriesRoot();
+    let projectEntries: Dirent[];
+    try {
+      projectEntries = await readdir(projectsRoot, { withFileTypes: true });
+    } catch (error) {
+      if (isNotFoundError(error)) {
+        return [];
+      }
+      throw error;
+    }
+
+    const hits: ProjectMemorySearchHit[] = [];
+    for (const projectEntry of projectEntries) {
+      if (
+        !projectEntry.isDirectory() ||
+        projectEntry.isSymbolicLink() ||
+        (params.workspaceId !== undefined && projectEntry.name !== params.workspaceId)
+      ) {
+        continue;
+      }
+
+      const workspaceId = projectEntry.name;
+      const workspaceRoot = join(projectsRoot, workspaceId);
+      const memoryRoot = join(workspaceRoot, PROJECT_MEMORY_DIRECTORY_NAME);
+      if (!(await isPlainDirectory(workspaceRoot)) || !(await isPlainDirectory(memoryRoot))) {
+        continue;
+      }
+
+      let memoryEntries: Dirent[];
+      try {
+        memoryEntries = await readdir(memoryRoot, { withFileTypes: true });
+      } catch (error) {
+        if (isNotFoundError(error)) {
+          continue;
+        }
+        throw error;
+      }
+
+      const label = resolveWorkspaceLabel(workspaceId);
+      for (const memoryEntry of memoryEntries) {
+        if (hits.length >= limit) {
+          break;
+        }
+        if (
+          !memoryEntry.isFile() ||
+          memoryEntry.isSymbolicLink() ||
+          !isProjectMemoryFileName(memoryEntry.name)
+        ) {
+          continue;
+        }
+
+        const filePath = join(memoryRoot, memoryEntry.name);
+        let fileMetadata;
+        try {
+          fileMetadata = await lstat(filePath);
+        } catch (error) {
+          if (isNotFoundError(error)) {
+            continue;
+          }
+          throw error;
+        }
+        if (!fileMetadata.isFile() || fileMetadata.isSymbolicLink()) {
+          continue;
+        }
+
+        // 文件名命中：无需读内容。
+        if (memoryEntry.name.toLocaleLowerCase().includes(query)) {
+          hits.push({
+            workspaceId,
+            label,
+            fileName: memoryEntry.name,
+            path: filePath,
+            kind: memoryEntry.name === PROJECT_MEMORY_INDEX_FILE_NAME ? "index" : "item",
+            updatedAt: fileMetadata.mtimeMs,
+            matchedInName: true,
+          });
+          continue;
+        }
+
+        // 内容命中：防御性跳过超大文件（写入侧已限 256 KiB）。
+        if (fileMetadata.size > 1024 * 1024) {
+          continue;
+        }
+        let content: string;
+        try {
+          content = await readFile(filePath, "utf8");
+        } catch {
+          // 并发删除/不可读文件跳过，不阻断整体检索。
+          continue;
+        }
+        const lines = content.split("\n");
+        const matchedLineIndex = lines.findIndex((line) =>
+          line.toLocaleLowerCase().includes(query),
+        );
+        if (matchedLineIndex >= 0) {
+          hits.push({
+            workspaceId,
+            label,
+            fileName: memoryEntry.name,
+            path: filePath,
+            kind: memoryEntry.name === PROJECT_MEMORY_INDEX_FILE_NAME ? "index" : "item",
+            updatedAt: fileMetadata.mtimeMs,
+            matchedInName: false,
+            snippet: buildSearchSnippet(lines[matchedLineIndex] ?? "", query.length),
+            snippetLine: matchedLineIndex + 1,
+          });
+        }
+      }
+    }
+
+    // 排序：文件名命中优先，其次更新时间倒序。
+    hits.sort(
+      (left, right) =>
+        Number(left.matchedInName) - Number(right.matchedInName) ||
+        right.updatedAt - left.updatedAt ||
+        left.fileName.localeCompare(right.fileName, "en"),
+    );
+    return hits.slice(0, limit);
+  }
+
   return {
     listProjectMemories,
+    searchProjectMemories,
     readProjectMemoryFile,
     writeProjectMemoryFile,
     deleteProjectMemoryFile,
   };
+}
+
+/** 构建命中行上下文片段：命中词居中，两侧各保留约 60 字符，超长截断加省略号。 */
+function buildSearchSnippet(line: string, queryLength: number): string {
+  const normalized = line.toLocaleLowerCase();
+  const index = normalized.indexOf(normalized.slice(0, Math.max(1, queryLength)).toLocaleLowerCase());
+  const clampIndex = Math.max(0, index);
+  const start = Math.max(0, clampIndex - 60);
+  const end = Math.min(line.length, clampIndex + queryLength + 60);
+  const prefix = start > 0 ? "…" : "";
+  const suffix = end < line.length ? "…" : "";
+  return `${prefix}${line.slice(start, end).trim()}${suffix}`;
 }

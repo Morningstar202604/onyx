@@ -21,9 +21,35 @@ export interface ProjectMemoryWorkspaceSummary {
   files: ProjectMemoryFileSummary[];
 }
 
+export interface ProjectMemorySearchHit {
+  workspaceId: string;
+  label: string;
+  fileName: string;
+  path: string;
+  kind: "index" | "item";
+  updatedAt: number;
+  /** 是否因文件名匹配（未读内容）。 */
+  matchedInName: boolean;
+  /** 内容命中时：命中行上下文片段。 */
+  snippet?: string;
+  /** 内容命中时：命中行号（1 起）。 */
+  snippetLine?: number;
+}
+
+export interface ProjectMemorySearchParams {
+  query: string;
+  /** 限定单个 workspace；缺省搜索全部。 */
+  workspaceId?: string;
+  /** 最大命中数，默认 50。 */
+  limit?: number;
+}
+
 export interface IMemoryService {
   /** 列出当前本地 profile 中可查看的 Project Memory。 */
   listProjectMemories(): Promise<ProjectMemoryWorkspaceSummary[]>;
+
+  /** 全文关键词检索 Project Memory（文件名 + 内容），按命中优先级排序。 */
+  searchProjectMemories(params: ProjectMemorySearchParams): Promise<ProjectMemorySearchHit[]>;
 
   /** 原样读取一个 Project Memory Markdown 文件。 */
   readProjectMemoryFile(params: {

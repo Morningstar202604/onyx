@@ -12,7 +12,7 @@ import { SettingsGroupCard, SettingsRow } from "@/settings/SettingsPageParts.js"
 
 type MemoryCatalogService = Pick<
   IMemoryService,
-  "listProjectMemories" | "writeProjectMemoryFile" | "deleteProjectMemoryFile"
+  "listProjectMemories" | "searchProjectMemories" | "writeProjectMemoryFile" | "deleteProjectMemoryFile"
 >;
 
 function normalizeWorkspaceDisplayName(value: string): string {
@@ -218,6 +218,14 @@ export function MemorySettingsSection({
               fileName,
             });
             await handleRefresh();
+          }}
+          onSearch={async (query, workspaceId) => {
+            const result = await memoryService.searchProjectMemories({
+              query,
+              workspaceId,
+            });
+            // 内容命中即返回；文件名命中由本地即时过滤覆盖。
+            return result.filter((hit) => !hit.matchedInName);
           }}
         />
       )}

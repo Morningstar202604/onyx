@@ -1,5 +1,8 @@
 import { Fragment, useEffect, useMemo, useState } from "react";
-import type { ProjectMemoryWorkspaceSummary } from "@onyx/services";
+import type {
+  ProjectMemorySearchHit,
+  ProjectMemoryWorkspaceSummary,
+} from "@onyx/services";
 import {
   TID_SETTINGS_MEMORY_COUNT,
   TID_SETTINGS_MEMORY_FILE,
@@ -37,6 +40,8 @@ import { SettingsSearchInput } from "@/settings/SettingsSearchInput.js";
 import { SettingsResourceHeaderActions } from "@/settings/SettingsResourceHeaderActions.js";
 import { formatMemoryUpdatedAt } from "@/settings/memoryUpdatedAt.js";
 import { WorkspaceEditorButtonGroup } from "@/WorkspaceEditorButtonGroup.js";
+import { MemoryContentHitList } from "@/settings/MemoryContentHitList.js";
+import { useMemoryContentSearch } from "@/settings/useMemoryContentSearch.js";
 
 export type MemoryViewerLoadingState = "idle" | "loading" | "ready" | "error";
 
@@ -49,6 +54,7 @@ export function MemorySettingsViewer({
   onScopeKeyChange,
   onWriteFile,
   onDeleteFile,
+  onSearch,
 }: {
   catalogError: string | null;
   catalogState: MemoryViewerLoadingState;
@@ -58,9 +64,18 @@ export function MemorySettingsViewer({
   onScopeKeyChange: (workspaceId: string) => void;
   onWriteFile: (fileName: string, content: string) => Promise<void>;
   onDeleteFile: (fileName: string) => Promise<void>;
+  onSearch?: (
+    query: string,
+    workspaceId: string,
+  ) => Promise<ProjectMemorySearchHit[]>;
 }) {
   const { intl, locale } = useZCodeIntl();
   const [searchQuery, setSearchQuery] = useState("");
+  const { contentHits, searching } = useMemoryContentSearch(
+    searchQuery,
+    selectedWorkspace?.id,
+    onSearch,
+  );
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     const interval = window.setInterval(() => setNow(Date.now()), 60_000);
@@ -237,6 +252,12 @@ export function MemorySettingsViewer({
         />
       ) : (
         <>
+          {contentHits.length > 0 ? <MemoryContentHitList hits={contentHits} /> : null}
+          {searching ? (
+            <div className="px-4 py-2 text-ui-sm text-foreground-subtle">
+              {intl.formatMessage({ id: "settings.memory.viewer.searching" })}
+            </div>
+          ) : null}
           <div className="flex min-h-7 flex-wrap items-center justify-between gap-3">
             <h3 className="text-ui-base font-medium text-foreground">
               {intl.formatMessage({ id: "settings.memory.viewer.files" })}
