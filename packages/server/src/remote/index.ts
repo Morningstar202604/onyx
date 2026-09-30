@@ -7,6 +7,11 @@ export type {
 } from "./backend.js";
 export { createRemoteBackend } from "./create-backend.js";
 export {
+  diagnoseRemoteConnection,
+  type RemoteDiagnosticResult,
+  type RemoteDiagnosticStep,
+} from "./diagnose.js";
+export {
   connectRemote,
   pickRemoteRuntimeEnv,
   type ConnectOptions,

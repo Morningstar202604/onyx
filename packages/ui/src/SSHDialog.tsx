@@ -45,6 +45,8 @@ import type { VariantProps } from "class-variance-authority";
 
 interface RemoteConnectionDialogProps {
   onConnect: (options: RemoteTarget, requestId?: string) => Promise<string>;
+  /** 连接诊断（可选）：分步探测目标环境，不建立会话 */
+  onDiagnose?: (target: RemoteTarget) => Promise<{ success: boolean; error?: string; result?: unknown }>;
   onSelectProject: (sessionId: string, path: string, localWorkspacePath?: string) => Promise<void>;
   onCancelSession: (sessionId: string) => Promise<void>;
   localWorkspacePath?: string;
@@ -65,6 +67,7 @@ interface RemoteConnectionDialogProps {
 
 export function RemoteConnectionDialog({
   onConnect,
+  onDiagnose,
   onSelectProject,
   onCancelSession,
   localWorkspacePath,
@@ -92,6 +95,12 @@ export function RemoteConnectionDialog({
   const [currentStep, setCurrentStep] = useState<RemoteWizardStep>("kind");
   const [connectedSessionId, setConnectedSessionId] = useState<string | null>(null);
   const [connectingRequestId, setConnectingRequestId] = useState<string | null>(null);
+  const [diagnosing, setDiagnosing] = useState(false);
+  const [diagnoseResult, setDiagnoseResult] = useState<{
+    ok: boolean;
+    error?: string;
+    steps?: Array<{ name: string; ok: boolean; detail: string; durationMs: number }>;
+  } | null>(null);
   const [pendingRemoteTarget, setPendingRemoteTarget] = useState<RemoteTarget | null>(null);
   const [selectingDirectory, setSelectingDirectory] = useState(false);
   const selectingDirectoryRef = useRef(false);
@@ -339,6 +348,56 @@ export function RemoteConnectionDialog({
     await startRemoteConnection(nextTarget);
   };
 
+  const handleDiagnose = async () => {
+    if (!onDiagnose || diagnosing) {
+      return;
+    }
+    const { target: nextTarget, errorMessage } = buildRemoteTarget(intl, {
+      kind,
+      host,
+      port,
+      username,
+      sshAuthMethod,
+      assetInstallMode,
+      password,
+      privateKeyPath,
+      privateKeyPassphrase,
+      selectedSshConfigAlias,
+      wslDistro,
+      wslUser,
+      dockerContainer,
+      manualDockerContainer,
+    });
+    if (!nextTarget) {
+      setValidationMessage(errorMessage ?? "Diagnose failed");
+      return;
+    }
+    setDiagnosing(true);
+    setDiagnoseResult(null);
+    try {
+      const response = await onDiagnose(nextTarget);
+      if (!response?.success) {
+        setDiagnoseResult({ ok: false, error: response?.error ?? "诊断失败" });
+        return;
+      }
+      const result = response.result as {
+        ok?: boolean;
+        steps?: Array<{ name: string; ok: boolean; detail: string; durationMs: number }>;
+      };
+      setDiagnoseResult({
+        ok: result?.ok ?? false,
+        steps: result?.steps,
+      });
+    } catch (diagnoseError) {
+      setDiagnoseResult({
+        ok: false,
+        error: getErrorMessage(diagnoseError),
+      });
+    } finally {
+      setDiagnosing(false);
+    }
+  };
+
   const handleStartPendingRemoteConnection = useCallback(() => {
     if (!pendingRemoteTarget) {
       void handleConnect();
@@ -557,6 +616,9 @@ export function RemoteConnectionDialog({
                     onConnect={() => {
                       void handleConnect();
                     }}
+                    onDiagnose={onDiagnose ? handleDiagnose : undefined}
+                    diagnosing={diagnosing}
+                    diagnoseResult={diagnoseResult ?? undefined}
                   />
                 ) : null}
 

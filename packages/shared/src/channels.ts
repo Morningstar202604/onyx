@@ -184,6 +184,8 @@ export const PlatformChannels = {
   BindRemoteWorkspaceSessionContext: "zcode:bind-remote-workspace-session-context",
   /** 释放当前窗口里的远程 session */
   DisposeRemoteSession: "zcode:dispose-remote-session",
+  /** Renderer → Main：对远程目标执行连接诊断（分步探测，不建立会话） */
+  DiagnoseRemote: "zcode:diagnose-remote",
   /** Renderer → Main：检查本机 Docker daemon 是否可用 */
   IsDockerAvailable: "zcode:is-docker-available",
   /** Renderer → Main：列出本机可用的 WSL 发行版 */
@@ -505,6 +507,8 @@ export const HostMessageTypes = {
   InitLocal: "init-local",
   /** main → window Host：在当前窗口建立一个远程 logical session */
   ConnectRemoteWorkspace: "connect-remote-workspace",
+  /** main → window Host：对目标执行远程连接诊断（分步探测，不建立会话） */
+  DiagnoseRemoteWorkspace: "diagnose-remote-workspace",
   /** main → window Host：取消尚未完成的远程连接 */
   CancelRemoteWorkspaceConnect: "cancel-remote-workspace-connect",
   /** main → window Host：为 logical session 绑定 canonical workspace 身份 */
@@ -569,6 +573,10 @@ export const HostResponseTypes = {
   RemoteWorkspaceConnectFailed: "remote-workspace-connect-failed",
   /** window Host → main：已连接的远程 logical session 关闭 */
   RemoteWorkspaceClosed: "remote-workspace-closed",
+  /** window Host → main：意外断连后自动重连成功，session 恢复 online */
+  RemoteWorkspaceReconnected: "remote-workspace-reconnected",
+  /** window Host → main：远程连接诊断结果 */
+  RemoteWorkspaceDiagnoseResult: "remote-workspace-diagnose-result",
   /** host 进程日志上报 */
   Log: "log",
   /** host 内拉起新的 agent 子进程 */

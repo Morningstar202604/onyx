@@ -264,6 +264,8 @@ contextBridge.exposeInMainWorld("zcode", {
     ipcRenderer.invoke(PlatformChannels.CancelPendingRemoteConnection, {
       requestId,
     }),
+  diagnoseRemote: (target: RemoteTarget): Promise<unknown> =>
+    ipcRenderer.invoke(PlatformChannels.DiagnoseRemote, target),
   bindRemoteWorkspaceSessionContext: (context: {
     remoteSessionId: string;
     workspacePath: string;

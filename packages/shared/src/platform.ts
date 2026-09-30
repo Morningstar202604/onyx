@@ -604,6 +604,11 @@ export interface IPlatformService {
   /** 取消当前窗口尚未建立完成的远程连接（可选：Web 平台可忽略） */
   cancelPendingRemoteConnection?(requestId?: string): Promise<void>;
 
+  /** 对远程目标执行连接诊断（分步探测，不建立会话）；Web 平台可不实现 */
+  diagnoseRemote?(
+    target: RemoteTarget,
+  ): Promise<{ success: boolean; error?: string; result?: unknown }>;
+
   /** 将 canonical workspace 身份绑定到已创建的远程 logical session。 */
   bindRemoteWorkspaceSessionContext?(
     context: BindRemoteWorkspaceSessionContextRequest,

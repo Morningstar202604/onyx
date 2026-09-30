@@ -1727,6 +1727,8 @@ const enUS: Record<string, string> = {
   "remote.connecting": "Connecting...",
   "remote.minimize": "Minimize remote connection window",
   "remote.startConnection": "Start connection",
+  "remote.diagnose": "Diagnose connection",
+  "remote.diagnosing": "Diagnosing…",
   "remote.retryConnection": "Retry connection",
   "remote.connectingHint": "Connecting with {method}.",
   "remote.connectionLog": "Connection log",

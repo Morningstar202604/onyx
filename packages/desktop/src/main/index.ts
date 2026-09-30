@@ -2174,6 +2174,7 @@ app.whenReady().then(async () => {
     },
     finalArmsCustomEventE2EEnabled: shouldEnableE2ETestBridge(process.env),
     createRemoteWorkspaceSession: remoteSessionManager.createRemoteWorkspaceSession,
+    diagnoseRemoteWorkspace: remoteSessionManager.diagnoseRemoteWorkspace,
     getRemoteConnectionStats: remoteSessionManager.getRemoteConnectionStats,
     disposeRemoteWorkspaceSession: remoteSessionManager.disposeRemoteWorkspaceSession,
     cancelPendingRemoteWorkspaceSessionsForWindow:

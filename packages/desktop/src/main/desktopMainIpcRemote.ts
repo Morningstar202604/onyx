@@ -169,6 +169,7 @@ export function registerRemoteIpcHandlers(options: {
     context?: { workspacePath: string; workspaceIdentity?: string },
     lifecycle?: { remoteUsageTelemetryEligible?: boolean },
   ) => Promise<string>;
+  diagnoseRemoteWorkspace: (win: BrowserWindow, target: RemoteTarget) => Promise<unknown>;
   getRemoteConnectionStats: () => RemoteConnectionStats;
   disposeRemoteWorkspaceSession: (
     sessionId: string,
@@ -377,6 +378,29 @@ export function registerRemoteIpcHandlers(options: {
       // 提前缓存 id 后再做清理，避免访问已经销毁的对象。
       clearOAuthRoutesForWindow(windowWebContentsId);
     });
+  });
+
+  ipcMain.handle(PlatformChannels.DiagnoseRemote, async (event, rawPayload: unknown) => {
+    const result = remoteTargetSchema.safeParse(rawPayload);
+    if (!result.success) {
+      const error = `Invalid diagnose-remote payload: ${formatZodError(result.error)}`;
+      options.logger.warn("[diagnose-remote]", error);
+      return { success: false, error };
+    }
+    try {
+      const win = BrowserWindow.fromWebContents(event.sender);
+      if (!win) {
+        throw new Error("未找到当前窗口，无法执行远程连接诊断");
+      }
+      const diagnose = await options.diagnoseRemoteWorkspace(win, result.data);
+      return { success: true, result: diagnose };
+    } catch (error) {
+      options.logger.warn("[diagnose-remote]", error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
   });
 
   ipcMain.handle(PlatformChannels.ConnectRemote, async (event, rawPayload: unknown) => {

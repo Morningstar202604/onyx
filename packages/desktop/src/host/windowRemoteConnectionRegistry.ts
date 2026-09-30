@@ -35,6 +35,11 @@ interface WindowRemoteConnectionConnectRequest {
 
 type WindowRemoteConnectionState = "connecting" | "online" | "closing" | "failed" | "disconnected";
 
+/** 自动重连：指数退避（1s → 2s → …上限 30s），无限重试直至用户主动断开。 */
+const RECONNECT_BASE_DELAY_MS = 1_000;
+const RECONNECT_MAX_DELAY_MS = 30_000;
+const RECONNECT_BACKOFF_FACTOR = 2;
+
 interface WindowRemoteLogicalSessionSnapshot {
   remoteSessionId: string;
   requestId: string;
@@ -63,6 +68,7 @@ class WindowRemoteConnectionUnavailableError extends Error {
 interface ConnectionEntry<TServices, TCapabilities> {
   key: string;
   target: RemoteTarget;
+  remoteAssets: WindowRemoteAssetDirs;
   state: WindowRemoteConnectionState;
   abortController: AbortController;
   sessions: Set<string>;
@@ -76,6 +82,9 @@ interface ConnectionEntry<TServices, TCapabilities> {
   workspaceKeys: Set<string>;
   runningTaskCountByWorkspaceKey: Map<string, number>;
   workspaceRuntimeByKey: Map<string, WorkspaceRuntimeState>;
+  reconnectTimer?: ReturnType<typeof setTimeout>;
+  reconnectAttempt: number;
+  reconnectInFlight: boolean;
 }
 
 interface RemoteWorkspaceContext {
@@ -146,6 +155,8 @@ export function createWindowRemoteConnectionRegistry<TServices, TCapabilities = 
   ) => Promise<WindowRemoteConnectionHandle<TServices, TCapabilities>>;
   createId: () => string;
   onSessionClosed?: (event: WindowRemoteConnectionCloseEvent & { remoteSessionId: string }) => void;
+  /** 自动重连成功（连接恢复、sessions 回到 online）后回调，供上层刷新状态。 */
+  onSessionReconnected?: (event: { remoteSessionId: string }) => void;
   releaseWorkspace?: (services: TServices, context: RemoteWorkspaceContext) => Promise<void>;
   onWorkspaceReleaseError?: (context: RemoteWorkspaceContext, error: unknown) => void;
   wslIdleTtlMs?: number;
@@ -344,12 +355,107 @@ export function createWindowRemoteConnectionRegistry<TServices, TCapabilities = 
     }, wslIdleTtlMs);
   }
 
+  function clearReconnectTimer(entry: ConnectionEntry<TServices, TCapabilities>): void {
+    if (!entry.reconnectTimer) {
+      return;
+    }
+    clearTimeout(entry.reconnectTimer);
+    entry.reconnectTimer = undefined;
+  }
+
+  /** 仅对 SSH/WSL 复用型连接自动重连；Docker 是 dedicated logical session，断连即失效。 */
+  function shouldAutoReconnect(entry: ConnectionEntry<TServices, TCapabilities>): boolean {
+    return entry.target.kind === "ssh" || entry.target.kind === "wsl";
+  }
+
+  /**
+   * 意外断连后按指数退避自动重建连接，并把原有 logical sessions 迁移到新连接。
+   * 只在以下条件全部满足时继续：未主动 dispose、仍有 sessions 在等待、key 上仍是本 entry。
+   */
+  function scheduleReconnect(entry: ConnectionEntry<TServices, TCapabilities>): void {
+    if (!shouldAutoReconnect(entry) || entry.disposed || entry.state === "closing") {
+      return;
+    }
+    if (entry.sessions.size === 0) {
+      return;
+    }
+    clearReconnectTimer(entry);
+    const delay = Math.min(
+      RECONNECT_BASE_DELAY_MS * RECONNECT_BACKOFF_FACTOR ** entry.reconnectAttempt,
+      RECONNECT_MAX_DELAY_MS,
+    );
+    entry.reconnectAttempt += 1;
+    entry.reconnectTimer = setTimeout(() => {
+      entry.reconnectTimer = undefined;
+      void reconnectEntry(entry);
+    }, delay);
+  }
+
+  async function reconnectEntry(entry: ConnectionEntry<TServices, TCapabilities>): Promise<void> {
+    if (
+      entry.disposed ||
+      entry.state === "closing" ||
+      entry.sessions.size === 0 ||
+      entry.reconnectInFlight
+    ) {
+      return;
+    }
+    // 用户手动触发的新连接已占住同 key：放弃自动重连，避免双连接竞争。
+    // 断连后旧 entry 已从复用表删除（undefined 即"无人占 key"），允许自己重建。
+    const current = entriesByKey.get(entry.key);
+    if (current !== undefined && current !== entry) {
+      return;
+    }
+    entry.reconnectInFlight = true;
+    try {
+      const newEntry = createEntry({
+        key: entry.key,
+        target: entry.target,
+        remoteAssets: entry.remoteAssets,
+      });
+      // 迁移 logical sessions 到新 entry；sessions 断连后仍在 sessionsById 中，
+      // 复用同一批 remoteSessionId 即可让上层 attachment scope 无需变化。
+      for (const remoteSessionId of Array.from(entry.sessions)) {
+        const session = sessionsById.get(remoteSessionId);
+        if (!session || session.cancelled) {
+          continue;
+        }
+        session.entry = newEntry;
+        newEntry.sessions.add(remoteSessionId);
+        session.state = "connecting";
+        session.sourceAvailability = "offline";
+      }
+      entry.sessions.clear();
+      await newEntry.ready;
+      for (const remoteSessionId of Array.from(newEntry.sessions)) {
+        const session = sessionsById.get(remoteSessionId);
+        if (!session || session.cancelled || session.entry !== newEntry) {
+          continue;
+        }
+        session.state = "online";
+        session.sourceAvailability = "online";
+        options.onSessionReconnected?.({ remoteSessionId });
+      }
+      entry.reconnectAttempt = 0;
+    } catch (error) {
+      // connect 阶段失败（认证/网络/部署）不触发无限重试风暴；已建立的断连重连
+      // 由 handleConnectionClosed 走 scheduleReconnect。这里仅记录并保持 disconnected。
+      console.warn(
+        "[remote-connection] auto reconnect failed, remaining disconnected:",
+        error instanceof Error ? error.message : String(error),
+      );
+    } finally {
+      entry.reconnectInFlight = false;
+    }
+  }
+
   async function disposeEntry(entry: ConnectionEntry<TServices, TCapabilities>): Promise<void> {
     if (entry.disposePromise) {
       return entry.disposePromise;
     }
     entry.disposed = true;
     clearIdleTimer(entry);
+    clearReconnectTimer(entry);
     entry.state = "closing";
     entry.abortController.abort();
     entry.closeSubscription?.dispose();
@@ -382,6 +488,8 @@ export function createWindowRemoteConnectionRegistry<TServices, TCapabilities = 
       session.sourceAvailability = "offline";
       options.onSessionClosed?.({ remoteSessionId, ...event });
     }
+    // 意外断连（SSH/WSL）：退避自动重连，任务状态不因网络抖动丢失。
+    scheduleReconnect(entry);
   }
 
   function createEntry(params: {
@@ -393,6 +501,7 @@ export function createWindowRemoteConnectionRegistry<TServices, TCapabilities = 
     const entry: ConnectionEntry<TServices, TCapabilities> = {
       key: params.key,
       target: params.target,
+      remoteAssets: params.remoteAssets,
       state: "connecting" as const,
       abortController,
       sessions: new Set<string>(),
@@ -402,6 +511,8 @@ export function createWindowRemoteConnectionRegistry<TServices, TCapabilities = 
       workspaceKeys: new Set(),
       runningTaskCountByWorkspaceKey: new Map(),
       workspaceRuntimeByKey: new Map(),
+      reconnectAttempt: 0,
+      reconnectInFlight: false,
     };
     entry.ready = options
       .connect({
@@ -591,6 +702,8 @@ export function createWindowRemoteConnectionRegistry<TServices, TCapabilities = 
         void disposeEntry(session.entry);
       }
     }
+    // 最后一个 logical session 取消后，等待自动重连已无意义：取消排队的重连定时器。
+    clearReconnectTimer(session.entry);
   }
 
   function bindWorkspaceContext(params: {

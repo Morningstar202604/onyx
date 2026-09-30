@@ -163,6 +163,11 @@ export function createRemoteWorkspaceSessionManager(options: {
   const pendingByRequestKey = new Map<string, PendingConnect>();
   const routesBySessionId = new Map<string, RemoteAttachmentRoute>();
   const listenedHosts = new WeakSet<ElectronUtilityProcess>();
+  const pendingDiagnoseByRequestKey = new Map<string, {
+    webContentsId: number;
+    resolve: (result: unknown) => void;
+    reject: (error: Error) => void;
+  }>();
   const reconnectsByWorkspaceKey = new Map<string, Promise<string>>();
   const pendingProviderProvisioningExecutions = new Map<
     string,
@@ -636,6 +641,20 @@ export function createRemoteWorkspaceSessionManager(options: {
         pending.reject(new Error(parsed.data.error));
         return;
       }
+      if (parsed.data.type === HostResponseTypes.RemoteWorkspaceDiagnoseResult) {
+        const key = requestKey(webContentsId, parsed.data.requestId);
+        const pending = pendingDiagnoseByRequestKey.get(key);
+        if (!pending) return;
+        pendingDiagnoseByRequestKey.delete(key);
+        if (parsed.data.ok) {
+          pending.resolve(parsed.data);
+        } else {
+          pending.reject(
+            new Error(parsed.data.error || "远程连接诊断失败"),
+          );
+        }
+        return;
+      }
       if (parsed.data.type === HostResponseTypes.RemoteWorkspaceClosed) {
         handleClosed(webContentsId, parsed.data);
       }
@@ -650,6 +669,12 @@ export function createRemoteWorkspaceSessionManager(options: {
       for (const [key, pending] of Array.from(pendingByRequestKey)) {
         if (pending.webContentsId === webContentsId) {
           pendingByRequestKey.delete(key);
+          pending.reject(error);
+        }
+      }
+      for (const [key, pending] of Array.from(pendingDiagnoseByRequestKey)) {
+        if (pending.webContentsId === webContentsId) {
+          pendingDiagnoseByRequestKey.delete(key);
           pending.reject(error);
         }
       }
@@ -716,6 +741,30 @@ export function createRemoteWorkspaceSessionManager(options: {
         remoteAssets: options.resolveRemoteAssetDirs(),
         ...(context?.workspacePath ? { workspacePath: context.workspacePath } : {}),
         ...(context?.workspaceIdentity ? { workspaceIdentity: context.workspaceIdentity } : {}),
+      });
+    });
+  }
+
+  async function diagnoseRemoteWorkspace(
+    win: BrowserWindow,
+    target: RemoteTarget,
+  ): Promise<unknown> {
+    if (appShutdownStarted) {
+      throw new Error("应用正在退出，无法执行远程连接诊断");
+    }
+    const child = getWindowHost(win);
+    const requestId = randomUUID();
+    const key = requestKey(win.webContents.id, requestId);
+    return new Promise<unknown>((resolve, reject) => {
+      pendingDiagnoseByRequestKey.set(key, {
+        webContentsId: win.webContents.id,
+        resolve,
+        reject,
+      });
+      child.postMessage({
+        type: HostMessageTypes.DiagnoseRemoteWorkspace,
+        requestId,
+        target,
       });
     });
   }
@@ -999,6 +1048,7 @@ export function createRemoteWorkspaceSessionManager(options: {
 
   return {
     createRemoteWorkspaceSession,
+    diagnoseRemoteWorkspace,
     attachRemoteWorkspaceSessionHost,
     reconnectBotRemoteWorkspaceSession,
     bindRemoteWorkspaceSessionContext,

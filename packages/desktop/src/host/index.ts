@@ -1779,6 +1779,15 @@ const windowRemoteConnectionRegistry = createWindowRemoteConnectionRegistry<
       error,
     );
   },
+  onSessionReconnected: (event) => {
+    logger.info(
+      `remote session auto-reconnected, remoteSessionId=${event.remoteSessionId}`,
+    );
+    parentPort?.postMessage({
+      type: HostResponseTypes.RemoteWorkspaceReconnected,
+      remoteSessionId: event.remoteSessionId,
+    });
+  },
   onSessionClosed: (event) => {
     // logical session 已离线时 attachment 仍持有旧 services/订阅；后续 sessionId
     // 换代只释放 transport，无法按旧 ID 找回这些端口。Host 在失效源头统一关闭所有 clientMode。
@@ -2553,6 +2562,34 @@ parentPort.on("message", async (e: Electron.MessageEvent) => {
           error: error instanceof Error ? error.message : String(error),
         });
       });
+    return;
+  }
+
+  if (msg.type === HostMessageTypes.DiagnoseRemoteWorkspace) {
+    logger.info(
+      `diagnosing remote workspace, requestId=${msg.requestId}, target=${formatRemoteTargetForLog(msg.target)}`,
+    );
+    void (async () => {
+      // 与连接路径一致：延迟加载 remote 模块，避免 ssh2 依赖链进入 host 启动路径。
+      const { diagnoseRemoteConnection } = await import("@onyx/server/remote");
+      try {
+        const result = await diagnoseRemoteConnection(msg.target);
+        parentPort?.postMessage({
+          type: HostResponseTypes.RemoteWorkspaceDiagnoseResult,
+          requestId: msg.requestId,
+          ok: result.ok,
+          targetKind: result.targetKind,
+          steps: result.steps,
+        });
+      } catch (error) {
+        parentPort?.postMessage({
+          type: HostResponseTypes.RemoteWorkspaceDiagnoseResult,
+          requestId: msg.requestId,
+          ok: false,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    })();
     return;
   }
 

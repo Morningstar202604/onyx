@@ -14,6 +14,7 @@ import type {
 } from "@onyx/services";
 import {
   AlertTriangleIcon,
+  CheckIcon,
   ChevronRightIcon,
   LoaderIcon,
   MonitorCogIcon,
@@ -167,6 +168,9 @@ export function RemoteConnectionSettingsStep({
   onApplySshConfigAlias,
   onClearSelectedSshConfigAlias,
   onConnect,
+  onDiagnose,
+  diagnosing = false,
+  diagnoseResult,
 }: {
   kind: RemoteTarget["kind"];
   host: string;
@@ -210,6 +214,14 @@ export function RemoteConnectionSettingsStep({
   onApplySshConfigAlias: (value: SSHConfigAliasOption) => void;
   onClearSelectedSshConfigAlias: () => void;
   onConnect: () => void;
+  /** 连接诊断（可选）：分步探测目标环境，不建立会话 */
+  onDiagnose?: () => void;
+  diagnosing?: boolean;
+  diagnoseResult?: {
+    ok: boolean;
+    error?: string;
+    steps?: Array<{ name: string; ok: boolean; detail: string; durationMs: number }>;
+  };
 }) {
   const { intl } = useZCodeIntl();
 
@@ -270,6 +282,46 @@ export function RemoteConnectionSettingsStep({
       </div>
 
       <div className="flex items-center justify-end gap-3">
+        {diagnoseResult ? (
+          <div
+            data-testid="remote-diagnose-result"
+            className={
+              diagnoseResult.ok
+                ? "flex-1 min-w-0 rounded-2xl border border-success bg-success px-4 py-3"
+                : "flex-1 min-w-0 rounded-2xl border border-warning bg-warning px-4 py-3"
+            }
+          >
+            <div className="flex items-start gap-2">
+              {diagnoseResult.ok ? (
+                <CheckIcon className="mt-0.5 size-4 shrink-0 text-success" />
+              ) : (
+                <AlertTriangleIcon className="mt-0.5 size-4 shrink-0 text-warning" />
+              )}
+              <div className="min-w-0 space-y-1 text-ui-base">
+                {diagnoseResult.steps?.map((step) => (
+                  <div key={step.name} className="flex items-start gap-2">
+                    <span
+                      className={
+                        step.ok
+                          ? "shrink-0 text-success-foreground"
+                          : "shrink-0 text-warning-foreground"
+                      }
+                    >
+                      {step.ok ? "✓" : "✗"}
+                    </span>
+                    <span className="min-w-0">
+                      {step.name}
+                      <span className="opacity-70">：{step.detail}</span>
+                    </span>
+                  </div>
+                ))}
+                {diagnoseResult.error ? (
+                  <div className="text-warning-foreground">{diagnoseResult.error}</div>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        ) : null}
         {validationMessage ? (
           <div className="flex flex-1 min-w-0 items-center gap-2">
             <AlertTriangleIcon className="size-4 shrink-0 text-warning" />
@@ -277,6 +329,25 @@ export function RemoteConnectionSettingsStep({
           </div>
         ) : null}
         <div className="flex shrink-0 justify-end gap-3">
+          {onDiagnose ? (
+            <Button
+              type="button"
+              variant="secondary"
+              size="lg"
+              className="h-10 min-w-0 px-5"
+              onClick={onDiagnose}
+              disabled={loading || diagnosing}
+            >
+              {diagnosing ? (
+                <>
+                  <LoaderIcon className="size-4 animate-spin" />
+                  {intl.formatMessage({ id: "remote.diagnosing" })}
+                </>
+              ) : (
+                intl.formatMessage({ id: "remote.diagnose" })
+              )}
+            </Button>
+          ) : null}
           <Button
             type="button"
             variant="secondary"

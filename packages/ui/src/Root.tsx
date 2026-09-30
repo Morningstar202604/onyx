@@ -754,6 +754,7 @@ function RootInner({
   const remoteConnectionDialog = allowRemoteWorkspace ? (
     <SSHDialog
       onConnect={handleConnectRemote}
+      onDiagnose={platform.diagnoseRemote ? (target) => platform.diagnoseRemote!(target) : undefined}
       onSelectProject={handleSelectRemoteProject}
       onCancelSession={handleCancelRemoteProject}
       localWorkspacePath={localWorkspacePathForRemoteConnection}

@@ -1609,6 +1609,8 @@ const zhCN: Record<string, string> = {
   "remote.connecting": "正在连接...",
   "remote.minimize": "收起远程连接窗口",
   "remote.startConnection": "开始连接",
+  "remote.diagnose": "诊断连接",
+  "remote.diagnosing": "诊断中…",
   "remote.retryConnection": "重新连接",
   "remote.connectingHint": "正在通过 {method} 建立连接。",
   "remote.connectionLog": "连接日志",

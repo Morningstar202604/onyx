@@ -235,6 +235,14 @@ export const hostCancelRemoteWorkspaceConnectMessageSchema = z
   })
   .strict();
 
+export const hostDiagnoseRemoteWorkspaceMessageSchema = z
+  .object({
+    type: z.literal("diagnose-remote-workspace"),
+    requestId: nonEmptyStringSchema,
+    target: remoteTargetSchema,
+  })
+  .strict();
+
 export const hostBindRemoteWorkspaceContextMessageSchema = z
   .object({
     type: z.literal("bind-remote-workspace-context"),
@@ -474,6 +482,7 @@ export const hostIncomingMessageSchema = z.discriminatedUnion("type", [
     .strict(),
   hostInitLocalMessageSchema,
   hostConnectRemoteWorkspaceMessageSchema,
+  hostDiagnoseRemoteWorkspaceMessageSchema,
   hostCancelRemoteWorkspaceConnectMessageSchema,
   hostBindRemoteWorkspaceContextMessageSchema,
   hostDisposeRemoteWorkspaceSessionMessageSchema,
