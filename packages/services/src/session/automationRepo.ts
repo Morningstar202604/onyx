@@ -1037,10 +1037,10 @@ export class AutomationRepo {
       /** transient 达上限后，循环任务的下一个正常 next_run_at（调用方重算）。 */
       nextRunAt?: number | null;
     },
-  ): Promise<void> {
+  ): Promise<boolean> {
     await this.ensureReady();
     const row = this.getRow(automationId);
-    if (!row) return;
+    if (!row) return false;
     const db = this.getDatabase();
     const now = options.failedAt;
     if (options.kind === "permanent") {
@@ -1051,7 +1051,7 @@ export class AutomationRepo {
             last_error = @error, updated_at = @now
         WHERE automation_id = @id`,
       ).run({ id: automationId, error: options.error, now });
-      return;
+      return true;
     }
     const attempts = row.dispatch_attempts + 1;
     if (attempts >= DISPATCH_MAX_ATTEMPTS) {
@@ -1078,7 +1078,7 @@ export class AutomationRepo {
           WHERE automation_id = @id`,
         ).run({ id: automationId, error: options.error, now });
       }
-      return;
+      return true;
     }
     // 未达上限：写退避 retry_at，复位 running 等下轮重认领。
     db.prepare(
@@ -1094,6 +1094,7 @@ export class AutomationRepo {
       error: options.error,
       now,
     });
+    return false;
   }
 
   /** 关机/退出时释放认领：清 running、保留 next_run_at，不记失败不推进。 */

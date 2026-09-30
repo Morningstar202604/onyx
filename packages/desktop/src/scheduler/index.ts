@@ -358,13 +358,22 @@ async function settleDispatchResult(
   }
   const kind = msg.failureKind ?? "transient";
   const automation = await repo.get(automationId);
-  await repo.markDispatchFailed(automationId, {
+  const exhausted = await repo.markDispatchFailed(automationId, {
     failedAt: now,
     error: msg.error ?? "dispatch failed",
     kind,
     // transient 达上限后循环任务跳下一个正常 next_run_at。
     nextRunAt: automation ? computeAutomationNextRunAt(automation, now) : null,
   });
+  if (exhausted) {
+    parentPort?.postMessage({
+      type: "scheduler-dispatch-alert",
+      automationId,
+      title: automation?.title ?? automationId,
+      error: msg.error ?? "dispatch failed",
+      permanent: kind === "permanent",
+    });
+  }
   void notifyWebhookRunResult(automation, msg.runId, false, log, null, msg.error ?? "dispatch failed").catch(
     () => {},
   );

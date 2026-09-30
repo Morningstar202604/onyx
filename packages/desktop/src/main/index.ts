@@ -39,6 +39,7 @@ import {
   ipcMain,
   nativeImage,
   net,
+  Notification,
   protocol,
   session,
   webContents,
@@ -1961,6 +1962,14 @@ app.whenReady().then(async () => {
         resolveDispatchHost: resolveCronDispatchHost,
         // keep-awake 已改为纯设置驱动；计数上报保留给后续诊断/配额用途，不再联动 blocker。
         onOffPeakActiveCountChanged: () => {},
+        // 派发失败达上限/永久失败：弹系统通知提醒用户任务已放弃。
+        notifyDispatchAlert: ({ title, error, permanent }) => {
+          if (!Notification.isSupported()) return;
+          new Notification({
+            title: "Onyx 自动化",
+            body: `${title}${permanent ? " 已失败" : " 连续重试失败已放弃"}：${error}`,
+          }).show();
+        },
       });
     } catch (error) {
       logger.error("[cron-scheduler] failed to spawn scheduler process:", error);

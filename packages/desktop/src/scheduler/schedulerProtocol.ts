@@ -46,6 +46,14 @@ export type SchedulerToMainMessage =
       // main 只取其中的 heap 作 scheduler 角色事件的 heap 维度，CPU 与 RSS 仍以 getAppMetrics 为准。
       type: "scheduler-resource-sample";
       sample: NodeSelfResourceSample;
+    }
+  | {
+      // 调度派发失败达上限 / 永久失败：提醒用户任务已放弃（失败重试告警）。
+      type: "scheduler-dispatch-alert";
+      automationId: string;
+      title: string;
+      error: string;
+      permanent: boolean;
     };
 
 /** main → scheduler */

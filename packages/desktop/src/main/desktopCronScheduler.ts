@@ -42,6 +42,13 @@ interface CronSchedulerDeps {
   resolveDispatchHost: () => ElectronUtilityProcess | null;
   /** 闲时任务执行中计数变化（keep-awake：main 据此 + 设置切 powerSaveBlocker）。 */
   onOffPeakActiveCountChanged?: (count: number) => void;
+  /** 派发失败达上限/永久失败时弹系统通知（失败重试告警）。 */
+  notifyDispatchAlert?: (payload: {
+    automationId: string;
+    title: string;
+    error: string;
+    permanent: boolean;
+  }) => void;
 }
 
 export interface CronSchedulerHandle {
@@ -93,6 +100,16 @@ export function spawnCronScheduler(deps: CronSchedulerDeps): CronSchedulerHandle
 
     if (msg.type === "offpeak-active-count") {
       deps.onOffPeakActiveCountChanged?.(msg.count);
+      return;
+    }
+
+    if (msg.type === "scheduler-dispatch-alert") {
+      deps.notifyDispatchAlert?.({
+        automationId: msg.automationId,
+        title: msg.title,
+        error: msg.error,
+        permanent: msg.permanent,
+      });
       return;
     }
 
