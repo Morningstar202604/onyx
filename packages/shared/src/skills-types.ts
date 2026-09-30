@@ -26,6 +26,8 @@ export interface SkillSummary {
   /** plugin scope 时为来源插件完整 ID（name@marketplace）；旧 payload 可缺省。 */
   pluginId?: string;
   metadata?: SkillMetadata;
+  /** frontmatter `trigger:` 声明的自动触发关键词（逗号/顿号分隔）；prompt 命中任意词即自动激活技能。 */
+  triggerKeywords?: string[];
 }
 
 export interface SkillsCapability {

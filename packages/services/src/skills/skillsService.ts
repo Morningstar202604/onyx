@@ -44,6 +44,8 @@ interface ParsedFrontmatter {
   keys: string[];
   /** 严格 YAML 解析是否成功；失败时仍可能有 looseFields。 */
   parseOk: boolean;
+  /** frontmatter `trigger:` 声明的自动触发关键词（逗号/顿号分隔）。 */
+  trigger: string;
 }
 
 const SKILL_META_FILE_NAME = "_meta.json";
@@ -242,6 +244,14 @@ function buildSkillId(params: {
   return `${params.provider}:${params.scope}:${params.name}:${hashStableIdPart(params.path)}`;
 }
 
+/** frontmatter trigger 字段 → 关键词数组（支持中英文逗号/顿号/空格分隔，去空）。 */
+function splitTriggerKeywords(trigger: string): string[] {
+  return trigger
+    .split(/[，,、;；\s]+/)
+    .map((keyword) => keyword.trim())
+    .filter((keyword) => keyword.length > 0);
+}
+
 function collectMentionedSkillNames(prompt: string): Set<string> {
   const names = new Set<string>();
   for (const match of prompt.matchAll(/\$([a-z0-9]+(?:-[a-z0-9]+)*)/g)) {
@@ -306,6 +316,7 @@ function readFrontmatter(content: string): ParsedFrontmatter {
       body: normalized.trim(),
       keys: [],
       parseOk: false,
+      trigger: "",
     };
   }
 
@@ -327,6 +338,7 @@ function readFrontmatter(content: string): ParsedFrontmatter {
       body,
       keys: looseKeys,
       parseOk: false,
+      trigger: "",
     };
   }
   let parsed: unknown;
@@ -341,6 +353,7 @@ function readFrontmatter(content: string): ParsedFrontmatter {
       body,
       keys: looseKeys,
       parseOk: false,
+      trigger: "",
     };
   }
   if (!isObjectRecord(parsed)) {
@@ -350,6 +363,7 @@ function readFrontmatter(content: string): ParsedFrontmatter {
       body,
       keys: looseKeys,
       parseOk: false,
+      trigger: "",
     };
   }
 
@@ -360,6 +374,7 @@ function readFrontmatter(content: string): ParsedFrontmatter {
     body,
     keys: Object.keys(parsed),
     parseOk: true,
+    trigger: readFrontmatterString(parsed.trigger),
   };
 }
 
@@ -965,6 +980,7 @@ async function discoverSkills(params: {
         sourcePath: skillPath,
         scope: root.scope,
         enabled: true,
+        ...(parsed.trigger ? { triggerKeywords: splitTriggerKeywords(parsed.trigger) } : {}),
         ...(root.pluginName ? { pluginName: root.pluginName } : {}),
         ...(root.pluginId ? { pluginId: root.pluginId } : {}),
         ...(metadata ? { metadata } : {}),
@@ -1087,17 +1103,20 @@ export function createSkillsService(options?: SkillsServiceOptions): ISkillsServ
       prompt: string;
     }): Promise<SkillsPromptContext> {
       const mentionedSkillNames = collectMentionedSkillNames(params.prompt);
-      if (mentionedSkillNames.size === 0) {
-        return { prompt: params.prompt, activatedSkillNames: [] };
-      }
-
       const { skills } = await this.list({
         workspacePath: params.workspacePath,
         workspaceIdentity: params.workspaceIdentity,
         provider: params.provider,
       });
+      const promptLower = params.prompt.toLocaleLowerCase();
       const activatedSkills = skills.filter(
-        (skill) => skill.enabled && mentionedSkillNames.has(skill.name),
+        (skill) =>
+          skill.enabled &&
+          (mentionedSkillNames.has(skill.name) ||
+            (skill.triggerKeywords?.some((keyword) =>
+              promptLower.includes(keyword.toLocaleLowerCase()),
+            ) ??
+              false)),
       );
       if (activatedSkills.length === 0) {
         return { prompt: params.prompt, activatedSkillNames: [] };
