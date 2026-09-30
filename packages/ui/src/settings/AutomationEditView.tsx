@@ -41,6 +41,7 @@ import {
   type ZCodeAutomation,
   type ZCodeAutomationRun,
   type ZCodeAutomationScheduleRule,
+  type ZCodeAutomationTriggerKind,
 } from "@onyx/shared";
 import {
   AutomationAddScheduleIcon,
@@ -1226,6 +1227,16 @@ export function AutomationEditView({
   const titleTouchedRef = useRef(false);
   const [title, setTitle] = useState("");
   const [prompt, setPrompt] = useState("");
+  // 触发方式：time=按调度（默认）；file-change=工作区文件变更触发（忽略 cron）。
+  const [triggerKind, setTriggerKind] = useState<ZCodeAutomationTriggerKind>(
+    () => editing?.triggerKind ?? "time",
+  );
+  const [fileChangePattern, setFileChangePattern] = useState(
+    () => editing?.fileChangePattern ?? "",
+  );
+  const [fileChangeDebounceMs, setFileChangeDebounceMs] = useState(() =>
+    editing?.fileChangeDebounceMs ?? 5000,
+  );
   const [model, setModel] = useState<string>("");
   const modelSelection = useRef("");
   const [mode, setMode] = useState<string>(AUTOMATION_DEFAULT_MODE);
@@ -1706,6 +1717,19 @@ export function AutomationEditView({
         ...(editing && touchedFields.has("schedule") ? { scheduleEditedByUser: true } : {}),
         mode: modeValue,
         modelSelection: effectiveSelection,
+        ...(triggerKind === "file-change"
+          ? {
+              triggerKind: "file-change" as const,
+              fileChangePattern: fileChangePattern.trim(),
+              fileChangeDebounceMs,
+            }
+          : editing?.triggerKind === "file-change"
+            ? {
+                triggerKind: "time" as const,
+                fileChangePattern: undefined,
+                fileChangeDebounceMs: undefined,
+              }
+            : {}),
       };
     },
     [
@@ -1719,6 +1743,9 @@ export function AutomationEditView({
       effectiveReasoningLevel,
       title,
       touchedFields,
+      triggerKind,
+      fileChangePattern,
+      fileChangeDebounceMs,
     ],
   );
 
@@ -2141,6 +2168,90 @@ export function AutomationEditView({
               />
             </div>
 
+            {/* 触发方式：时间调度 / 文件变更 */}
+            <div className={AUTOMATION_FORM_FIELD_CLASSNAME}>
+              <label className="text-ui-base font-normal leading-5 text-foreground-subtle">
+                {intl.formatMessage({ id: "automations.form.triggerKind.label" })}
+              </label>
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  data-testid="automation-trigger-kind-time"
+                  onClick={() => setTriggerKind("time")}
+                  className={cn(
+                    "flex h-9 items-center gap-1.5 rounded-xl border px-3 text-ui-base font-normal leading-5 transition-colors",
+                    triggerKind === "time"
+                      ? "border-input-border-focused bg-input-focused text-foreground"
+                      : "border-input-border bg-input text-foreground-subtle hover:text-foreground",
+                  )}
+                >
+                  {intl.formatMessage({ id: "automations.form.triggerKind.time" })}
+                </button>
+                <button
+                  type="button"
+                  data-testid="automation-trigger-kind-file-change"
+                  onClick={() => setTriggerKind("file-change")}
+                  className={cn(
+                    "flex h-9 items-center gap-1.5 rounded-xl border px-3 text-ui-base font-normal leading-5 transition-colors",
+                    triggerKind === "file-change"
+                      ? "border-input-border-focused bg-input-focused text-foreground"
+                      : "border-input-border bg-input text-foreground-subtle hover:text-foreground",
+                  )}
+                >
+                  {intl.formatMessage({ id: "automations.form.triggerKind.fileChange" })}
+                </button>
+              </div>
+              {triggerKind === "file-change" ? (
+                <p className="mt-1 text-ui-sm text-foreground-subtle">
+                  {intl.formatMessage({ id: "automations.form.triggerKind.fileChangeHint" })}
+                </p>
+              ) : null}
+            </div>
+
+            {triggerKind === "file-change" ? (
+              <div className="space-y-3">
+                <div className={AUTOMATION_FORM_FIELD_CLASSNAME}>
+                  <label
+                    className="text-ui-base font-normal leading-5 text-foreground-subtle"
+                    htmlFor="automation-file-change-pattern"
+                  >
+                    {intl.formatMessage({ id: "automations.form.fileChangePattern.label" })}
+                  </label>
+                  <input
+                    id="automation-file-change-pattern"
+                    value={fileChangePattern}
+                    onChange={(event) => setFileChangePattern(event.target.value)}
+                    placeholder="**/*.{ts,tsx}"
+                    className="h-9 w-full rounded-xl border border-input-border bg-input px-3 text-ui-base text-foreground outline-none focus:border-input-border-focused"
+                  />
+                  <p className="mt-1 text-ui-sm text-foreground-subtle">
+                    {intl.formatMessage({ id: "automations.form.fileChangePattern.hint" })}
+                  </p>
+                </div>
+                <div className={AUTOMATION_FORM_FIELD_CLASSNAME}>
+                  <label
+                    className="text-ui-base font-normal leading-5 text-foreground-subtle"
+                    htmlFor="automation-file-change-debounce"
+                  >
+                    {intl.formatMessage({ id: "automations.form.fileChangeDebounce.label" })}
+                  </label>
+                  <input
+                    id="automation-file-change-debounce"
+                    type="number"
+                    min={500}
+                    max={60000}
+                    step={500}
+                    value={fileChangeDebounceMs}
+                    onChange={(event) => setFileChangeDebounceMs(Number(event.target.value) || 5000)}
+                    className="h-9 w-full rounded-xl border border-input-border bg-input px-3 text-ui-base text-foreground outline-none focus:border-input-border-focused"
+                  />
+                  <p className="mt-1 text-ui-sm text-foreground-subtle">
+                    {intl.formatMessage({ id: "automations.form.fileChangeDebounce.hint" })}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
             {/* 会话来源的旧 cron 无法可靠回显；删除后切换到标准 UI 调度编辑流程。 */}
             {preserveSessionCreatedSchedule ? (
               <div className={AUTOMATION_FORM_FIELD_CLASSNAME}>
@@ -2555,6 +2666,8 @@ export function AutomationEditView({
                   }}
                 />
               </div>
+            )}
+              </>
             )}
 
             {/* Instructions + 底部项目/模型选择器 */}

@@ -28,6 +28,7 @@ import {
   startSchedulerResourceTelemetry,
   type SchedulerResourceTelemetry,
 } from "./schedulerResourceTelemetry.js";
+import { FileChangeTriggerRegistry } from "./fileChangeTrigger.js";
 
 /** 轮询间隔：cron 最小粒度是分钟，20s 轮询足以按时命中且开销低。 */
 const POLL_INTERVAL_MS = 20_000;
@@ -48,6 +49,23 @@ type InFlight = {
 const repo = new AutomationRepo();
 /** runId → 在途派发上下文；等 main 回报后结算。scheduler 重启丢失时靠 claimDue 的僵尸回收兜底。 */
 const inFlight = new Map<string, InFlight>();
+
+// ---- 文件变更触发（file-change automation）----
+const fileChangeTrigger = new FileChangeTriggerRegistry({
+  requestDispatch: async (automationId, filePath) => {
+    // 事件防抖到期：把该 automation 的 next_run_at 立即写为 now，claimDue 随即认领派发。
+    const updated = await repo.update(
+      automationId,
+      {},
+      { nextRunAt: Date.now() },
+    );
+    if (updated && updated.enabled && updated.lifecycleStatus === "active") {
+      log("info", `[file-change] dispatch scheduled automation=${automationId} file=${filePath}`);
+      requestTick();
+    }
+  },
+  log,
+});
 
 // ---- 闲时任务（off-peak）----
 const offPeakRepo = new OffPeakTaskRepo();
@@ -104,6 +122,8 @@ async function tick(): Promise<void> {
         for (const task of offPeakClaimed) {
           await handleOffPeakClaimed(task, now);
         }
+        // 文件变更触发：每次 tick 对账 watcher 注册表（新增/更新/启停/删除）。
+        await syncFileChangeWatchers();
         // keep-awake：上报执行中计数，main 据此 + 设置决定 powerSaveBlocker。
         await reportOffPeakActiveCount();
       } catch (error) {
@@ -124,6 +144,16 @@ function requestTick(): void {
     return;
   }
   void tick();
+}
+
+/** 拉取全部 enabled automation 对账文件变更 watcher；失败仅留痕，不阻断调度。 */
+async function syncFileChangeWatchers(): Promise<void> {
+  try {
+    const automations = await repo.list();
+    fileChangeTrigger.sync(automations);
+  } catch (error) {
+    log("warn", `[file-change] sync watchers failed: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
 
 async function handleClaimed(automation: ZCodeAutomation, now: number): Promise<void> {
@@ -352,6 +382,7 @@ async function dispose(): Promise<void> {
     }
   }
   offPeakInFlight.clear();
+  fileChangeTrigger.dispose();
   try {
     repo.close();
   } catch {

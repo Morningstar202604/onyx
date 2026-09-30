@@ -7,6 +7,7 @@ import {
   type ZCodeAutomation,
   type ZCodeAutomationRun,
   type ZCodeAutomationScheduleRule,
+  type ZCodeAutomationTriggerKind,
   type ModelSelection,
 } from "@onyx/shared";
 import type { IZCodeAgentService } from "@onyx/services";
@@ -34,6 +35,9 @@ export interface CreateAutomationInput {
   maxRuns?: number;
   endAt?: number;
   scheduleRule?: ZCodeAutomationScheduleRule;
+  triggerKind?: ZCodeAutomationTriggerKind;
+  fileChangePattern?: string;
+  fileChangeDebounceMs?: number;
   // 目标项目;缺省用 store 当前列表所在项目。创建整页可在项目下拉里改。
   workspacePath?: string;
   workspaceIdentity?: string;
@@ -50,6 +54,9 @@ export interface UpdateAutomationInput {
   endAt?: number | null;
   scheduleRule?: ZCodeAutomationScheduleRule | null;
   scheduleEditedByUser?: boolean;
+  triggerKind?: ZCodeAutomationTriggerKind;
+  fileChangePattern?: string;
+  fileChangeDebounceMs?: number;
 }
 
 interface AutomationManagementState {

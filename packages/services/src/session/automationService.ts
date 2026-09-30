@@ -5,6 +5,7 @@ import type {
   ZCodeAutomationScheduleRule,
   ZCodeAutomationUpdateParams,
 } from "@onyx/shared";
+import { assertValidFileChangeTriggerParams } from "#src/session/automationFileChangeTrigger.js";
 import { resolveWorkspaceKey } from "@onyx/shared";
 import { AutomationRepo } from "#src/session/automationRepo.js";
 import {
@@ -208,6 +209,7 @@ export class AutomationService {
     if (!isValidCronExpr(normalizedParams.cronExpr)) {
       throw new InvalidCronExprError(normalizedParams.cronExpr);
     }
+    assertValidFileChangeTriggerParams(normalizedParams);
     // computeScheduleRuleNextRunAt 曾静默修正 interval=0，并在超大间隔下返回 null，
     // 使非法规则仍被持久化为 active。写库前必须在领域层拒绝，不能依赖 UI 选择器兜底。
     if (normalizedParams.scheduleRule) {
@@ -311,6 +313,9 @@ export class AutomationService {
     if (normalizedParams.cronExpr !== undefined && !isValidCronExpr(normalizedParams.cronExpr)) {
       throw new InvalidCronExprError(normalizedParams.cronExpr);
     }
+    // 触发方式切换（time ↔ file-change）也要重算 next_run_at：file-change 不按 cron 排期。
+    const triggerKindChanged = normalizedParams.triggerKind !== undefined && normalizedParams.triggerKind !== existing.triggerKind;
+    assertValidFileChangeTriggerParams(normalizedParams);
     const updatedAt = Date.now();
     const effectiveCron = normalizedParams.cronExpr ?? existing.cronExpr;
     // 会话侧长间隔 carrier 归一化：把 intervalUnit+interval + 兼容 cron 组装成权威 scheduleRule。
@@ -359,15 +364,12 @@ export class AutomationService {
         : effectiveDirectScheduleRule === undefined
           ? normalizedWithSchedule
           : { ...normalizedWithSchedule, scheduleRule: explicitScheduleRule ?? null };
-    if (
-      cronChanged ||
-      normalizedParams.endAt !== undefined ||
-      effectiveDirectScheduleRule !== undefined
-    ) {
+    if (cronChanged || triggerKindChanged || normalizedParams.endAt !== undefined || effectiveDirectScheduleRule !== undefined) {
       options.nextRunAt = computeAutomationNextRunAt(
         {
           cronExpr: effectiveCron,
           scheduleRule: effectiveScheduleRule,
+          triggerKind: normalizedParams.triggerKind ?? existing.triggerKind,
         },
         updatedAt,
       );
@@ -414,21 +416,18 @@ export class AutomationService {
             {
               cronExpr: effectiveCron,
               scheduleRule: effectiveScheduleRule,
+              triggerKind: normalizedParams.triggerKind ?? existing.triggerKind,
             },
             updatedAt,
           );
         }
       }
     }
-
     return this.repo.update(automationId, updateParams, options, workspaceKey);
   }
-
   async delete(automationId: string, scope?: AutomationWorkspaceScope): Promise<boolean> {
     return this.repo.delete(automationId, resolveScopeKey(scope));
   }
-
-  /** 暂停 / 恢复。 */
   async setEnabled(
     automationId: string,
     enabled: boolean,
@@ -436,8 +435,6 @@ export class AutomationService {
   ): Promise<void> {
     return this.repo.setEnabled(automationId, enabled, resolveScopeKey(scope));
   }
-
-  /** 失败任务手动重跑：回 active、清计数，按 cron 重算下次时间。 */
   async restart(automationId: string, scope?: AutomationWorkspaceScope): Promise<void> {
     const workspaceKey = resolveScopeKey(scope);
     const existing = await this.repo.get(automationId, workspaceKey);
@@ -448,8 +445,6 @@ export class AutomationService {
     const nextRunAt = computeAutomationNextRunAt(existing);
     return this.repo.restart(automationId, { nextRunAt }, workspaceKey);
   }
-
-  /** 立即运行：创建供当前 host 直接派发的 manual run，不修改原 cron 计划。 */
   async runNow(
     automationId: string,
     scope?: AutomationWorkspaceScope,
@@ -459,7 +454,6 @@ export class AutomationService {
     if (!existing) return null;
     return this.repo.runNow(automationId, { now: Date.now() }, workspaceKey);
   }
-
   async listRuns(
     automationId: string,
     scope?: AutomationWorkspaceScope,

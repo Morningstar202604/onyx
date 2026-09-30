@@ -74,6 +74,9 @@ interface AutomationRow {
   end_at: number | null;
   schedule_rule: string | null;
   schedule_edited_by_user: number;
+  trigger_kind: string | null;
+  file_change_pattern: string | null;
+  file_change_debounce_ms: number | null;
   run_count: number;
   scheduled_run_count: number;
   enabled: number;
@@ -134,6 +137,13 @@ function rowToAutomation(row: AutomationRow): ZCodeAutomation {
       ? (JSON.parse(row.schedule_rule) as ZCodeAutomation["scheduleRule"])
       : undefined,
     ...(row.schedule_edited_by_user === 1 ? { scheduleEditedByUser: true } : {}),
+    ...(row.trigger_kind === "file-change"
+      ? {
+          triggerKind: "file-change" as const,
+          fileChangePattern: row.file_change_pattern ?? undefined,
+          fileChangeDebounceMs: row.file_change_debounce_ms ?? undefined,
+        }
+      : {}),
     runCount: row.run_count,
     enabled: row.enabled === 1,
     lifecycleStatus: row.lifecycle_status as ZCodeAutomationLifecycleStatus,
@@ -338,6 +348,7 @@ export class AutomationRepo {
           automation_id, title, cron_expr, prompt, model, provider, model_selection,
           workspace_key, workspace_path, workspace_identity, target_task_id, bot_delivery_target, location_kind,
           recurring, max_runs, end_at, schedule_rule, schedule_edited_by_user,
+          trigger_kind, file_change_pattern, file_change_debounce_ms,
           run_count, enabled, lifecycle_status,
           next_run_at, last_run_at, running, claimed_at,
           dispatch_status, dispatch_attempts, retry_at, last_error,
@@ -347,6 +358,7 @@ export class AutomationRepo {
           @automation_id, @title, @cron_expr, @prompt, @model, @provider, @model_selection,
           @workspace_key, @workspace_path, @workspace_identity, @target_task_id, @bot_delivery_target, 'local',
           @recurring, @max_runs, @end_at, @schedule_rule, 0,
+          @trigger_kind, @file_change_pattern, @file_change_debounce_ms,
           0, @enabled, @lifecycle_status,
           @next_run_at, NULL, 0, NULL,
           'idle', 0, NULL, NULL,
@@ -375,6 +387,10 @@ export class AutomationRepo {
         max_runs: params.maxRuns ?? null,
         end_at: params.endAt ?? null,
         schedule_rule: params.scheduleRule ? JSON.stringify(params.scheduleRule) : null,
+        trigger_kind: params.triggerKind === "file-change" ? "file-change" : null,
+        file_change_pattern: params.triggerKind === "file-change" ? (params.fileChangePattern ?? null) : null,
+        file_change_debounce_ms:
+          params.triggerKind === "file-change" ? (params.fileChangeDebounceMs ?? null) : null,
         enabled: options.lifecycleStatus === "completed" ? 0 : 1,
         lifecycle_status: options.lifecycleStatus ?? "active",
         next_run_at: options.nextRunAt,
@@ -527,6 +543,24 @@ export class AutomationRepo {
           : params.scheduleEditedByUser
             ? 1
             : 0,
+      trigger_kind:
+        params.triggerKind === undefined
+          ? existing.trigger_kind
+          : params.triggerKind === "file-change"
+            ? "file-change"
+            : null,
+      file_change_pattern:
+        params.triggerKind === undefined
+          ? existing.file_change_pattern
+          : params.triggerKind === "file-change"
+            ? (params.fileChangePattern ?? null)
+            : null,
+      file_change_debounce_ms:
+        params.triggerKind === undefined
+          ? existing.file_change_debounce_ms
+          : params.triggerKind === "file-change"
+            ? (params.fileChangeDebounceMs ?? null)
+            : null,
       next_run_at: options?.nextRunAt === undefined ? existing.next_run_at : options.nextRunAt,
       lifecycle_status: options?.lifecycleStatus ?? existing.lifecycle_status,
       dispatch_attempts: options?.resetRetry ? 0 : existing.dispatch_attempts,
@@ -886,6 +920,9 @@ export class AutomationRepo {
             end_at: (row["a_end_at"] as number | null) ?? null,
             schedule_rule: (row["a_schedule_rule"] as string | null) ?? null,
             schedule_edited_by_user: row["a_schedule_edited_by_user"] as number,
+            trigger_kind: (row["a_trigger_kind"] as string | null) ?? null,
+            file_change_pattern: (row["a_file_change_pattern"] as string | null) ?? null,
+            file_change_debounce_ms: (row["a_file_change_debounce_ms"] as number | null) ?? null,
             run_count: row["a_run_count"] as number,
             scheduled_run_count: row["a_scheduled_run_count"] as number,
             enabled: row["a_enabled"] as number,

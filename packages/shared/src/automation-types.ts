@@ -31,6 +31,9 @@ export type ZCodeAutomationLocationKind = "local" | "remote";
 /** 触发来源：定时 or 立即运行。 */
 export type ZCodeAutomationTrigger = "schedule" | "manual";
 
+/** 触发方式：time=按调度规则（默认）；file-change=工作区文件变更触发（忽略 cron 到期，由 watcher 唤醒）。 */
+export type ZCodeAutomationTriggerKind = "time" | "file-change";
+
 /** 自定义重复规则；cronExpr 保留为兼容展示，调度以本字段为权威。 */
 export interface ZCodeAutomationScheduleRule {
   unit: "minute" | "hourly" | "daily" | "weekly" | "monthly" | "yearly";
@@ -87,6 +90,12 @@ export interface ZCodeAutomation {
   scheduleRule?: ZCodeAutomationScheduleRule;
   /** 会话来源的只读调度是否已被用户在管理页显式删除并重设。 */
   scheduleEditedByUser?: boolean;
+  /** 触发方式；缺省 time（按调度规则）。 */
+  triggerKind?: ZCodeAutomationTriggerKind;
+  /** file-change 触发的文件匹配 pattern（glob，相对 workspacePath），缺省全部文件。 */
+  fileChangePattern?: string;
+  /** file-change 触发的防抖窗口（毫秒），缺省 5000。 */
+  fileChangeDebounceMs?: number;
   runCount: number;
   enabled: boolean;
   lifecycleStatus: ZCodeAutomationLifecycleStatus;
@@ -172,6 +181,12 @@ export interface ZCodeAutomationCreateParams {
   intervalUnit?: ZCodeAutomationIntervalUnit;
   /** 1–200 的整数间隔，必须与 intervalUnit 配对。 */
   interval?: number;
+  /** 触发方式；缺省 time。 */
+  triggerKind?: ZCodeAutomationTriggerKind;
+  /** file-change 触发的文件匹配 pattern（glob，相对 workspacePath）。 */
+  fileChangePattern?: string;
+  /** file-change 触发的防抖窗口（毫秒，500–60000）。 */
+  fileChangeDebounceMs?: number;
 }
 
 /** 编辑 automation 的可变字段。 */
@@ -199,4 +214,10 @@ export interface ZCodeAutomationUpdateParams {
   interval?: number;
   /** 仅由管理页在用户实际修改调度时写入；undefined=保留原来源状态。 */
   scheduleEditedByUser?: boolean;
+  /** 触发方式；undefined=不修改。 */
+  triggerKind?: ZCodeAutomationTriggerKind;
+  /** file-change 触发 pattern；undefined=不修改。 */
+  fileChangePattern?: string;
+  /** file-change 触发防抖窗口；undefined=不修改。 */
+  fileChangeDebounceMs?: number;
 }

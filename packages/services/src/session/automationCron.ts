@@ -88,7 +88,7 @@ export function buildRelativeDelaySchedule(
  * 仅允许小于一分钟的工具调用跨分钟误差立即补执行，已经陈旧的目标必须拒绝并重新计算。
  */
 export function computeInitialAutomationNextRunAt(
-  automation: Pick<ZCodeAutomation, "cronExpr" | "recurring" | "scheduleRule">,
+  automation: Pick<ZCodeAutomation, "cronExpr" | "recurring" | "scheduleRule" | "triggerKind">,
   from = Date.now(),
 ): number | null {
   const nextRunAt = computeAutomationNextRunAt(automation, from);
@@ -341,9 +341,13 @@ export function buildIntervalScheduleRule(
 }
 
 export function computeAutomationNextRunAt(
-  automation: Pick<ZCodeAutomation, "cronExpr" | "scheduleRule">,
+  automation: Pick<ZCodeAutomation, "cronExpr" | "scheduleRule" | "triggerKind">,
   from?: number,
 ): number | null {
+  // file-change 触发不按调度排期：由 scheduler 的 watcher 在文件变更时写 nextRunAt=now 唤醒。
+  if (automation.triggerKind === "file-change") {
+    return null;
+  }
   return automation.scheduleRule
     ? computeScheduleRuleNextRunAt(automation.scheduleRule, from)
     : computeNextRunAt(automation.cronExpr, from);
