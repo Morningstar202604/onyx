@@ -9,6 +9,7 @@ import type { Dirent } from "node:fs";
 import { basename, isAbsolute, join, relative, sep } from "node:path";
 import { readProjectMemoryFileFromStableHandle } from "#src/memory/projectMemoryStableRead.js";
 import { getZCodeDataRootDir } from "#src/paths.js";
+import { mergeMemoryText } from "#src/memory/memoryMerge.js";
 
 const PROJECT_MEMORY_INDEX_FILE_NAME = "MEMORY.md";
 const PROJECT_MEMORY_DIRECTORY_NAME = "memory";
@@ -261,7 +262,15 @@ export function createMemoryService(): IMemoryService {
     if (rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel)) {
       throw new Error(`Project Memory path is outside the local profile: ${targetPath}`);
     }
-    await writeFile(targetPath, params.content, "utf8");
+    // 冲突合并：同名记忆文件二次写入时按句子级去重合并，避免覆盖丢旧记忆。
+    let content = params.content;
+    try {
+      const existing = await readFile(targetPath, "utf8");
+      content = mergeMemoryText(existing, params.content);
+    } catch (error) {
+      if (!isNotFoundError(error)) throw error;
+    }
+    await writeFile(targetPath, content, "utf8");
   }
 
   async function deleteProjectMemoryFile(params: {
