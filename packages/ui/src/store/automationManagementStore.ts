@@ -38,6 +38,7 @@ export interface CreateAutomationInput {
   triggerKind?: ZCodeAutomationTriggerKind;
   fileChangePattern?: string;
   fileChangeDebounceMs?: number;
+  webhookUrl?: string | null;
   // 目标项目;缺省用 store 当前列表所在项目。创建整页可在项目下拉里改。
   workspacePath?: string;
   workspaceIdentity?: string;
@@ -57,6 +58,7 @@ export interface UpdateAutomationInput {
   triggerKind?: ZCodeAutomationTriggerKind;
   fileChangePattern?: string;
   fileChangeDebounceMs?: number;
+  webhookUrl?: string | null;
 }
 
 interface AutomationManagementState {

@@ -6077,6 +6077,8 @@ const enUS: Record<string, string> = {
   "automations.form.fileChangePattern.hint": "Relative to workspace, e.g. **/*.ts or src/**/*.{ts,tsx}; empty matches all files.",
   "automations.form.fileChangeDebounce.label": "Debounce (ms)",
   "automations.form.fileChangeDebounce.hint": "Wait after a burst of changes before triggering; default 5000 (5s).",
+  "automations.form.webhookUrl.label": "Result Webhook (optional)",
+  "automations.form.webhookUrl.hint": "POST a run summary to this URL after each run (success and failure); empty disables delivery.",
   "automations.form.prompt.placeholder": "What should this task do each time it runs?",
   "automations.form.model.label": "Model",
   "automations.form.model.previewRetry": "Model info failed to load. Retry",

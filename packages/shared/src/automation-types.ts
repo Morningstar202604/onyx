@@ -96,6 +96,8 @@ export interface ZCodeAutomation {
   fileChangePattern?: string;
   /** file-change 触发的防抖窗口（毫秒），缺省 5000。 */
   fileChangeDebounceMs?: number;
+  /** 运行结束后的结果投递 Webhook URL（http/https，可选）；为空不投递。 */
+  webhookUrl?: string | null;
   runCount: number;
   enabled: boolean;
   lifecycleStatus: ZCodeAutomationLifecycleStatus;
@@ -187,6 +189,8 @@ export interface ZCodeAutomationCreateParams {
   fileChangePattern?: string;
   /** file-change 触发的防抖窗口（毫秒，500–60000）。 */
   fileChangeDebounceMs?: number;
+  /** 运行结束后的结果投递 Webhook URL（http/https，可选）。 */
+  webhookUrl?: string | null;
 }
 
 /** 编辑 automation 的可变字段。 */
@@ -220,4 +224,6 @@ export interface ZCodeAutomationUpdateParams {
   fileChangePattern?: string;
   /** file-change 触发防抖窗口；undefined=不修改。 */
   fileChangeDebounceMs?: number;
+  /** 结果投递 Webhook URL；undefined=不修改；null=清除。 */
+  webhookUrl?: string | null;
 }

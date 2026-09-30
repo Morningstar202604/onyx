@@ -6,6 +6,7 @@ import type {
   ZCodeAutomationUpdateParams,
 } from "@onyx/shared";
 import { assertValidFileChangeTriggerParams } from "#src/session/automationFileChangeTrigger.js";
+import { assertValidWebhookUrl } from "#src/session/automationWebhookDelivery.js";
 import { resolveWorkspaceKey } from "@onyx/shared";
 import { AutomationRepo } from "#src/session/automationRepo.js";
 import {
@@ -210,6 +211,7 @@ export class AutomationService {
       throw new InvalidCronExprError(normalizedParams.cronExpr);
     }
     assertValidFileChangeTriggerParams(normalizedParams);
+    assertValidWebhookUrl(normalizedParams.webhookUrl);
     // computeScheduleRuleNextRunAt 曾静默修正 interval=0，并在超大间隔下返回 null，
     // 使非法规则仍被持久化为 active。写库前必须在领域层拒绝，不能依赖 UI 选择器兜底。
     if (normalizedParams.scheduleRule) {
@@ -316,6 +318,7 @@ export class AutomationService {
     // 触发方式切换（time ↔ file-change）也要重算 next_run_at：file-change 不按 cron 排期。
     const triggerKindChanged = normalizedParams.triggerKind !== undefined && normalizedParams.triggerKind !== existing.triggerKind;
     assertValidFileChangeTriggerParams(normalizedParams);
+    assertValidWebhookUrl(normalizedParams.webhookUrl);
     const updatedAt = Date.now();
     const effectiveCron = normalizedParams.cronExpr ?? existing.cronExpr;
     // 会话侧长间隔 carrier 归一化：把 intervalUnit+interval + 兼容 cron 组装成权威 scheduleRule。

@@ -77,6 +77,7 @@ interface AutomationRow {
   trigger_kind: string | null;
   file_change_pattern: string | null;
   file_change_debounce_ms: number | null;
+  webhook_url: string | null;
   run_count: number;
   scheduled_run_count: number;
   enabled: number;
@@ -142,6 +143,7 @@ function rowToAutomation(row: AutomationRow): ZCodeAutomation {
           triggerKind: "file-change" as const,
           fileChangePattern: row.file_change_pattern ?? undefined,
           fileChangeDebounceMs: row.file_change_debounce_ms ?? undefined,
+          webhookUrl: row.webhook_url ?? null,
         }
       : {}),
     runCount: row.run_count,
@@ -348,7 +350,7 @@ export class AutomationRepo {
           automation_id, title, cron_expr, prompt, model, provider, model_selection,
           workspace_key, workspace_path, workspace_identity, target_task_id, bot_delivery_target, location_kind,
           recurring, max_runs, end_at, schedule_rule, schedule_edited_by_user,
-          trigger_kind, file_change_pattern, file_change_debounce_ms,
+          trigger_kind, file_change_pattern, file_change_debounce_ms, webhook_url,
           run_count, enabled, lifecycle_status,
           next_run_at, last_run_at, running, claimed_at,
           dispatch_status, dispatch_attempts, retry_at, last_error,
@@ -358,7 +360,7 @@ export class AutomationRepo {
           @automation_id, @title, @cron_expr, @prompt, @model, @provider, @model_selection,
           @workspace_key, @workspace_path, @workspace_identity, @target_task_id, @bot_delivery_target, 'local',
           @recurring, @max_runs, @end_at, @schedule_rule, 0,
-          @trigger_kind, @file_change_pattern, @file_change_debounce_ms,
+          @trigger_kind, @file_change_pattern, @file_change_debounce_ms, @webhook_url,
           0, @enabled, @lifecycle_status,
           @next_run_at, NULL, 0, NULL,
           'idle', 0, NULL, NULL,
@@ -391,6 +393,7 @@ export class AutomationRepo {
         file_change_pattern: params.triggerKind === "file-change" ? (params.fileChangePattern ?? null) : null,
         file_change_debounce_ms:
           params.triggerKind === "file-change" ? (params.fileChangeDebounceMs ?? null) : null,
+        webhook_url: params.webhookUrl ?? null,
         enabled: options.lifecycleStatus === "completed" ? 0 : 1,
         lifecycle_status: options.lifecycleStatus ?? "active",
         next_run_at: options.nextRunAt,
@@ -561,6 +564,7 @@ export class AutomationRepo {
           : params.triggerKind === "file-change"
             ? (params.fileChangeDebounceMs ?? null)
             : null,
+      webhook_url: params.webhookUrl === undefined ? existing.webhook_url : params.webhookUrl,
       next_run_at: options?.nextRunAt === undefined ? existing.next_run_at : options.nextRunAt,
       lifecycle_status: options?.lifecycleStatus ?? existing.lifecycle_status,
       dispatch_attempts: options?.resetRetry ? 0 : existing.dispatch_attempts,
@@ -843,6 +847,10 @@ export class AutomationRepo {
             a.end_at AS a_end_at,
             a.schedule_rule AS a_schedule_rule,
             a.schedule_edited_by_user AS a_schedule_edited_by_user,
+            a.trigger_kind AS a_trigger_kind,
+            a.file_change_pattern AS a_file_change_pattern,
+            a.file_change_debounce_ms AS a_file_change_debounce_ms,
+            a.webhook_url AS a_webhook_url,
             a.run_count AS a_run_count,
             a.scheduled_run_count AS a_scheduled_run_count,
             a.enabled AS a_enabled,
@@ -923,6 +931,7 @@ export class AutomationRepo {
             trigger_kind: (row["a_trigger_kind"] as string | null) ?? null,
             file_change_pattern: (row["a_file_change_pattern"] as string | null) ?? null,
             file_change_debounce_ms: (row["a_file_change_debounce_ms"] as number | null) ?? null,
+            webhook_url: (row["a_webhook_url"] as string | null) ?? null,
             run_count: row["a_run_count"] as number,
             scheduled_run_count: row["a_scheduled_run_count"] as number,
             enabled: row["a_enabled"] as number,

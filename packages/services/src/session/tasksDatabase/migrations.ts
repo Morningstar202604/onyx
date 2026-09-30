@@ -28,6 +28,7 @@ const columns = [
   ["automations", "trigger_kind", "TEXT"],
   ["automations", "file_change_pattern", "TEXT"],
   ["automations", "file_change_debounce_ms", "INTEGER"],
+  ["automations", "webhook_url", "TEXT"],
   ["automation_runs", "model_selection", "TEXT"],
   ["off_peak_tasks", "thought_level", "TEXT"],
   ["off_peak_tasks", "model_selection", "TEXT"],

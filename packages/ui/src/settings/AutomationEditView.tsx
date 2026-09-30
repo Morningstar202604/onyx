@@ -178,6 +178,17 @@ const CUSTOM_REPEAT_INTERVAL_MAX = 200;
  * 生成分页控件的页码序列：首尾各保留 3 页、当前页左右各 1 页，其余用省略号折叠。
  * 例：current=1,total=10 → [1,2,3,"ellipsis",8,9,10]。
  */
+/** 编辑表单的 Webhook URL 轻校验：非空时必须为 http(s) 地址。 */
+function isValidWebhookUrlInput(url: string): boolean {
+  if (url.trim() === "") return true;
+  try {
+    const parsed = new URL(url.trim());
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 function buildRunsPageItems(current: number, total: number): Array<number | "ellipsis"> {
   if (total <= 7) {
     return Array.from({ length: total }, (_, index) => index + 1);
@@ -1237,6 +1248,8 @@ export function AutomationEditView({
   const [fileChangeDebounceMs, setFileChangeDebounceMs] = useState(() =>
     editing?.fileChangeDebounceMs ?? 5000,
   );
+  const [webhookUrl, setWebhookUrl] = useState(() => editing?.webhookUrl ?? "");
+
   const [model, setModel] = useState<string>("");
   const modelSelection = useRef("");
   const [mode, setMode] = useState<string>(AUTOMATION_DEFAULT_MODE);
@@ -1730,6 +1743,7 @@ export function AutomationEditView({
                 fileChangeDebounceMs: undefined,
               }
             : {}),
+        webhookUrl: webhookUrl.trim() === "" ? null : webhookUrl.trim(),
       };
     },
     [
@@ -1746,6 +1760,7 @@ export function AutomationEditView({
       triggerKind,
       fileChangePattern,
       fileChangeDebounceMs,
+      webhookUrl,
     ],
   );
 
@@ -2669,6 +2684,28 @@ export function AutomationEditView({
             )}
               </>
             )}
+
+            {/* 结果投递（可选）：运行结束 POST 摘要到 Webhook */}
+            <div className={AUTOMATION_FORM_FIELD_CLASSNAME}>
+              <label
+                className="text-ui-base font-normal leading-5 text-foreground-subtle"
+                htmlFor="automation-webhook-url"
+              >
+                {intl.formatMessage({ id: "automations.form.webhookUrl.label" })}
+              </label>
+              <input
+                id="automation-webhook-url"
+                data-testid="automation-webhook-url"
+                value={webhookUrl}
+                onChange={(event) => setWebhookUrl(event.target.value)}
+                placeholder="https://example.com/hook"
+                aria-invalid={webhookUrl.trim() !== "" && !isValidWebhookUrlInput(webhookUrl)}
+                className="h-9 w-full rounded-xl border border-input-border bg-input px-3 text-ui-base text-foreground outline-none focus:border-input-border-focused aria-invalid:!border-destructive aria-invalid:!ring-2 aria-invalid:!ring-destructive/20"
+              />
+              <p className="mt-1 text-ui-sm text-foreground-subtle">
+                {intl.formatMessage({ id: "automations.form.webhookUrl.hint" })}
+              </p>
+            </div>
 
             {/* Instructions + 底部项目/模型选择器 */}
             <div className={AUTOMATION_FORM_FIELD_CLASSNAME}>

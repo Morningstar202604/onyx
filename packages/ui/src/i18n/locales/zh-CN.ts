@@ -5808,6 +5808,8 @@ const zhCN: Record<string, string> = {
   "automations.form.fileChangePattern.hint": "相对工作区路径，如 **/*.ts 或 src/**/*.{ts,tsx}；留空匹配全部文件。",
   "automations.form.fileChangeDebounce.label": "防抖窗口（毫秒）",
   "automations.form.fileChangeDebounce.hint": "连续变更后等待多久再触发，默认 5000（5 秒）。",
+  "automations.form.webhookUrl.label": "结果投递 Webhook（可选）",
+  "automations.form.webhookUrl.hint": "运行结束后向该地址 POST 运行摘要（成功/失败均投递）；留空不投递。",
   "automations.form.prompt.placeholder": "每次运行时这个任务要做什么？",
   "automations.form.model.label": "模型",
   "automations.form.model.previewRetry": "模型信息加载失败，重试",

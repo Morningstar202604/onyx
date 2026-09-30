@@ -29,6 +29,7 @@ import {
   type SchedulerResourceTelemetry,
 } from "./schedulerResourceTelemetry.js";
 import { FileChangeTriggerRegistry } from "./fileChangeTrigger.js";
+import { notifyWebhookRunResult } from "./webhookNotify.js";
 
 /** 轮询间隔：cron 最小粒度是分钟，20s 轮询足以按时命中且开销低。 */
 const POLL_INTERVAL_MS = 20_000;
@@ -49,6 +50,7 @@ type InFlight = {
 const repo = new AutomationRepo();
 /** runId → 在途派发上下文；等 main 回报后结算。scheduler 重启丢失时靠 claimDue 的僵尸回收兜底。 */
 const inFlight = new Map<string, InFlight>();
+
 
 // ---- 文件变更触发（file-change automation）----
 const fileChangeTrigger = new FileChangeTriggerRegistry({
@@ -330,6 +332,7 @@ async function settleDispatchResult(
     const automation = await repo.get(automationId);
     const nextRunAt = automation ? computeAutomationNextRunAt(automation, now) : null;
     await repo.markDispatched(automationId, { dispatchedAt: now, nextRunAt });
+    void notifyWebhookRunResult(automation, msg.runId, true, log, msg.sessionId ?? null).catch(() => {});
     return;
   }
 
@@ -343,15 +346,17 @@ async function settleDispatchResult(
     return;
   }
   const kind = msg.failureKind ?? "transient";
+  const automation = await repo.get(automationId);
   await repo.markDispatchFailed(automationId, {
     failedAt: now,
     error: msg.error ?? "dispatch failed",
     kind,
     // transient 达上限后循环任务跳下一个正常 next_run_at。
-    nextRunAt: await repo
-      .get(automationId)
-      .then((automation) => (automation ? computeAutomationNextRunAt(automation, now) : null)),
+    nextRunAt: automation ? computeAutomationNextRunAt(automation, now) : null,
   });
+  void notifyWebhookRunResult(automation, msg.runId, false, log, null, msg.error ?? "dispatch failed").catch(
+    () => {},
+  );
 }
 
 async function dispose(): Promise<void> {
