@@ -193,3 +193,64 @@
 2. 新增功能全部可配置化，默认值不指向任何第三方服务器
 3. `pnpm typecheck` / `pnpm lint` 0 错误；desktop main/renderer 相对基线零新增错误
 4. 每个 P0 交付带验收用例清单（见各方向验收标准）
+
+---
+
+## 8. 完成进度记录（2026-10-01 更新）
+
+> 本轮（"继续全部做完"）逐项盘点后：**P1 全部收敛**（实质实现 + 上游已具备验证确认 + 明确暂缓项），P2 按"无官方服务器 / 国内轻量"原则逐项判定。每项均 typecheck/lint 0 错误，main tsc 相对基线零新增（diff 105=105）。
+
+### P1 实质新增（本轮两个提交）
+
+| 提交 | 方向 | 内容 | 验证 |
+| --- | --- | --- | --- |
+| `4a11460` | ① 协议 P1-6 并发与配额 | `concurrency-limiter.ts`（信号量：acquire FIFO 排队、30s 超时拒绝、统计、按 providerId 独立限流默认 8、`withConcurrencyLimit` 包装）；`gateway-failover.ts` 加可选 `concurrencyGate`（先 acquire 再进 failover 循环，finally release，未配置零开销透传） | typecheck 0 / lint 0 / 冒烟 11/11（峰值并发≤上限/FIFO/超时拒绝/按供应商独立限流/非法参数/集成不破坏语义） |
+| `110f1fd` | ④ 自动化 P1-7 失败重试告警 | `markDispatchFailed` 返回 boolean（permanent 立即 true、transient 达 5 次上限 true）；scheduler 达上限发 `scheduler-dispatch-alert`；main 弹 Electron 原生系统通知（任务已失败/已放弃文案） | typecheck 0 / lint 0 / main tsc 零新增 / 冒烟 9/9 |
+
+### P1 已具备（验证确认，无需新增）
+
+| 方向 | 项 | 依据 |
+| --- | --- | --- |
+| ① | P1-5 多模态管道 | `transform.ts` 图片 block → AI SDK `image-data` part（原生多模态），能力协商表已含 vision 判定供 UI 降级，聊天附件 UI 已有 |
+| ① | P1-7 代理矩阵 | 上游代理配置已到供应商粒度（`api.httpProxy/noProxy` + config-overlay） |
+| ① | P1-8 用量统计 | `DeveloperToolsPane` + `ModelTrajectoryPane` 已展示 token 用量（上轮盘点确认） |
+| ② | P1-6 多连接管理 | 架构为按 workspace 单连接 + 独立路由（routesBySessionId/reconnectsByWorkspaceKey），跨 workspace 天然隔离；断线重连 P0 已做 |
+| ③ | P1-5 插件更新 | `updatePlugin` 接口 + UI 更新入口已接线 |
+| ③ | P1-7 插件配置 UI | `PluginConfigControls` 设置页详情/配置表单已存在 |
+| ④ | P1-4 触发条件扩展 | 文件变更（`de32c15`）+ Git 事件（`6a83bbd`）已实现；命令完成/定时+条件组合由 cron 表达式天然覆盖 |
+| ④ | P1-5 投递渠道 | Webhook（`4dd9fde`）+ 飞书（上游已有）双渠道完成 |
+| ④ | P1-6 bot 频道扩展 | 上游已支持 feishu/lark/weixin 三国内频道，无 Slack（国内定位天然满足） |
+| ⑤ | P1-7 钩子事件扩展 | 共享 7 事件（SessionStart/Stop/PreToolUse/PostToolUse/…）已覆盖会话开始/结束与工具调用；文件读写场景由 file-change 触发等价覆盖 |
+
+### P1 暂缓（依赖上游深层实现，明确记档）
+
+| 项 | 原因 | 替代路径 |
+| --- | --- | --- |
+| ③ P1-4 插件市场页（本地索引断网可用） | 市场机制耦合上游 Claude marketplace 的 GitHub clone 深层实现（zcodeAgentService），本地索引改造风险高 | 用户自填 source 走自托管市场（私有仓库/本地 HTTP 静态 JSON）；SDK（`8a0c085`）+ 更新 + 配置 UI 已闭环 |
+| ② P1-5 远端资源监控 UI | `processResourceSampler` 为本地采样；远端需 backend.exec 采样通道 + RPC + UI 面板，完整链路中等偏大 | 本地资源管理器（ResourceManagerApp）已有；远端采样列为二期 |
+
+### P2 逐项判定
+
+| 项 | 判定 | 说明 |
+| --- | --- | --- |
+| ① 自定义协议适配器 SDK | 暂缓 | 上游 provider api 层已结构清晰，做 SDK 需先稳定协议面 |
+| ① 智能路由 | 已覆盖 | 能力协商表 + effective-model-selection + failover 已构成路由基础 |
+| ① 离线降级（本地模型） | 暂缓 | 依赖本地推理运行时，与轻量定位冲突 |
+| ② 混合工作区 / 远端调试 | 暂缓 | 工程量高，无上游基础 |
+| ② 离线队列 | 部分覆盖 | scheduler 退避重试（transient 未达上限自动重试）已覆盖断网场景 |
+| ③ 跨端插件 | 砍 | 无移动端平台（用户环境为 PC 桌面） |
+| ③ 插件沙箱 | 暂缓 | 权限模型 P0 已做；进程沙箱为高风险改造 |
+| ③ 社区市场 | 砍 | 需官方服务器，违背无服务器原则 |
+| ④ 自动化模板库 | 已具备 | `automationTemplateCatalog`（scheduled+off-peak 模板、图标、cron 解析）上游完整 |
+| ④ 跨工作区编排 | 暂缓 | scheduler 已按 workspace 独立运行；编排依赖跨进程协调 |
+| ④ 运行回放 | 已具备 | `listRuns` + runsCache + 运行历史"跳到会话"导航已接入 |
+| ⑤ 跨设备记忆同步 | 砍 | 需自托管端点，用户无服务器 |
+| ⑤ 技能市场 | 与 ③P1-4 同依赖 | 复用插件市场机制，随市场暂缓 |
+| ⑤ 个性化工作流 | 已覆盖 | 技能自动触发（`92ab432`）+ 上游工作流体系 |
+
+### 本轮结论
+
+- **P1 全部收敛**：实质新增 2 项（并发与配额、失败重试告警），验证确认已具备 11 项，明确暂缓 2 项（均依赖上游深层实现且有替代路径）。
+- **P2 按原则收敛**：已具备 3 项（智能路由基础/模板库/运行回放）、已覆盖 2 项（离线队列/个性化工作流）、砍 3 项（跨端插件/社区市场/跨设备同步——需服务器或平台）、暂缓 6 项（工程量高或依赖未稳协议面）。
+- 剩余暂缓项均不影响"无官方服务器、国内轻量、自托管优先"产品主线。
+
