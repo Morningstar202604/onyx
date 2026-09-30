@@ -1,6 +1,6 @@
 /* eslint-disable max-lines -- 稳定性上报集中单模块，拆分反而增加跨文件状态同步 */
 import { createHash, randomUUID } from "node:crypto";
-import armsRum from "@arms/rum-electron";
+import armsRum from "./armsRumStub.js";
 import { BrowserWindow, type WebContents } from "electron";
 import {
   mapZCodeEnvToArmsRumEnv,
@@ -9,7 +9,7 @@ import {
   type HostAgentProcessExitedResponse,
   type HostAgentProcessReadyResponse,
   type HostAgentProcessSpawnedResponse,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import type { CrashCapturePaths } from "./desktopCrashCapture.js";
 import { registerCrashEventMonitor as registerBaseCrashEventMonitor } from "./desktopCrashCapture.js";
 import { getResourceManagerWindowId } from "./resourceManagerWindow.js";
@@ -187,14 +187,14 @@ function redactRemainingAbsolutePaths(value: string): string {
   const protectedPaths: string[] = [];
   const protectedValue = value.replace(AGENT_CRASH_KNOWN_PATH_PLACEHOLDER_PATTERN, (match) => {
     const index = protectedPaths.push(match) - 1;
-    return `ZCODE_REDACTED_PATH_${index}_TOKEN`;
+    return `ONYX_REDACTED_PATH_${index}_TOKEN`;
   });
   const redacted = protectedValue
     .replace(AGENT_CRASH_WINDOWS_ABSOLUTE_PATH_PATTERN, "<path>")
     .replace(AGENT_CRASH_POSIX_ABSOLUTE_PATH_PATTERN, "<path>");
   return protectedPaths.reduce(
     (result, protectedPath, index) =>
-      result.replace(`ZCODE_REDACTED_PATH_${index}_TOKEN`, protectedPath),
+      result.replace(`ONYX_REDACTED_PATH_${index}_TOKEN`, protectedPath),
     redacted,
   );
 }

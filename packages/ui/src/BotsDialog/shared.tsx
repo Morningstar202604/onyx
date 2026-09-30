@@ -2,8 +2,8 @@ import { Bot, Webhook } from "lucide-react";
 import type {
   BotConfig,
   BotServiceStatus,
-} from "@zcode/shared";
-import { ALL_BOT_WORKSPACES, BOT_BIND_CODE_TTL_MS } from "@zcode/shared";
+} from "@onyx/shared";
+import { ALL_BOT_WORKSPACES, BOT_BIND_CODE_TTL_MS } from "@onyx/shared";
 import {
   DingDingChannelIcon,
   DiscordChannelIcon,

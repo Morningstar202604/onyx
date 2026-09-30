@@ -1,13 +1,13 @@
 import { resolve } from "node:path";
-import { workspaceHookPolicySchema } from "@zcode/contracts";
-import type { WorkspaceHookPolicyProvider } from "@zcode/core";
+import { workspaceHookPolicySchema } from "@onyx/contracts";
+import type { WorkspaceHookPolicyProvider } from "@onyx/core";
 import {
   zcodeWorkspaceHookTrustGrantParamsSchema,
   zcodeWorkspaceHookTrustGrantReasonCodeSchema,
   zcodeWorkspaceHookTrustGrantResultSchema,
   type ZCodeWorkspaceHookTrustGrantReasonCode,
   type ZCodeWorkspaceHookTrustGrantResult,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import {
   grantWorkspaceHookTrust,
   type WorkspaceHookTrustCliStatus,

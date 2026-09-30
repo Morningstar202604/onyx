@@ -9,8 +9,8 @@ import type {
   ZCodePluginInfo,
   ZCodePluginComponentKind,
   ZCodePluginsDescribeResult,
-} from "@zcode/shared";
-import { isPluginCommand, isUserCommand, ZCODE_COMMAND_AGENT_SOURCE } from "@zcode/shared";
+} from "@onyx/shared";
+import { isPluginCommand, isUserCommand, ONYX_COMMAND_AGENT_SOURCE } from "@onyx/shared";
 import type { PluginComponentDisplayGroup } from "@/settings/PluginComponentGroups.js";
 
 interface ResourceGroups<TLocal, TPlugin> {
@@ -182,7 +182,7 @@ export function groupCommandsByPlugin(
   for (const command of commands) {
     if (
       isUserCommand(command) &&
-      command.agentSource === ZCODE_COMMAND_AGENT_SOURCE &&
+      command.agentSource === ONYX_COMMAND_AGENT_SOURCE &&
       normalizedQueryMatches(query, [command.name, command.description, command.prompt])
     ) {
       local.push(command);

@@ -18,9 +18,9 @@ const { environment: zcodeEnv, content: zcodeBuiltinProviderConfigJson } =
   await loadBuiltinProviderConfig();
 
 export const SERVER_HTTP_DEFINES = {
-  __ZCODE_VERSION__: JSON.stringify(version),
-  __ZCODE_ENV__: JSON.stringify(zcodeEnv),
-  __ZCODE_BUILTIN_PROVIDER_CONFIG_JSON__: JSON.stringify(zcodeBuiltinProviderConfigJson),
+  __ONYX_VERSION__: JSON.stringify(version),
+  __ONYX_ENV__: JSON.stringify(zcodeEnv),
+  __ONYX_BUILTIN_PROVIDER_CONFIG_JSON__: JSON.stringify(zcodeBuiltinProviderConfigJson),
 };
 
 function createSharedDefines() {
@@ -59,11 +59,11 @@ export default defineConfig({
   target: "node22",
   // workspace 包的 exports 指向 .ts 源码，node 运行时无法直接加载，需要 bundle 进来
   noExternal: [
-    "@zcode/shared",
-    "@zcode/rpc",
-    "@zcode/services",
-    "@zcode/services/node",
-    "@zcode/client",
+    "@onyx/shared",
+    "@onyx/rpc",
+    "@onyx/services",
+    "@onyx/services/node",
+    "@onyx/client",
   ],
   // ssh2 / node-pty 含 .node native addon，不能被 esbuild 处理。
   // undici / axios 这类 CJS 依赖被内联进 ESM bundle 后，运行时会走到

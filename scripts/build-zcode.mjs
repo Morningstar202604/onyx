@@ -14,7 +14,7 @@ import { installScriptSource } from "./zcode-distribution/installer.mjs";
 
 const root = resolve(import.meta.dirname, "..");
 const defaultOutDir = resolve(root, "dist", "zcode");
-const defaultBaseUrl = (await loadEndpointEnv()).ZCODE_DIST_BASE_URL?.trim() || "";
+const defaultBaseUrl = (await loadEndpointEnv()).ONYX_DIST_BASE_URL?.trim() || "";
 const packageDirName = "zcode";
 const usage = `Usage:
   pnpm build:zcode
@@ -145,13 +145,13 @@ async function buildOutputs(skipBuild) {
     return;
   }
 
-  run("pnpm", ["--filter", "@zcode/cli...", "build"]);
+  run("pnpm", ["--filter", "@onyx/cli...", "build"]);
   await rm(resolve(root, "packages", "server", "dist"), {
     force: true,
     recursive: true,
   });
-  run("pnpm", ["--filter", "@zcode/server", "build"]);
-  run("pnpm", ["--filter", "@zcode/web", "build"]);
+  run("pnpm", ["--filter", "@onyx/server", "build"]);
+  run("pnpm", ["--filter", "@onyx/web", "build"]);
 }
 
 async function stageZCodePackage({ packageRoot, version }) {
@@ -233,7 +233,7 @@ async function createTarball({ packageParent, releaseDir, tarballName }) {
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   if (!options.help && !options.baseUrl)
-    throw new Error("Configure ZCODE_DIST_BASE_URL in .env or pass --base-url");
+    throw new Error("Configure ONYX_DIST_BASE_URL in .env or pass --base-url");
   if (options.help) {
     console.log(usage);
     return;

@@ -1,5 +1,5 @@
-import armsRum from "@arms/rum-electron";
-import type { ArmsRumEnv, FinalArmsCustomEventPayload } from "@zcode/shared";
+import armsRum from "./armsRumStub.js";
+import type { ArmsRumEnv, FinalArmsCustomEventPayload } from "@onyx/shared";
 
 import type { ZCodeDataSizeScanResult } from "./zcodeDataSizeScanner.js";
 import {
@@ -11,18 +11,18 @@ import { scanZCodeDataDirectoryInWorker } from "./zcodeDataSizeWorkerClient.js";
 
 export type { ZCodeDataSizeTelemetryState } from "./zcodeDataSizeTelemetryState.js";
 
-const ZCODE_DATA_SIZE_SCAN_MAX_DURATION_MS = 30_000;
-const ZCODE_DATA_SIZE_SCAN_MAX_FILES = 200_000;
-const ZCODE_DATA_SIZE_DAILY_INTERVAL_MS = 24 * 60 * 60 * 1000;
-const ZCODE_DATA_SIZE_IDLE_POLL_MS = 5 * 60 * 1000;
-const ZCODE_DATA_SIZE_IDLE_WAIT_FALLBACK_MS = 6 * 60 * 60 * 1000;
-const ZCODE_DATA_SIZE_MINIMUM_IDLE_SECONDS = 5 * 60;
-const ZCODE_DATA_SIZE_STARTUP_MIN_DELAY_MS = 2 * 60 * 1000;
-const ZCODE_DATA_SIZE_STARTUP_JITTER_MAX_MS = 8 * 60 * 1000;
-const ZCODE_DATA_SIZE_DAILY_JITTER_MAX_MS = 60 * 60 * 1000;
-const ZCODE_DATA_SIZE_ABORTED_RETRY_MS = 30 * 60 * 1000;
-const ZCODE_DATA_SIZE_FAILURE_RETRY_MS = 6 * 60 * 60 * 1000;
-const ZCODE_DATA_SIZE_ACTIVITY_POLL_MS = 1_000;
+const ONYX_DATA_SIZE_SCAN_MAX_DURATION_MS = 30_000;
+const ONYX_DATA_SIZE_SCAN_MAX_FILES = 200_000;
+const ONYX_DATA_SIZE_DAILY_INTERVAL_MS = 24 * 60 * 60 * 1000;
+const ONYX_DATA_SIZE_IDLE_POLL_MS = 5 * 60 * 1000;
+const ONYX_DATA_SIZE_IDLE_WAIT_FALLBACK_MS = 6 * 60 * 60 * 1000;
+const ONYX_DATA_SIZE_MINIMUM_IDLE_SECONDS = 5 * 60;
+const ONYX_DATA_SIZE_STARTUP_MIN_DELAY_MS = 2 * 60 * 1000;
+const ONYX_DATA_SIZE_STARTUP_JITTER_MAX_MS = 8 * 60 * 1000;
+const ONYX_DATA_SIZE_DAILY_JITTER_MAX_MS = 60 * 60 * 1000;
+const ONYX_DATA_SIZE_ABORTED_RETRY_MS = 30 * 60 * 1000;
+const ONYX_DATA_SIZE_FAILURE_RETRY_MS = 6 * 60 * 60 * 1000;
+const ONYX_DATA_SIZE_ACTIVITY_POLL_MS = 1_000;
 
 interface ZCodeDataSizeTelemetryTiming {
   abortedRetryMs: number;
@@ -38,16 +38,16 @@ interface ZCodeDataSizeTelemetryTiming {
 }
 
 const DEFAULT_TIMING: ZCodeDataSizeTelemetryTiming = {
-  abortedRetryMs: ZCODE_DATA_SIZE_ABORTED_RETRY_MS,
-  activityPollMs: ZCODE_DATA_SIZE_ACTIVITY_POLL_MS,
-  dailyIntervalMs: ZCODE_DATA_SIZE_DAILY_INTERVAL_MS,
-  dailyJitterMaxMs: ZCODE_DATA_SIZE_DAILY_JITTER_MAX_MS,
-  failureRetryMs: ZCODE_DATA_SIZE_FAILURE_RETRY_MS,
-  idlePollMs: ZCODE_DATA_SIZE_IDLE_POLL_MS,
-  idleWaitFallbackMs: ZCODE_DATA_SIZE_IDLE_WAIT_FALLBACK_MS,
-  minimumIdleSeconds: ZCODE_DATA_SIZE_MINIMUM_IDLE_SECONDS,
-  startupJitterMaxMs: ZCODE_DATA_SIZE_STARTUP_JITTER_MAX_MS,
-  startupMinDelayMs: ZCODE_DATA_SIZE_STARTUP_MIN_DELAY_MS,
+  abortedRetryMs: ONYX_DATA_SIZE_ABORTED_RETRY_MS,
+  activityPollMs: ONYX_DATA_SIZE_ACTIVITY_POLL_MS,
+  dailyIntervalMs: ONYX_DATA_SIZE_DAILY_INTERVAL_MS,
+  dailyJitterMaxMs: ONYX_DATA_SIZE_DAILY_JITTER_MAX_MS,
+  failureRetryMs: ONYX_DATA_SIZE_FAILURE_RETRY_MS,
+  idlePollMs: ONYX_DATA_SIZE_IDLE_POLL_MS,
+  idleWaitFallbackMs: ONYX_DATA_SIZE_IDLE_WAIT_FALLBACK_MS,
+  minimumIdleSeconds: ONYX_DATA_SIZE_MINIMUM_IDLE_SECONDS,
+  startupJitterMaxMs: ONYX_DATA_SIZE_STARTUP_JITTER_MAX_MS,
+  startupMinDelayMs: ONYX_DATA_SIZE_STARTUP_MIN_DELAY_MS,
 };
 
 interface ZCodeDataSizeTelemetryLogger {
@@ -130,7 +130,7 @@ function stableJitterMs(deviceMid: string, bucketAt: number, maxMs: number): num
   if (maxMs <= 0) {
     return 0;
   }
-  const key = `${deviceMid}:${Math.floor(bucketAt / ZCODE_DATA_SIZE_DAILY_INTERVAL_MS)}`;
+  const key = `${deviceMid}:${Math.floor(bucketAt / ONYX_DATA_SIZE_DAILY_INTERVAL_MS)}`;
   let hash = 2_166_136_261;
   for (let index = 0; index < key.length; index += 1) {
     hash ^= key.charCodeAt(index);
@@ -422,8 +422,8 @@ export function registerDesktopZCodeDataSizeTelemetry(options: {
     scan: ({ signal }) =>
       scanZCodeDataDirectoryInWorker(
         {
-          maxDurationMs: ZCODE_DATA_SIZE_SCAN_MAX_DURATION_MS,
-          maxFiles: ZCODE_DATA_SIZE_SCAN_MAX_FILES,
+          maxDurationMs: ONYX_DATA_SIZE_SCAN_MAX_DURATION_MS,
+          maxFiles: ONYX_DATA_SIZE_SCAN_MAX_FILES,
           rootPath: options.rootPath,
         },
         signal,

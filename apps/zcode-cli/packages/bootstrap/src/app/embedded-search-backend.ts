@@ -1,7 +1,7 @@
-import type { EmbeddedSearchBackend } from "@zcode/contracts";
-import { getRuntimeToolRuntime } from "@zcode/shared";
+import type { EmbeddedSearchBackend } from "@onyx/contracts";
+import { getRuntimeToolRuntime } from "@onyx/shared";
 
-const EMBEDDED_SEARCH_COMMAND_ENV = "ZCODE_EMBEDDED_SEARCH_COMMAND";
+const EMBEDDED_SEARCH_COMMAND_ENV = "ONYX_EMBEDDED_SEARCH_COMMAND";
 const INTERNAL_SEARCH_ENTRYPOINT = "__internal-search";
 
 export function resolveDefaultEmbeddedSearchBackend(input: {

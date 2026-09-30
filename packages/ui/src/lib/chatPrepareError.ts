@@ -1,9 +1,9 @@
 import {
   normalizeUnknownError,
-  ZCODE_AGENT_PROVIDER_NOT_READY_CODE,
+  ONYX_AGENT_PROVIDER_NOT_READY_CODE,
   type ZCodeProvider,
   type ZCodeError,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { normalizeZCodeUiError } from "@/lib/zcodeUiError.js";
 
 export const MODEL_CONFIG_MISSING_UI_ERROR_CODE = "model_config_missing";
@@ -22,7 +22,7 @@ export function buildModelConfigMissingUiError(): ModelConfigMissingUiError {
 }
 
 export function isProviderNotReadyError(error: unknown): boolean {
-  return normalizeUnknownError(error).code === ZCODE_AGENT_PROVIDER_NOT_READY_CODE;
+  return normalizeUnknownError(error).code === ONYX_AGENT_PROVIDER_NOT_READY_CODE;
 }
 
 interface WorkspacePrepareErrorContext {

@@ -1,5 +1,5 @@
-import type { Event } from "@zcode/rpc";
-import { ServiceChannels } from "@zcode/shared";
+import type { Event } from "@onyx/rpc";
+import { ServiceChannels } from "@onyx/shared";
 import { createServiceDescriptor } from "../descriptors.js";
 
 export type PromptAttachmentTransferPhase = "uploading" | "committing" | "complete" | "canceled";

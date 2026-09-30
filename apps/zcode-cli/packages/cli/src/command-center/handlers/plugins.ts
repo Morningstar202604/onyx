@@ -1,5 +1,5 @@
-import type { TuiSelection, TuiSubmitPromptResult } from "@zcode/tui";
-import { resolvePluginDisplayName } from "@zcode/shared";
+import type { TuiSelection, TuiSubmitPromptResult } from "@onyx/tui";
+import { resolvePluginDisplayName } from "@onyx/shared";
 import type {
   CommandCenterDeps,
   CommandCenterPluginListOutcome,

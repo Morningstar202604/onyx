@@ -13,7 +13,7 @@ import type {
   ConversationShareContinuation,
   ConversationShareRecord,
   Locale,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import {
   decodeConversationShareRows,
   buildConversationPreviewArtifactCandidates,
@@ -22,14 +22,14 @@ import {
   type ConversationPreviewArtifactCandidate,
   localizeConversationShareUrl,
   resolveRuntimeZCodeEndpointOrigin,
-} from "@zcode/shared";
-import type { ConversationRow } from "@zcode/shared/zcode-protocol-v4";
+} from "@onyx/shared";
+import type { ConversationRow } from "@onyx/shared/zcode-protocol-v4";
 import {
   PROTOCOL_V4_LIMITS,
-  ZCODE_ATTACHMENT_FAULT_CODES,
+  ONYX_ATTACHMENT_FAULT_CODES,
   readZCodeAttachmentFaultCode,
-} from "@zcode/shared/zcode-protocol-v4";
-import { Emitter } from "@zcode/rpc";
+} from "@onyx/shared/zcode-protocol-v4";
+import { Emitter } from "@onyx/rpc";
 
 import type { IZCodeAgentService } from "../zcode-agent/zcodeAgent.js";
 import type { IZCodeSessionService } from "#src/zcode-session/zcodeSession.js";
@@ -308,7 +308,7 @@ function hasUnsafeShareString(value: unknown): boolean {
 }
 
 function hasUnsupportedArtifactReference(value: unknown): boolean {
-  if (typeof value === "string") return /^zcode-artifact:\/\//iu.test(value);
+  if (typeof value === "string") return /^onyx-artifact:\/\//iu.test(value);
   if (Array.isArray(value)) return value.some(hasUnsupportedArtifactReference);
   if (!value || typeof value !== "object") return false;
   return Object.entries(value as Record<string, unknown>).some(([key, entry]) =>
@@ -519,8 +519,8 @@ function isDefiniteMissingAttachment(error: unknown): boolean {
   const faultCode = readZCodeAttachmentFaultCode(error);
   if (faultCode) {
     return (
-      faultCode === ZCODE_ATTACHMENT_FAULT_CODES.shareStatNotFound ||
-      faultCode === ZCODE_ATTACHMENT_FAULT_CODES.statNotFile
+      faultCode === ONYX_ATTACHMENT_FAULT_CODES.shareStatNotFound ||
+      faultCode === ONYX_ATTACHMENT_FAULT_CODES.statNotFile
     );
   }
   const message = error instanceof Error ? error.message : String(error);
@@ -531,10 +531,10 @@ function isAttachmentAuthorizationError(error: unknown): boolean {
   const faultCode = readZCodeAttachmentFaultCode(error);
   if (faultCode) {
     return (
-      faultCode === ZCODE_ATTACHMENT_FAULT_CODES.shareStatNotAuthorized ||
-      faultCode === ZCODE_ATTACHMENT_FAULT_CODES.shareReadNotAuthorized ||
-      faultCode === ZCODE_ATTACHMENT_FAULT_CODES.shareStatConnectionUntrusted ||
-      faultCode === ZCODE_ATTACHMENT_FAULT_CODES.shareReadConnectionUntrusted
+      faultCode === ONYX_ATTACHMENT_FAULT_CODES.shareStatNotAuthorized ||
+      faultCode === ONYX_ATTACHMENT_FAULT_CODES.shareReadNotAuthorized ||
+      faultCode === ONYX_ATTACHMENT_FAULT_CODES.shareStatConnectionUntrusted ||
+      faultCode === ONYX_ATTACHMENT_FAULT_CODES.shareReadConnectionUntrusted
     );
   }
   const message = error instanceof Error ? error.message : String(error);
@@ -545,8 +545,8 @@ function isAttachmentAuthorizationError(error: unknown): boolean {
 function isAttachmentTooLargeError(error: unknown): boolean {
   const faultCode = readZCodeAttachmentFaultCode(error);
   return (
-    faultCode === ZCODE_ATTACHMENT_FAULT_CODES.shareStatTooLarge ||
-    faultCode === ZCODE_ATTACHMENT_FAULT_CODES.previewTooLarge
+    faultCode === ONYX_ATTACHMENT_FAULT_CODES.shareStatTooLarge ||
+    faultCode === ONYX_ATTACHMENT_FAULT_CODES.previewTooLarge
   );
 }
 
@@ -719,16 +719,17 @@ export class ConversationShareService implements IConversationShareService {
     this.downloadTimeoutMs = options.downloadTimeoutMs ?? DOWNLOAD_TIMEOUT_MS;
     this.conversationWorkspaceRoot =
       options.conversationWorkspaceRoot ?? getConversationWorkspaceDir();
-    // 兜底写死生产站 https://zcode.z.ai/cn/share，于是测试环境（API base 走
-    // 配置的 ZCode origin）导入后回链仍指向生产站，点分割线打开的是另一个环境的分享。
-    // 改用与 API base 同一个环境解析器（buildRuntimeZCodeApiUrl 也走它），保证同环境。
-    // 优先级不变：显式 option > ZCODE_CONVERSATION_SHARE_WEB_URL > 按环境推导。
-    this.shareWebUrl = (
+    // 原上游兜底写死生产站 https://zcode.z.ai/cn/share；Onyx 无官方服务器，
+    // 未配置分享站点时 shareWebUrl 置空（分享回链随之失效，不产生任何上游地址）。
+    // 优先级不变：显式 option > ONYX_CONVERSATION_SHARE_WEB_URL > 按环境推导（可为空）。
+    const resolvedShareOrigin =
       options.shareWebUrl ??
-      process.env.ZCODE_CONVERSATION_SHARE_WEB_URL ??
-      `${resolveRuntimeZCodeEndpointOrigin(process.env)}/cn/share`
-    ).replace(/\/+$/u, "");
-    this.importIndexPath = join(this.conversationWorkspaceRoot, ".zcode-share-imports.json");
+      process.env.ONYX_CONVERSATION_SHARE_WEB_URL ??
+      resolveRuntimeZCodeEndpointOrigin(process.env);
+    this.shareWebUrl = resolvedShareOrigin
+      ? `${resolvedShareOrigin}/cn/share`.replace(/\/+$/u, "")
+      : "";
+    this.importIndexPath = join(this.conversationWorkspaceRoot, ".onyx-share-imports.json");
     this.logger = options.logger ?? createServiceLogger("conversation-share");
     this.completedImportsLoaded = this.loadCompletedImportIndex();
     if (this.zcodeSessionService) {
@@ -1388,9 +1389,9 @@ export class ConversationShareService implements IConversationShareService {
         : this.conversationWorkspaceRoot;
     const workspaceIdentity =
       input.targetWorkspaceIdentity && !remoteTarget ? input.targetWorkspaceIdentity : undefined;
-    const shareRoot = join(workspacePath, ".zcode-share");
+    const shareRoot = join(workspacePath, ".onyx-share");
     const importRoot = join(shareRoot, sanitizeFileSegment(continuation.share.share_id));
-    const markerPath = join(importRoot, ".zcode-share-import.json");
+    const markerPath = join(importRoot, ".onyx-share-import.json");
     const stagingPath = join(importRoot, ".share-import-staging");
     const finalArtifactsPath = join(importRoot, "shared-artifacts");
     const conversationPath = join(importRoot, "shared-conversation.json");
@@ -1400,7 +1401,10 @@ export class ConversationShareService implements IConversationShareService {
     // 这个 URL 会进持久化的 provenance 与 sharedContextImport 快照，而
     // sharedContextImportV2StateSchema 只接受规范的 /cn/share/<code>；durable 记录也不该
     // 存随界面语言变化的值（用户之后切语言，存的就错了）。本地化只在展示时做。
-    const shareUrl = `${this.shareWebUrl}/${encodeURIComponent(input.shareCode)}`;
+    // Onyx 未配置分享站点时 shareWebUrl 为空，回链留空、不进 provenance。
+    const shareUrl = this.shareWebUrl
+      ? `${this.shareWebUrl}/${encodeURIComponent(input.shareCode)}`
+      : "";
     await mkdir(shareRoot, { recursive: true });
     try {
       const existingMarker = JSON.parse(await readFile(markerPath, "utf8")) as Record<
@@ -1547,7 +1551,7 @@ export class ConversationShareService implements IConversationShareService {
         await writeFile(join(stagingPath, fileName), bytes);
         installedArtifacts.push({
           artifactId: artifact.artifact_id,
-          workspaceRelativePath: `.zcode-share/${sanitizeFileSegment(continuation.share.share_id)}/shared-artifacts/${fileName}`,
+          workspaceRelativePath: `.onyx-share/${sanitizeFileSegment(continuation.share.share_id)}/shared-artifacts/${fileName}`,
           displayName: artifact.display_name,
           mimeType: artifact.mime_type,
           sha256: artifact.sha256,
@@ -1707,7 +1711,7 @@ export class ConversationShareService implements IConversationShareService {
   /**
    * 按 contextId 找回导入时落盘的公开 rows。
    *
-   * 目录名用的是 share_id 而不是 contextId（二者不等价），所以扫 .zcode-share/ 下各
+   * 目录名用的是 share_id 而不是 contextId（二者不等价），所以扫 .onyx-share/ 下各
    * importRoot 并比对文件内的 contextId —— 不额外维护索引，历史导入也能被读到。
    * 内容来自磁盘，属跨存储边界，必须过 schema 再交给渲染层。
    */
@@ -1715,7 +1719,7 @@ export class ConversationShareService implements IConversationShareService {
     workspacePath: string;
     contextId: string;
   }): Promise<ImportedConversationShare | null> {
-    const shareRoot = join(input.workspacePath, ".zcode-share");
+    const shareRoot = join(input.workspacePath, ".onyx-share");
     let entries: Dirent[];
     try {
       entries = await readdir(shareRoot, { withFileTypes: true });
@@ -2169,12 +2173,12 @@ export class ConversationShareService implements IConversationShareService {
     await this.completedImportsLoaded;
     // 只扫描默认 conversation workspace 的 import-owned 子目录；其它 workspace 的 marker
     // 在下一次带 target 的导入请求中处理，避免启动期枚举并触碰用户项目目录。
-    const shareRoot = join(this.conversationWorkspaceRoot, ".zcode-share");
+    const shareRoot = join(this.conversationWorkspaceRoot, ".onyx-share");
     const imports = await readdir(shareRoot, { withFileTypes: true }).catch(() => []);
     for (const entry of imports) {
       if (!entry.isDirectory()) continue;
       const importRoot = join(shareRoot, entry.name);
-      const markerPath = join(importRoot, ".zcode-share-import.json");
+      const markerPath = join(importRoot, ".onyx-share-import.json");
       let marker: {
         sessionId?: unknown;
         shareCode?: unknown;

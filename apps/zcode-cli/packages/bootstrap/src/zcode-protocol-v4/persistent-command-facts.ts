@@ -3,8 +3,8 @@ import type {
   SessionId,
   SessionInputRecord,
   SessionStorePort,
-} from "@zcode/contracts";
-import type { CommandAck } from "@zcode/shared/zcode-protocol-v4";
+} from "@onyx/contracts";
+import type { CommandAck } from "@onyx/shared/zcode-protocol-v4";
 import type { PersistentCommandFactSource } from "./persistent-command-index.js";
 
 const V4_COMMAND_FACT_SESSION_ENTRY = "v4/command_fact";

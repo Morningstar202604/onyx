@@ -25,14 +25,14 @@ import type {
   TraceId,
   ToolCallId,
   TurnId,
-} from "@zcode/contracts";
-import type { PendingTurnInput } from "@zcode/contracts";
+} from "@onyx/contracts";
+import type { PendingTurnInput } from "@onyx/contracts";
 import {
   createTurnId,
   createCoreError,
   CoreErrorType,
   modelMessageContentToText,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 
 // -----------------------------------------------
 // Turn Machine

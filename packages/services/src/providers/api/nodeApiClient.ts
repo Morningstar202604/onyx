@@ -1,11 +1,11 @@
 import {
   ApiError,
-  DEFAULT_ZCODE_ENDPOINT_ORIGIN,
+  DEFAULT_ONYX_ENDPOINT_ORIGIN,
   normalizeZCodeEndpointOrigin,
   rewriteZCodeEndpointUrl,
   type ApiClient,
   type ApiRequestInit,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { createServiceLogger } from "#src/logger/serviceLogger.js";
 import { buildZCodeSourceHeaders } from "../sourceHeaders.js";
 import { withRequestIdHeader } from "./requestIdHeaders.js";
@@ -53,7 +53,7 @@ function withZCodeEndpointHeaders(
     });
   }
 
-  if (next.get("HTTP-Referer") === DEFAULT_ZCODE_ENDPOINT_ORIGIN) {
+  if (next.get("HTTP-Referer") === DEFAULT_ONYX_ENDPOINT_ORIGIN) {
     next.set("HTTP-Referer", endpointOrigin);
   }
   return next;
@@ -90,7 +90,7 @@ export class NodeApiClient implements ApiClient {
     const endpointOrigin = this.resolveZCodeEndpointOrigin
       ? await this.resolveZCodeEndpointOrigin()
       : undefined;
-    const activeEndpointOrigin = endpointOrigin ?? DEFAULT_ZCODE_ENDPOINT_ORIGIN;
+    const activeEndpointOrigin = endpointOrigin ?? DEFAULT_ONYX_ENDPOINT_ORIGIN;
     const requestInput = rewriteZCodeEndpointUrl(input, activeEndpointOrigin);
     const url = resolveUrl(requestInput);
     const method = resolveMethod(init);

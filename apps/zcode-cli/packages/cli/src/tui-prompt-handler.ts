@@ -1,9 +1,9 @@
-import { getDefaultConfigPath, updateUiLocaleInFileConfig } from "@zcode/adapters/config";
-import type { SessionEvent } from "@zcode/contracts";
-import type { ZCodeAppOptions } from "@zcode/bootstrap";
-import { DEFAULT_LOCALE, type SupportedLocale } from "@zcode/i18n";
-import type { TuiRequestPermission } from "@zcode/tui";
-import type { GlobalOptions } from "@zcode/shared-types";
+import { getDefaultConfigPath, updateUiLocaleInFileConfig } from "@onyx/adapters/config";
+import type { SessionEvent } from "@onyx/contracts";
+import type { ZCodeAppOptions } from "@onyx/bootstrap";
+import { DEFAULT_LOCALE, type SupportedLocale } from "@onyx/i18n";
+import type { TuiRequestPermission } from "@onyx/tui";
+import type { GlobalOptions } from "@onyx/shared-types";
 import { createCommandCenter, parseSlashCommand } from "./command-center.js";
 import type { CommandCenterApp } from "./command-center.js";
 import { resolveDisplayLocale } from "./locale.js";

@@ -1,9 +1,9 @@
 import {
   mapZCodeEnvToArmsRumEnv,
   type ZCodeRuntimeEnv,
-  ZCODE_ARMS_RUM_ENDPOINT,
-  ZCODE_VERSION,
-} from "@zcode/shared";
+  ONYX_ARMS_RUM_ENDPOINT,
+  ONYX_VERSION,
+} from "@onyx/shared";
 
 /** 主进程 init 的 browserCollectors，经 autoInject 注入到 renderer 的 RumSDK.init(collectors) */
 export const ARMS_BROWSER_COLLECTORS = {
@@ -37,8 +37,8 @@ export function parseArmsViewName(url: string): string {
 export function buildArmsBrowserInitConfig(runtimeEnv: ZCodeRuntimeEnv) {
   return {
     enable: true,
-    version: ZCODE_VERSION,
-    endpoint: ZCODE_ARMS_RUM_ENDPOINT,
+    version: ONYX_VERSION,
+    endpoint: ONYX_ARMS_RUM_ENDPOINT,
     env: mapZCodeEnvToArmsRumEnv(runtimeEnv),
     sessionConfig: {
       sampleRate: 1,

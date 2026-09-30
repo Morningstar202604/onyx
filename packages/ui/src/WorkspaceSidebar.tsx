@@ -46,7 +46,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import type { Locale, RemoteTarget, ZCodeTaskMeta } from "@zcode/shared";
+import type { Locale, RemoteTarget, ZCodeTaskMeta } from "@onyx/shared";
 import type { UserInfo } from "@/lib/userInfo.js";
 import {
   TID_CONVERSATION_NEW_TASK,
@@ -56,7 +56,7 @@ import {
   TID_PROJECT_SECTION,
   TID_SIDEBAR,
   TID_WORKSPACE_LIST,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { ControlHintTooltip } from "@/ControlHintTooltip.js";
 import { Button } from "@/components/ui/button.js";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs.js";

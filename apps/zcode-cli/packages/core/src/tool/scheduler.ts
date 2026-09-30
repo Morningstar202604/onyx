@@ -2,8 +2,8 @@
 // Tool Scheduler - Tool execution scheduling
 // ============================================================
 
-import type { ModelToolSideEffectScope, ToolCallId } from "@zcode/contracts";
-import { createCoreError, CoreErrorType } from "@zcode/contracts";
+import type { ModelToolSideEffectScope, ToolCallId } from "@onyx/contracts";
+import { createCoreError, CoreErrorType } from "@onyx/contracts";
 
 // -----------------------------------------------
 // Types

@@ -5,7 +5,7 @@ import {
   type BrowserClientMode,
   type BrowserCommand,
   type ZCodeBrowserAmbientContext,
-} from "@zcode/shared";
+} from "@onyx/shared";
 
 export interface BrowserAmbientContextExecutor {
   list(input: {

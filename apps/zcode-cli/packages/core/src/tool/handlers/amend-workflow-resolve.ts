@@ -11,7 +11,7 @@ import {
   AmendWorkflowInputSchema,
   type AmendWorkflowInput,
   type ModelCatalogPort,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import type {
   ToolHandlerFailure,
   ToolInputResolutionContext,

@@ -4,7 +4,7 @@
  * 从 zcodeSessionStore.ts 拆分出来，包含 workspace 状态读取/更新辅助函数，
  * 以及所有按 task 粒度的只读访问器和独立选择器。
  */
-import type { ZCodeTaskRuntimeStatus, ZCodeTaskMeta } from "@zcode/shared";
+import type { ZCodeTaskRuntimeStatus, ZCodeTaskMeta } from "@onyx/shared";
 import { mergeTaskWithOptimisticMeta } from "@/lib/zcodeTaskMetaMerge.js";
 import {
   DEFAULT_TASK_UI_STATE,
@@ -148,7 +148,7 @@ export function updateWorkspaceState(
   const nextWorkspaceState = updater(current);
 
   if (nextWorkspaceState === current) {
-    // 单 ZCode Agent 迁移后旧 provider 选择都会归一为 glm，很多调用实际不会改变状态。
+    // 单 Onyx Agent 迁移后旧 provider 选择都会归一为 glm，很多调用实际不会改变状态。
     // 如果仍把 merged overlay 快照写回 identity bucket，会打破 selector 的引用缓存并触发无意义重渲染。
     return { workspaces: state.workspaces };
   }

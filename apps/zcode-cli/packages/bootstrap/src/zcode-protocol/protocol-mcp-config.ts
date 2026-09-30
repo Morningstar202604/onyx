@@ -1,5 +1,5 @@
-import type { McpServerConfig } from "@zcode/contracts";
-import type { ZCodeProtocolMcpServer } from "@zcode/shared";
+import type { McpServerConfig } from "@onyx/contracts";
+import type { ZCodeProtocolMcpServer } from "@onyx/shared";
 
 export function protocolMcpServersToRuntimeMcpConfig(
   servers: ZCodeProtocolMcpServer[] | undefined,
@@ -16,7 +16,7 @@ export function protocolMcpServersToRuntimeMcpConfig(
         command: server.command,
         args: server.args,
         env: Object.fromEntries(server.env.map(({ name, value }) => [name, value])),
-        // ZCode Protocol 的 mcpServers 是 session/runtime 和状态查询的完整覆盖配置。
+        // Onyx Protocol 的 mcpServers 是 session/runtime 和状态查询的完整覆盖配置。
         // 这里如果不还原 timeoutMs，UI 保存的超时会在真实工具初始化或 mcp/list 探测前丢失。
         ...(server.timeoutMs !== undefined ? { timeoutMs: server.timeoutMs } : {}),
         ...(server.isolation !== undefined ? { isolation: server.isolation } : {}),

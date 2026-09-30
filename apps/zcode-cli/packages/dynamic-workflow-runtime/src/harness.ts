@@ -3,13 +3,13 @@
  *
  * 职责：把一份 workflow 脚本（或已 lowered 的函数体）在受控子进程里跑起来，用 NDJSON 桥接
  * 子进程的 `__host.*` 调用到一个 {@link WorkflowEngine} 实例，最终返回引擎的 {@link RunSettlement}。
- * 本包**只**依赖 `@zcode/dynamic-workflow` 与 node 内建——证明整条管线 app-free 可跑，
- * 绝不 import `@zcode/core`/`@zcode/contracts`/`@zcode/bootstrap`/`@zcode/adapters`。
+ * 本包**只**依赖 `@onyx/dynamic-workflow` 与 node 内建——证明整条管线 app-free 可跑，
+ * 绝不 import `@onyx/core`/`@onyx/contracts`/`@onyx/bootstrap`/`@onyx/adapters`。
  *
  * 时序（happy path）：
  *
  *   parent                         child(vm)
- *     │  write <cwd>/.zcode/workflow-runs/<runId>.mjs（payload: lowered+args 内嵌）
+ *     │  write <cwd>/.onyx/workflow-runs/<runId>.mjs（payload: lowered+args 内嵌）
  *     │  spawn(node <entry>)
  *     │──────────────────────────▶│  build __host in context
  *     │◀── create-actor(local#1) ──│  createActor 同步返回 local#1
@@ -42,7 +42,7 @@ import {
   type ValidateFn,
   type WorkflowDriver,
   type WorkflowReportSink,
-} from "@zcode/dynamic-workflow";
+} from "@onyx/dynamic-workflow";
 import { type ChildMessage, type ChildPayload, type ResponseMessage } from "./protocol.js";
 import { renderChildEntry } from "./child-source.js";
 import { writeChildEntryFile, type HarnessWarning } from "./child-entry-file.js";
@@ -121,7 +121,7 @@ export interface RunWorkflowOptions {
    */
   childSpawn?: { argsPrefix: readonly string[] };
   /**
-   * 非致命状况的上报口（今日只有一种：入口文件写不进项目 `.zcode/`，回落到了 OS 临时目录）。
+   * 非致命状况的上报口（今日只有一种：入口文件写不进项目 `.onyx/`，回落到了 OS 临时目录）。
    * harness 是 app-free 的，没有 logger；bootstrap 把它接到自己的 warn 日志。
    */
   onWarning?: (warning: HarnessWarning) => void;

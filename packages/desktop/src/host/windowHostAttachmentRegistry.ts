@@ -1,5 +1,5 @@
-import type { WindowHostAttachmentScope } from "@zcode/shared";
-import type { ZCodeAgentV4ClientMode } from "@zcode/services";
+import type { WindowHostAttachmentScope } from "@onyx/shared";
+import type { ZCodeAgentV4ClientMode } from "@onyx/services";
 
 interface WindowHostAttachmentPort {
   once(event: "close", listener: () => void): unknown;

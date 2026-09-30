@@ -1,7 +1,7 @@
-import type { Logger, McpPort } from "@zcode/contracts";
-import type { McpConnectionPool, McpTelemetryTracker } from "@zcode/adapters/mcp";
-import type { SqliteSessionStore } from "@zcode/adapters/storage";
-import { shutdownPreparedModelTelemetry } from "@zcode/telemetry";
+import type { Logger, McpPort } from "@onyx/contracts";
+import type { McpConnectionPool, McpTelemetryTracker } from "@onyx/adapters/mcp";
+import type { SqliteSessionStore } from "@onyx/adapters/storage";
+import { shutdownPreparedModelTelemetry } from "@onyx/telemetry";
 import { closeSessionStore } from "../app/session-store.js";
 import type { NodeReplBrowserBroker } from "../app/node-repl-browser-broker.js";
 import type { ZCodeProcessResourceSampler } from "../process-resource-sampler.js";
@@ -37,7 +37,7 @@ export async function cleanupProtocolRuntime(options: {
         }),
       ]);
     } catch (error) {
-      options.logger.warn(`ZCode Protocol ${resource} shutdown failed`, {
+      options.logger.warn(`Onyx Protocol ${resource} shutdown failed`, {
         errorType: error instanceof Error ? error.name : typeof error,
         event: `zcode_protocol.${resource}.shutdown.failed`,
         module: "bootstrap.zcode_protocol",

@@ -1,7 +1,8 @@
 import { randomBytes } from "node:crypto";
-import type { HttpClientPort, HttpClientRunOptions, TraceContext } from "@zcode/contracts";
+import type { HttpClientPort, HttpClientRunOptions, TraceContext } from "@onyx/contracts";
 
-const DEFAULT_ZCODE_OAUTH_BASE_URL = "https://zcode.z.ai/api/v1";
+// Onyx 无官方账号服务器：默认 OAuth base 置空，未显式配置即发起登录会直接失败。
+const DEFAULT_ONYX_OAUTH_BASE_URL = "";
 export type CliOAuthProviderId = "zai" | "bigmodel";
 const POLL_TOKEN_BYTES = 32;
 const JSON_CONTENT_TYPE = "application/json";
@@ -73,7 +74,7 @@ export class CliOAuthError extends Error {
 }
 
 export function createCliOAuthClient(options: CliOAuthClientOptions): CliOAuthClient {
-  const baseUrl = normalizeBaseUrl(options.baseUrl ?? DEFAULT_ZCODE_OAUTH_BASE_URL);
+  const baseUrl = normalizeBaseUrl(options.baseUrl ?? DEFAULT_ONYX_OAUTH_BASE_URL);
   const encoder = new TextEncoder();
 
   return {

@@ -5,9 +5,9 @@ import type {
   TuiSendInputResult,
   TuiSubmitPrompt,
   TuiSubmitPromptResult,
-} from "@zcode/tui";
-import type { SupportedLocale, UiLocale } from "@zcode/i18n";
-import type { ModelSelection, ZCodeModelOption } from "@zcode/shared";
+} from "@onyx/tui";
+import type { SupportedLocale, UiLocale } from "@onyx/i18n";
+import type { ModelSelection, ZCodeModelOption } from "@onyx/shared";
 import type {
   BackgroundTaskCancelResult,
   DynamicWorkflowRunResumeResult,
@@ -17,7 +17,7 @@ import type {
   PluginMetadata,
   WorkflowRunSnapshot,
   WorkflowRunStatus,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import type {
   CommandCenterCustomCommandContent,
   CommandCenterCustomCommandListOutcome,
@@ -194,8 +194,8 @@ export type CommandCenterApp = {
   getTheme?(): TuiSubmitPromptResult["theme"];
   getThoughtLevel?(): string | undefined;
   loadSessionTranscript?(): Promise<NonNullable<TuiSubmitPromptResult["restoredMessages"]>>;
-  readSubagents?: import("@zcode/tui").TuiReadSubagents;
-  readSubagentTranscript?: import("@zcode/tui").TuiReadSubagentTranscript;
+  readSubagents?: import("@onyx/tui").TuiReadSubagents;
+  readSubagentTranscript?: import("@onyx/tui").TuiReadSubagentTranscript;
   readTarget?(): Promise<CommandCenterTarget | null>;
   setTarget?(input: {
     objective: string;

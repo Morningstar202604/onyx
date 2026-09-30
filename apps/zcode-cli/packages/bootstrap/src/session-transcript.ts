@@ -6,8 +6,8 @@ import {
   type SessionId,
   type SessionStorePort,
   type ToolResultDisplayPayload,
-} from "@zcode/contracts";
-import { getConversationMessageProjectionPolicy } from "@zcode/shared";
+} from "@onyx/contracts";
+import { getConversationMessageProjectionPolicy } from "@onyx/shared";
 
 export type SessionTranscriptPart =
   | {

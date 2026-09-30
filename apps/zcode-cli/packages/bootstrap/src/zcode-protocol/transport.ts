@@ -5,9 +5,9 @@ import type {
   ZCodeProtocolRequest,
   ZCodeProtocolRequestId,
   ZCodeProtocolResponse,
-} from "@zcode/shared";
-import { zcodeProtocolMessageSchema, zcodeProtocolMethods } from "@zcode/shared";
-import type { Logger } from "@zcode/contracts";
+} from "@onyx/shared";
+import { zcodeProtocolMessageSchema, zcodeProtocolMethods } from "@onyx/shared";
+import type { Logger } from "@onyx/contracts";
 
 type ZCodeProtocolOutgoingMessage =
   | ZCodeProtocolError
@@ -102,7 +102,7 @@ export class ZCodeProtocolNdjsonConnection {
       this.buffer = "";
     }
     this.draining = true;
-    this.notifyTransportClosed(new Error("ZCode Protocol client connection closed"));
+    this.notifyTransportClosed(new Error("Onyx Protocol client connection closed"));
     // EOF 保留短请求半关闭响应，但挂起 handler 不能让进程永久保活。
     this.drainTimer = setTimeout(() => this.finish(), PROTOCOL_EOF_DRAIN_MS);
     void this.processing.then(
@@ -112,7 +112,7 @@ export class ZCodeProtocolNdjsonConnection {
   };
 
   private readonly onAbort = (): void => {
-    this.notifyTransportClosed(new Error("ZCode Protocol runtime stopping"));
+    this.notifyTransportClosed(new Error("Onyx Protocol runtime stopping"));
     this.finish();
   };
 
@@ -200,7 +200,7 @@ export class ZCodeProtocolNdjsonConnection {
     try {
       decoded = JSON.parse(line);
     } catch (error) {
-      this.options.logger?.warn("ZCode Protocol JSON parse failed", {
+      this.options.logger?.warn("Onyx Protocol JSON parse failed", {
         error: error instanceof Error ? error.message : String(error),
         event: "zcode_protocol.parse.failed",
         module: "bootstrap.zcode_protocol",
@@ -212,7 +212,7 @@ export class ZCodeProtocolNdjsonConnection {
 
     const parsed = zcodeProtocolMessageSchema.safeParse(decoded);
     if (!parsed.success) {
-      this.sendError("invalid-message", -32600, "Invalid ZCode Protocol message", {
+      this.sendError("invalid-message", -32600, "Invalid Onyx Protocol message", {
         issues: parsed.error.issues,
       });
       return null;

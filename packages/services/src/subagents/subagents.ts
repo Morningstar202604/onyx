@@ -8,8 +8,8 @@ import type {
   BuiltInSubagentModelOverrideParams,
   PluginSubagentModelOverrideParams,
   SubagentsListMode,
-} from "@zcode/shared";
-import { ServiceChannels } from "@zcode/shared";
+} from "@onyx/shared";
+import { ServiceChannels } from "@onyx/shared";
 import { createServiceDescriptor } from "../descriptors.js";
 
 export interface ISubagentsService {

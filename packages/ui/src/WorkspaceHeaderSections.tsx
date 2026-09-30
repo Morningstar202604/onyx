@@ -6,7 +6,7 @@ import {
   TID_WORKSPACE_PATH,
   TID_WORKSPACE_TITLE,
   type ZCodeTaskMeta,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { useMemo, useRef, useState } from "react";
 import { ControlHintTooltip } from "@/ControlHintTooltip.js";
 import { cn } from "@/components/lib/utils.js";

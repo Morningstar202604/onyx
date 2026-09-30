@@ -1,4 +1,4 @@
-import type { CollaborationMode } from "@zcode/contracts";
+import type { CollaborationMode } from "@onyx/contracts";
 import { useCallback, type Dispatch, type SetStateAction } from "react";
 import type { TuiSetMode } from "./types.js";
 

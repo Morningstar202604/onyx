@@ -7,32 +7,24 @@ import {
   PERSONAL_PROVIDER_CONFIG_FILE_NAME,
   resolveZCodeBuiltinCachePaths,
   resolveZCodeBuiltinClientPlatform,
-  ZCODE_BUILTIN_PROVIDER_BUNDLED_CONFIG_FILE_ENV,
-  ZCODE_BUILTIN_PROVIDER_CONFIG_FILE_ENV,
-  ZCODE_PERSONAL_PROVIDER_CONFIG_FILE_ENV,
-  type ZCodeBuiltinRefreshEvent,
-} from "@zcode/provider-node";
-import { resolveRuntimeZCodeEndpointOrigin, ZCODE_VERSION } from "@zcode/shared";
+  ONYX_BUILTIN_PROVIDER_BUNDLED_CONFIG_FILE_ENV,
+  ONYX_BUILTIN_PROVIDER_CONFIG_FILE_ENV,
+  ONYX_PERSONAL_PROVIDER_CONFIG_FILE_ENV,
+} from "@onyx/provider-node";
+import { resolveRuntimeZCodeEndpointOrigin, ONYX_VERSION } from "@onyx/shared";
 import type { CliEnv } from "./env.js";
 
-export const SEA_ZCODE_BUILTIN_PROVIDER_CONFIG_ASSET_KEY = "zcode-provider/zcode-builtin.json";
+export const SEA_ONYX_BUILTIN_PROVIDER_CONFIG_ASSET_KEY = "zcode-provider/zcode-builtin.json";
 
 export function createCliProviderRefreshReporter(
   stderr: Pick<NodeJS.WriteStream, "write"> = process.stderr,
 ) {
+  // Onyx 内置供应商配置随包静态分发：无远端同步，仅保留错误回调。
   return {
     onBuiltinRefreshError(error: unknown) {
       stderr.write(
         `ZCode Built-in 刷新失败: ${error instanceof Error ? error.message : "unknown error"}\n`,
       );
-    },
-    onBuiltinRefreshResult(event: ZCodeBuiltinRefreshEvent) {
-      // TTL 检查不是生产事件；成功更新才默认留痕，不能输出 CDN URL 查询参数或内容。
-      if (event.result === "updated" || process.env.NODE_ENV !== "production") {
-        stderr.write(
-          `ZCode Built-in ${event.result}${event.reason ? ` (${event.reason})` : ""}${event.revision === undefined ? "" : ` revision=${event.revision} source=CDN`}\n`,
-        );
-      }
     },
   };
 }
@@ -55,13 +47,13 @@ export async function prepareCliProviderRuntimeEnv(
 ): Promise<Record<string, string>> {
   if (!requiresProviderRuntime(options.argv)) return {};
 
-  const explicitZCodeBuiltin = options.env[ZCODE_BUILTIN_PROVIDER_CONFIG_FILE_ENV]?.trim();
-  const explicitPersonal = options.env[ZCODE_PERSONAL_PROVIDER_CONFIG_FILE_ENV]?.trim();
-  const dataBaseDir = options.dataBaseDir ?? options.env.ZCODE_DATA_BASE_DIR?.trim() ?? homedir();
+  const explicitZCodeBuiltin = options.env[ONYX_BUILTIN_PROVIDER_CONFIG_FILE_ENV]?.trim();
+  const explicitPersonal = options.env[ONYX_PERSONAL_PROVIDER_CONFIG_FILE_ENV]?.trim();
+  const dataBaseDir = options.dataBaseDir ?? options.env.ONYX_DATA_BASE_DIR?.trim() ?? homedir();
   if (explicitZCodeBuiltin && explicitPersonal) {
     return {
-      [ZCODE_BUILTIN_PROVIDER_CONFIG_FILE_ENV]: explicitZCodeBuiltin,
-      [ZCODE_PERSONAL_PROVIDER_CONFIG_FILE_ENV]: explicitPersonal,
+      [ONYX_BUILTIN_PROVIDER_CONFIG_FILE_ENV]: explicitZCodeBuiltin,
+      [ONYX_PERSONAL_PROVIDER_CONFIG_FILE_ENV]: explicitPersonal,
     };
   }
 
@@ -73,12 +65,12 @@ export async function prepareCliProviderRuntimeEnv(
       sea: options.sea ?? getSeaProviderConfigAssets(),
     }));
   const personalFilePath =
-    explicitPersonal ?? join(dataBaseDir, ".zcode", "v2", PERSONAL_PROVIDER_CONFIG_FILE_NAME);
-  const appVersion = options.appVersion ?? ZCODE_VERSION;
+    explicitPersonal ?? join(dataBaseDir, ".onyx", "v2", PERSONAL_PROVIDER_CONFIG_FILE_NAME);
+  const appVersion = options.appVersion ?? ONYX_VERSION;
   const platform = options.platform ?? resolveZCodeBuiltinClientPlatform();
   const zcodeEndpointOrigin = resolveRuntimeZCodeEndpointOrigin(options.env);
   const cachePaths = resolveZCodeBuiltinCachePaths({
-    environmentConfigRoot: join(dataBaseDir, ".zcode", "v2"),
+    environmentConfigRoot: join(dataBaseDir, ".onyx", "v2"),
     platform,
     appVersion,
     zcodeEndpointOrigin,
@@ -96,9 +88,9 @@ export async function prepareCliProviderRuntimeEnv(
   }
 
   return {
-    [ZCODE_BUILTIN_PROVIDER_CONFIG_FILE_ENV]: cachePaths.activeFilePath,
-    [ZCODE_BUILTIN_PROVIDER_BUNDLED_CONFIG_FILE_ENV]: zcodeBuiltinFilePath,
-    [ZCODE_PERSONAL_PROVIDER_CONFIG_FILE_ENV]: personalFilePath,
+    [ONYX_BUILTIN_PROVIDER_CONFIG_FILE_ENV]: cachePaths.activeFilePath,
+    [ONYX_BUILTIN_PROVIDER_BUNDLED_CONFIG_FILE_ENV]: zcodeBuiltinFilePath,
+    [ONYX_PERSONAL_PROVIDER_CONFIG_FILE_ENV]: personalFilePath,
   };
 }
 
@@ -135,9 +127,9 @@ async function resolveBundledZCodeBuiltinProviderConfig(input: {
   readonly sea: SeaProviderConfigAssets | undefined;
 }): Promise<string> {
   if (input.sea?.isSea()) {
-    const content = input.sea.getAsset(SEA_ZCODE_BUILTIN_PROVIDER_CONFIG_ASSET_KEY, "utf8");
+    const content = input.sea.getAsset(SEA_ONYX_BUILTIN_PROVIDER_CONFIG_ASSET_KEY, "utf8");
     return materializeZCodeBuiltinProviderConfig({
-      environmentConfigRoot: join(input.dataBaseDir, ".zcode", "v2"),
+      environmentConfigRoot: join(input.dataBaseDir, ".onyx", "v2"),
       content,
     });
   }

@@ -1,5 +1,5 @@
-import type { WorkflowRunProgressEnvelope } from "@zcode/shared/zcode-protocol-v4";
-import type { ModelSelection, ZCodeModelOption } from "@zcode/shared";
+import type { WorkflowRunProgressEnvelope } from "@onyx/shared/zcode-protocol-v4";
+import type { ModelSelection, ZCodeModelOption } from "@onyx/shared";
 import type {
   CollaborationMode,
   InputDelivery,
@@ -16,7 +16,7 @@ import type {
   UiThemePreference,
   TurnId,
   TurnSteerResult,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 
 export type TuiContextUsage = Pick<SessionProjection, "contextUsed" | "contextWindow">;
 
@@ -216,7 +216,7 @@ export type TuiCancelBackgroundTask = (taskId: string) => Promise<unknown>;
 export type TuiReadSubagents = (input?: {
   endedCursor?: string;
   endedLimit?: number;
-}) => Promise<import("@zcode/shared").ZCodeSessionSubagentsResult>;
+}) => Promise<import("@onyx/shared").ZCodeSessionSubagentsResult>;
 export type TuiSubagentTranscriptSnapshot = {
   sessionId: string;
   sequenceNumber: number;

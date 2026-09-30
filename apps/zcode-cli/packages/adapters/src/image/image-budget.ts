@@ -1,5 +1,5 @@
-import type { ImagePrepareForModelRequest } from "@zcode/contracts";
-import { createImageProcessorError } from "@zcode/contracts";
+import type { ImagePrepareForModelRequest } from "@onyx/contracts";
+import { createImageProcessorError } from "@onyx/contracts";
 
 export type ImageBudget = {
   maxBase64Bytes: number;

@@ -14,7 +14,7 @@ import type {
   IntegratedTerminalShellSelection,
   Locale,
   ZCodeInteractionBehavior,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import type { UserInfo } from "@/lib/userInfo.js";
 import {
   TID_SETTINGS_BACK_BUTTON,
@@ -22,7 +22,7 @@ import {
   TID_SETTINGS_SECTION_NAV,
   TID_SETTINGS_USAGE_TAB,
   testId,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { Button } from "@/components/ui/button.js";
 import { toast } from "@/components/ui/toast.js";
 import { DesktopWindowFrame } from "@/DesktopWindowFrame.js";

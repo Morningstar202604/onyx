@@ -26,7 +26,7 @@ import {
   type ReadPartsOutput,
   type ReadPdfOutput,
   type TraceContext,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import type {
   ToolExecutionContext,
   ToolExecutionModelContext,

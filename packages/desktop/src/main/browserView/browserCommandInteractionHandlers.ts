@@ -1,5 +1,5 @@
-import type { BrowserCommand, BrowserCommandResult } from "@zcode/shared";
-import { browserSnapshotElementSchema } from "@zcode/shared";
+import type { BrowserCommand, BrowserCommandResult } from "@onyx/shared";
+import { browserSnapshotElementSchema } from "@onyx/shared";
 import {
   dispatchClickAt,
   dispatchDrag,

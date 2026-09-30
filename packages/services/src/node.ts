@@ -8,18 +8,18 @@ import {
   createNodeProviderRuntimePathEnv,
   NodeModelSelectionConfigRepository,
   PERSONAL_PROVIDER_CONFIG_FILE_NAME,
-} from "@zcode/provider-node";
+} from "@onyx/provider-node";
 import { getAppConfigDir as resolveAppConfigDir } from "./paths.js";
 import {
   buildLocalMediaPreviewUrl,
   isProviderProvisioningAccountCredentialKey,
   type ProviderProvisioningTrigger,
-} from "@zcode/shared";
+} from "@onyx/shared";
 
 export {
   materializeZCodeBuiltinProviderConfig,
-  ZCODE_BUILTIN_PROVIDER_CONFIG_FILE_ENV,
-} from "@zcode/provider-node";
+  ONYX_BUILTIN_PROVIDER_CONFIG_FILE_ENV,
+} from "@onyx/provider-node";
 
 export { createFileService } from "./file/fileService.js";
 export {
@@ -45,8 +45,8 @@ export {
   parseFsFaultRulesFromEnvValue,
   resetProcessFsFaultInjectorForTests,
   setFsFaultInjectorForTests,
-  ZCODE_E2E_FS_FAULTS_ALLOW_ENV,
-  ZCODE_E2E_FS_FAULTS_ENV,
+  ONYX_E2E_FS_FAULTS_ALLOW_ENV,
+  ONYX_E2E_FS_FAULTS_ENV,
 } from "./fs/fsFaultInjection.js";
 export type {
   FsFaultCheckInput,
@@ -70,7 +70,7 @@ export {
   getGitCheckpointIndexRootDir,
   copyDataDirectory,
   validateDataBaseDirTarget,
-  ZCODE_WINDOWS_APP_INSTALL_DIR_ENV,
+  ONYX_WINDOWS_APP_INSTALL_DIR_ENV,
 } from "./paths.js";
 export { createGitService } from "./git/gitService.js";
 export { GitCommitMessageGenerator } from "./git/gitCommitMessageGenerator.js";
@@ -105,7 +105,7 @@ export {
   readZCodeStdioTapDevState,
   setZCodeStdioTapDevEnabled,
 } from "./zcode-agent/zcodeStdioTapDevConfig.js";
-export type { ZCodeStdioTapDevState } from "@zcode/shared";
+export type { ZCodeStdioTapDevState } from "@onyx/shared";
 export {
   createCuaHelperInstaller,
   requestHelperAccessibilityPermissionViaLaunchServices,
@@ -366,7 +366,7 @@ import {
   buildAgentRuntimeEnv,
 } from "./runtime-tools/agentProxyEnv.js";
 import { ensureAppCaCert } from "./runtime-tools/appCaCert.js";
-import { buildHelperOpenArgs, isCuaLocalDevelopmentRuntime } from "@zcode/zcode-cua/broker/server";
+import { buildHelperOpenArgs, isCuaLocalDevelopmentRuntime } from "@onyx/zcode-cua/broker/server";
 import { createServiceLogger, type ServiceLogger } from "#src/logger/serviceLogger.js";
 import { IOffPeakTaskService } from "./session/offPeakTask.js";
 import { OffPeakTaskService } from "./session/offPeakTaskService.js";
@@ -419,10 +419,10 @@ import {
 } from "#src/cua-permission-broker/windowsCuaDevRuntime.js";
 import { createCanonicalCuaHelperInstaller } from "./cua-permission-broker/cuaHelperInstaller.js";
 import { WindowsCuaHelperHost } from "#src/cua-permission-broker/windowsCuaDevHelperHost.js";
-import { DEV_HELPER_APP_NAME, HELPER_APP_NAME } from "@zcode/zcode-cua/broker/helperConstants";
-import { resolveBrokerSocketPath } from "@zcode/zcode-cua/broker/socketPath";
+import { DEV_HELPER_APP_NAME, HELPER_APP_NAME } from "@onyx/zcode-cua/broker/helperConstants";
+import { resolveBrokerSocketPath } from "@onyx/zcode-cua/broker/socketPath";
 import {
-  DEFAULT_ZCODE_MODEL_CONTEXT_BUDGET_STRATEGY,
+  DEFAULT_ONYX_MODEL_CONTEXT_BUDGET_STRATEGY,
   formatLogPrefix,
   type ServiceAuthorityMode,
   resolveRuntimeZCodeEndpointOrigin,
@@ -432,16 +432,16 @@ import {
   isZCodeCuaMcpCommand,
   isZCodeCuaMcpPackageArg,
   isZCodeCuaInternalFeatureEnabled,
-  ZCODE_CUA_PLUGIN_AUTHORITY_ENV_KEY,
+  ONYX_CUA_PLUGIN_AUTHORITY_ENV_KEY,
   type ZCodeAutomation,
   type ZCodeAutomationRun,
   getCapturedZCodeAgentTelemetryEnv,
-  ZCODE_DESKTOP_CONTEXT_PROMPT_ENABLED_ENV,
-  ZCODE_VERSION,
+  ONYX_DESKTOP_CONTEXT_PROMPT_ENABLED_ENV,
+  ONYX_VERSION,
   buildRuntimeZCodeApiUrl,
-} from "@zcode/shared";
+} from "@onyx/shared";
 
-// 这些 conversation-share 实现依赖 Node 文件系统；仅通过 @zcode/services/node 暴露，
+// 这些 conversation-share 实现依赖 Node 文件系统；仅通过 @onyx/services/node 暴露，
 // 防止 browser-safe 根入口把 node:* 依赖带进 renderer。
 export {
   ConversationShareService,
@@ -721,7 +721,7 @@ export function createDynamicCuaProductMcpServerResolver(options: {
       // 委托到底层真实 resolver（由 ICuaPermissionService.restartHelper 经此调用）。
       const resolver = await options.getResolver();
       if (!resolver) {
-        throw new Error("ZCode Computer Use is not enabled (plugin off or not product mode).");
+        throw new Error("Onyx Computer Use is not enabled (plugin off or not product mode).");
       }
       await resolver.restart();
     },
@@ -729,7 +729,7 @@ export function createDynamicCuaProductMcpServerResolver(options: {
       // 授权完成后的 restart 必须保留 session id，才能复用底层的幂等与时序保障。
       const resolver = await options.getResolver();
       if (!resolver) {
-        throw new Error("ZCode Computer Use is not enabled (plugin off or not product mode).");
+        throw new Error("Onyx Computer Use is not enabled (plugin off or not product mode).");
       }
       await resolver.restartAfterPermissionGrant(onboardingSessionId);
     },
@@ -960,12 +960,12 @@ export function createDefaultCuaProductHelper(
   };
 }
 
-export const ZCODE_CUA_BUNDLED_HELPER_APP_PATH_ENV = "ZCODE_CUA_BUNDLED_HELPER_APP_PATH";
+export const ONYX_CUA_BUNDLED_HELPER_APP_PATH_ENV = "ONYX_CUA_BUNDLED_HELPER_APP_PATH";
 
 export function resolveBundledCuaHelperAppPath(
   env: NodeJS.ProcessEnv = process.env,
 ): string | undefined {
-  const injectedPath = env[ZCODE_CUA_BUNDLED_HELPER_APP_PATH_ENV]?.trim();
+  const injectedPath = env[ONYX_CUA_BUNDLED_HELPER_APP_PATH_ENV]?.trim();
   if (injectedPath) {
     return injectedPath;
   }
@@ -979,7 +979,7 @@ export { isOfficialCuaPluginEnabledForWorkspace };
 
 export function hasGlobalCliZCodeCuaServer(env: NodeJS.ProcessEnv = process.env): boolean {
   const home = env.HOME?.trim() || homedir();
-  const configPath = join(home, ".zcode", "cli", "config.json");
+  const configPath = join(home, ".onyx", "cli", "config.json");
   let parsed: unknown;
   try {
     parsed = JSON.parse(readFileSync(configPath, "utf8"));
@@ -999,7 +999,7 @@ function isGlobalCliZCodeCuaServer(name: string, config: unknown): boolean {
   if (config.enabled === false) return false;
   if (typeof config.type === "string" && config.type !== "stdio") return false;
   if (name === "computer-use") return true;
-  // 与 desktop/services resolver 和 CLI bootstrap 共用 @zcode/shared 的单一事实源，避免第三处
+  // 与 desktop/services resolver 和 CLI bootstrap 共用 @onyx/shared 的单一事实源，避免第三处
   // 判定漂移：git/.git/本地路径形态的 zcode-cua 若这里漏判，全局 CLI env 注入不会带 broker
   // socket/token，agent 会回退成 Python/uvx 自己持有 macOS TCC（违反 product broker 边界）。
   if (typeof config.command === "string" && isZCodeCuaMcpCommand(config.command)) {
@@ -1098,7 +1098,7 @@ export async function buildCuaProductHelperAgentEnv(
       cuaProductHelperAgentEnvRetryAt.delete(host);
       return {
         [BROKER_SOCKET_ENV]: transport.socketPath,
-        [ZCODE_CUA_PLUGIN_AUTHORITY_ENV_KEY]: transport.pluginAuthority,
+        [ONYX_CUA_PLUGIN_AUTHORITY_ENV_KEY]: transport.pluginAuthority,
       };
     }
     // 原来只在 1s 超时后读取预留 tuple，Host 已安全占住 socket 时也会白等。
@@ -1111,7 +1111,7 @@ export async function buildCuaProductHelperAgentEnv(
       // token 鉴权已整体删除（连接门是代码签名身份）。凭据只剩 socket + authority。
       return {
         [BROKER_SOCKET_ENV]: reserved.socketPath,
-        [ZCODE_CUA_PLUGIN_AUTHORITY_ENV_KEY]: reserved.pluginAuthority,
+        [ONYX_CUA_PLUGIN_AUTHORITY_ENV_KEY]: reserved.pluginAuthority,
       };
     }
     // 有界 deadline race：cold launch 没在 1s 内 ready 且无预留才 fail-closed。waitForCuaHelperStartup
@@ -1131,7 +1131,7 @@ export async function buildCuaProductHelperAgentEnv(
     cuaProductHelperAgentEnvRetryAt.delete(host);
     return {
       [BROKER_SOCKET_ENV]: handle.socketPath,
-      [ZCODE_CUA_PLUGIN_AUTHORITY_ENV_KEY]: handle.pluginAuthority,
+      [ONYX_CUA_PLUGIN_AUTHORITY_ENV_KEY]: handle.pluginAuthority,
     };
   } catch (error) {
     // caller_timeout 仅表示共享的 30s startup 仍在后台运行；trackCuaProductHelperStartup 会在其
@@ -1152,7 +1152,7 @@ export async function buildCuaProductHelperAgentEnv(
         cuaProductHelperAgentEnvRetryAt.delete(host);
         return {
           [BROKER_SOCKET_ENV]: reserved.socketPath,
-          [ZCODE_CUA_PLUGIN_AUTHORITY_ENV_KEY]: reserved.pluginAuthority,
+          [ONYX_CUA_PLUGIN_AUTHORITY_ENV_KEY]: reserved.pluginAuthority,
         };
       }
     }
@@ -1274,13 +1274,13 @@ export function createLocalServices(options: {
   const isDesktopAttachedRemote = options?.serviceAuthorityMode === "desktop-attached-remote";
   // host / remote server 以前直接沿用当前进程环境启动后续服务。
   // GUI 启动的 desktop、SSH/WSL/Docker 拉起的 remote server 往往拿不到用户 login shell 里的 PATH，
-  // 导致 bun 这类只在 shell profile 里追加的命令在 ZCode Agent/终端里不可见。
+  // 导致 bun 这类只在 shell profile 里追加的命令在 Onyx Agent/终端里不可见。
   // 这里在所有本地服务启动前统一修正运行时环境，并顺带把内置 rg 注入 PATH，
-  // 让 ZCode Agent、终端、认证 runtime 共用同一套命令解析结果。
+  // 让 Onyx Agent、终端、认证 runtime 共用同一套命令解析结果。
   initializeRuntimeProcessEnv(options?.runtimeProcessEnvPatch);
 
   const desktopContextPromptEnabledRaw =
-    process.env[ZCODE_DESKTOP_CONTEXT_PROMPT_ENABLED_ENV]?.trim();
+    process.env[ONYX_DESKTOP_CONTEXT_PROMPT_ENABLED_ENV]?.trim();
   const desktopContextPromptEnabled =
     desktopContextPromptEnabledRaw === "1"
       ? true
@@ -1427,8 +1427,8 @@ export function createLocalServices(options: {
   // service 创建完成后再赋值。Helper recovery 始终不能回收 Agent。
   let hasActiveTurnRef: (() => boolean) | undefined;
   const isCuaEnabledForContext = (context?: CuaProductMcpServerResolverContext): boolean =>
-    // 保留 main 原有 gate 行为（避免回归）：dev/internal 特性开启时（ZCODE_CUA_DEV_MODE=1 或
-    // ZCODE_CUA_PRODUCT_HELPER=1）即视为启用，不依赖 config.json 显式 enable——main 的 bootstrap
+    // 保留 main 原有 gate 行为（避免回归）：dev/internal 特性开启时（ONYX_CUA_DEV_MODE=1 或
+    // ONYX_CUA_PRODUCT_HELPER=1）即视为启用，不依赖 config.json 显式 enable——main 的 bootstrap
     // 用 isZCodeCuaInternalFeatureEnabled 门控 bundled plugin，与 feat 的 workspace enablement 不同。
     // 生产路径（dev mode off）回落到官方插件 workspace enablement 判定（与 feat 一致）。
     isZCodeCuaInternalFeatureEnabled(process.env) ||
@@ -1521,17 +1521,17 @@ export function createLocalServices(options: {
   // 签名门查询；产品 Helper 不嵌 dev policy，这对 argv 无效（产品签名天然过 Team 门）。
   // 拉起后轮询 ping（5s/100ms），就绪返回 socket 路径，否则 null。
   //
-  // dev 判定直接用上游的 isCuaLocalDevelopmentRuntime（@zcode/zcode-cua/broker/server，
+  // dev 判定直接用上游的 isCuaLocalDevelopmentRuntime（@onyx/zcode-cua/broker/server，
   // 即本文件已经用来 import buildHelperOpenArgs 的那个 subpath，可正常导入）。
   //
   // 行为等价性（别误读成安全加固）：上游是 `COMPILED_LOCAL_DEVELOPMENT_RUNTIME &&
-  // ZCODE_RUNTIME_ENV!=="production"`，而那个编译期常量只有 scripts/build-cua-helper-app.mjs
+  // ONYX_RUNTIME_ENV!=="production"`，而那个编译期常量只有 scripts/build-cua-helper-app.mjs
   // 会用 define 折叠（Helper bundle）；desktop host bundle 没有该 define，于是回退成
   // `process.env.NODE_ENV !== "production"` —— 正是复制品写的那一项。所以在**当前**打包形态下
-  // 两者逐字等价，关门靠的是 ZCODE_RUNTIME_ENV=production（打包态显式注入且不传 NODE_ENV）。
+  // 两者逐字等价，关门靠的是 ONYX_RUNTIME_ENV=production（打包态显式注入且不传 NODE_ENV）。
   //
   // 换成上游的收益是消除漂移面：折叠点、因子个数与 fail-closed 方向都由上游一处决定，
-  // 哪天 host bundle 也补上 __ZCODE_LOCAL_DEVELOPMENT_RUNTIME__ define（Helper 侧已经有），
+  // 哪天 host bundle 也补上 __ONYX_LOCAL_DEVELOPMENT_RUNTIME__ define（Helper 侧已经有），
   // 编译期门自动生效，不需要再回来改这里。
 
   const launchStandaloneCuaHelperForStatus = async (): Promise<string | null> => {
@@ -1542,7 +1542,7 @@ export function createLocalServices(options: {
     const socketPath = resolveBrokerSocketPath();
     // standaloneHelperCandidatePaths 未在上游 exports 白名单——此处按同一规则枚举安装候选
     //（dev-desktop → dev/ 前缀；app 名一律取 helperConstants，不写字面量）。
-    const home = process.env.ZCODE_HOME?.trim() || join(homedir(), ".zcode");
+    const home = process.env.ONYX_HOME?.trim() || join(homedir(), ".onyx");
     const baseRoot = join(home, "computer-use");
     // 安装布局见上游 helperLauncher.resolveCuaHelperInstallRoot：dev 是独立子根 `dev/` 且 app
     // 名换成 DEV_HELPER_APP_NAME；preview 是独立子根 `preview/` 但**沿用**稳定 app 名
@@ -1635,7 +1635,7 @@ export function createLocalServices(options: {
       ) {
         return {
           available: false,
-          reason: "ZCode Computer Use is not enabled (plugin off or not product mode).",
+          reason: "Onyx Computer Use is not enabled (plugin off or not product mode).",
         };
       }
       // 懒启动：状态查询绝不拉起 Helper。托管 host 在（如刚完成授权流）→ 全量查询；
@@ -1654,13 +1654,13 @@ export function createLocalServices(options: {
           return {
             available: false,
             reason:
-              "ZCode Computer Use is not running; it will start automatically on first Computer Use use.",
+              "Onyx Computer Use is not running; it will start automatically on first Computer Use use.",
             idle: true,
           } satisfies { available: false; reason: string; idle: true };
         }
         // standalone Helper 上直接查权限真值（身份模式，无 token）。
         try {
-          const { callBrokerMethod } = await import("@zcode/zcode-cua/broker/helperHealth");
+          const { callBrokerMethod } = await import("@onyx/zcode-cua/broker/helperHealth");
           const report = await callBrokerMethod<{
             grant_owner: string;
             owner?: { display_name?: string };
@@ -1683,7 +1683,7 @@ export function createLocalServices(options: {
         } catch {
           return {
             available: false,
-            reason: "ZCode Computer Use is starting up; retry in a moment.",
+            reason: "Onyx Computer Use is starting up; retry in a moment.",
             idle: true,
           } satisfies { available: false; reason: string; idle: true };
         }
@@ -1693,7 +1693,7 @@ export function createLocalServices(options: {
         if (!helper || !isDefaultCuaProductHelperCurrent(helper)) {
           return {
             available: false,
-            reason: "ZCode Computer Use lifecycle is disposed.",
+            reason: "Onyx Computer Use lifecycle is disposed.",
           };
         }
         // Screen Recording 的真值必须来自一个新进程：撤销对已运行的常驻 Helper 不生效，
@@ -1702,7 +1702,7 @@ export function createLocalServices(options: {
         if (!isDefaultCuaProductHelperCurrent(helper)) {
           return {
             available: false,
-            reason: "ZCode Computer Use lifecycle is disposed.",
+            reason: "Onyx Computer Use lifecycle is disposed.",
           };
         }
         // 真实 screen-capture 探针：TCC screen_recording === "granted" 只说明系统记录了授权，并不保证
@@ -1717,7 +1717,7 @@ export function createLocalServices(options: {
         if (!isDefaultCuaProductHelperCurrent(helper)) {
           return {
             available: false,
-            reason: "ZCode Computer Use lifecycle is disposed.",
+            reason: "Onyx Computer Use lifecycle is disposed.",
           };
         }
         const reportedOwnerDisplayName =
@@ -1761,7 +1761,7 @@ export function createLocalServices(options: {
       ) {
         return {
           ok: false,
-          reason: "ZCode Computer Use is not enabled (plugin off or not product mode).",
+          reason: "Onyx Computer Use is not enabled (plugin off or not product mode).",
         };
       }
       // 走 resolver.restart()，让 host 尽可能复用 transport；不得通过 disposeWorkspace
@@ -1774,7 +1774,7 @@ export function createLocalServices(options: {
       if (!resolver) {
         return {
           ok: false,
-          reason: "ZCode Computer Use is not enabled (plugin off or not product mode).",
+          reason: "Onyx Computer Use is not enabled (plugin off or not product mode).",
         };
       }
       try {
@@ -1786,14 +1786,14 @@ export function createLocalServices(options: {
         if (!helper || !isDefaultCuaProductHelperCurrent(helper)) {
           return {
             ok: false,
-            reason: "ZCode Computer Use lifecycle is disposed.",
+            reason: "Onyx Computer Use lifecycle is disposed.",
           };
         }
         return { ok: true };
       } catch (error) {
         return {
           ok: false,
-          reason: `Failed to restart ZCode Computer Use: ${
+          reason: `Failed to restart Onyx Computer Use: ${
             error instanceof Error ? error.message : String(error)
           }`,
         };
@@ -1874,7 +1874,7 @@ export function createLocalServices(options: {
         // 它不需要 host——托管态由 host 铸造，懒启动态在此按 spawn 铸造，语义与校验完全一致。
         cuaProductHelperEnv = {
           [BROKER_SOCKET_ENV]: resolveBrokerSocketPath(),
-          [ZCODE_CUA_PLUGIN_AUTHORITY_ENV_KEY]: randomBytes(16).toString("hex"),
+          [ONYX_CUA_PLUGIN_AUTHORITY_ENV_KEY]: randomBytes(16).toString("hex"),
         };
         cuaProductHelperWorkspaceRegistry.setEnabled(context, false);
       } else if (cuaProductHelperHost && helper) {
@@ -1942,7 +1942,7 @@ export function createLocalServices(options: {
           resolveSessionRuntimePreferences: async (scope) => {
             // 预算已统一，不能把可选远端配置作为本地/手机 shared-host 建会话的前置条件。
             const settings = await settingService.get();
-            const modelContextBudgetStrategy = DEFAULT_ZCODE_MODEL_CONTEXT_BUDGET_STRATEGY;
+            const modelContextBudgetStrategy = DEFAULT_ONYX_MODEL_CONTEXT_BUDGET_STRATEGY;
             return {
               askUserQuestionAutoResolutionEnabled:
                 settings.askUserQuestionAutoResolutionEnabled !== false,
@@ -2016,7 +2016,7 @@ export function createLocalServices(options: {
   const gitService = createGitService({
     commitMessageGenerator: gitCommitMessageGenerator,
   });
-  // task wrapper 由 ZCode task service adapter 提供；核心 session 状态由 ZCode agent server 维护。
+  // task wrapper 由 ZCode task service adapter 提供；核心 session 状态由 Onyx agent server 维护。
   const zcodeTaskService = createZCodeTaskServiceAdapter({
     zcodeAgentService,
     taskIndexRepo,
@@ -2099,7 +2099,7 @@ export function createLocalServices(options: {
         apiClient,
         resolveRequestContext: async () => ({
           endpointOrigin: await resolveCurrentZCodeEndpointOrigin(),
-          appVersion: ZCODE_VERSION,
+          appVersion: ONYX_VERSION,
           platform: `${process.platform}-${process.arch}`,
         }),
       }),

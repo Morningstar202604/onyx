@@ -18,7 +18,7 @@ import {
   type SessionModelTransition,
   type ToolCallRow,
   type TopicFrameDeliveryKind,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@onyx/shared/zcode-protocol-v4";
 import { logger } from "@/logger.js";
 import type { ConversationTurnNavigatorHydrationResult } from "@/v4/conversationTurnNavigatorHelpers.js";
 import type { ConversationTransport } from "@/v4/transport.js";
@@ -68,10 +68,10 @@ function isRuntimeRecycleError(error: unknown): boolean {
   return (
     // 冷订阅可能亲自拉起新 runtime；restart 令在途 ACK 失效后仍须有界重订，不能停在 error。
     message.includes("fault.subscription.runtimeRestarted") ||
-    message.includes("ZCode agent transport closed") ||
-    message.includes("ZCode Protocol client disposed") ||
-    message.includes("ZCode Protocol client is disposed") ||
-    message.includes("ZCode Agent runtime is not running")
+    message.includes("Onyx agent transport closed") ||
+    message.includes("Onyx Protocol client disposed") ||
+    message.includes("Onyx Protocol client is disposed") ||
+    message.includes("Onyx Agent runtime is not running")
   );
 }
 

@@ -232,7 +232,7 @@ nodes:
         file: packages/services/src/session/taskIndexRepo.ts
   - id: service.zcode-agent-connection-scope
     kind: service
-    label: Host-trusted ZCode Agent attachment connection scope
+    label: Host-trusted Onyx Agent attachment connection scope
     codeSeeds:
       - symbol: createZCodeAgentConnectionScope
         file: packages/services/src/zcode-agent/zcodeAgentConnectionScope.ts

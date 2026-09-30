@@ -6,12 +6,12 @@ import {
   providerProvisioningEnvelopeSchema,
   type ProviderProvisioningCredentialEntry,
   type ProviderProvisioningEnvelope,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import type {
   PersonalProviderConfigRepository,
   ProviderConfigLayerSnapshot,
-} from "@zcode/provider";
-import { decodeProviderConfigFile, encodeProviderConfigFile } from "@zcode/provider-node";
+} from "@onyx/provider";
+import { decodeProviderConfigFile, encodeProviderConfigFile } from "@onyx/provider-node";
 import {
   createCredentialCipherProvider,
   type CredentialCipherProvider,

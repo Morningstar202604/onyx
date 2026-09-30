@@ -20,7 +20,7 @@ import {
   type ModelMessageContent,
   createWorkflowPhaseAlongside,
   createWorkflowPhaseNames,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import type {
   ToolApprovalGate,
   ToolEntry,

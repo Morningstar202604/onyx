@@ -1,7 +1,7 @@
 /* oxlint-disable eslint(max-lines) -- 平台事件和分享导入共用同一生命周期。 */
 import { useEffect, useRef, useState } from "react";
 import { useZCodeSessionStore } from "@/store/zcodeSessionStore.js";
-import type { IPlatformService } from "@zcode/shared";
+import type { IPlatformService } from "@onyx/shared";
 import { isWorkspaceTab, type TabStoreState, type WindowTabState } from "@/store/tabStore.js";
 import { useTabStore } from "@/store/TabStoreProvider.js";
 import { logger } from "@/logger.js";
@@ -47,14 +47,14 @@ export function useRootPlatformEffects({
 }: {
   initialWorkspaceAbsPath?: string;
   initialWorkspaceIdentity?: string;
-  initialWorkspacePurpose?: import("@zcode/shared").WorkspacePurpose;
+  initialWorkspacePurpose?: import("@onyx/shared").WorkspacePurpose;
   initialTaskId?: string;
   canBootstrapInitialWorkspace?: boolean;
   addTab: (
     workspacePath: string,
     options?: {
       workspaceIdentity?: string;
-      workspacePurpose?: import("@zcode/shared").WorkspacePurpose;
+      workspacePurpose?: import("@onyx/shared").WorkspacePurpose;
     },
   ) => void;
   setIsBootstrappingInitialWorkspace: (value: boolean) => void;

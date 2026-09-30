@@ -17,7 +17,7 @@ import {
   type BrowserTabSummary,
   type BrowserUserTabInfo,
   type BrowserViewportSize,
-} from "@zcode/contracts/browser-control";
+} from "@onyx/contracts/browser-control";
 import { loadBrowserDocumentation } from "./documentation.js";
 import {
   BrowserApiPolicy,

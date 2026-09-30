@@ -1,8 +1,8 @@
 import {
   isZCodeAgentProvider,
   type ZCodeProvider,
-} from "@zcode/shared";
-import type { ModelSelectionView } from "@zcode/services";
+} from "@onyx/shared";
+import type { ModelSelectionView } from "@onyx/services";
 import type { ModelSelectGroup } from "@/ModelConfigSelect.js";
 import { decodeCustomModelValue, encodeCustomModelValue } from "@/lib/zcodeCustomModelValue.js";
 
@@ -22,7 +22,7 @@ function supportsRegistryApiFormat(
   apiFormat: string | null | undefined,
 ): boolean {
   if (!apiFormat) return false;
-  // 仅剩 glm（ZCode Agent）provider；三方 CLI 的 api format 差异已随 provider 下线。
+  // 仅剩 glm（Onyx Agent）provider；三方 CLI 的 api format 差异已随 provider 下线。
   return isZCodeAgentProvider(selectedProvider);
 }
 

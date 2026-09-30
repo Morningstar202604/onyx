@@ -6,7 +6,7 @@ import type {
   PermissionBrokerRequest,
   PermissionBrokerResult,
   TodoItem,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import type {
   TuiClipboardImage,
   TuiOptions,

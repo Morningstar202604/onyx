@@ -1,5 +1,5 @@
-import type { AppUsageRequest, AppUsageSnapshot } from "@zcode/shared";
-import { ServiceChannels } from "@zcode/shared";
+import type { AppUsageRequest, AppUsageSnapshot } from "@onyx/shared";
+import { ServiceChannels } from "@onyx/shared";
 import { createServiceDescriptor } from "../descriptors.js";
 
 export interface IUsageStatsService {

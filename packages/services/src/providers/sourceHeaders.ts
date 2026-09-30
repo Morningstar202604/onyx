@@ -4,13 +4,13 @@ import { join } from "node:path";
 import {
   buildZCodeSourceHeadersFromContext,
   normalizeZCodeSourceHeaderValue,
-  ZCODE_ENV,
-  ZCODE_SOURCE_HEADERS,
-  ZCODE_VERSION,
-} from "@zcode/shared";
+  ONYX_ENV,
+  ONYX_SOURCE_HEADERS,
+  ONYX_VERSION,
+} from "@onyx/shared";
 import { getAppConfigDir } from "../paths.js";
 
-export { ZCODE_SOURCE_HEADERS };
+export { ONYX_SOURCE_HEADERS };
 
 interface ZCodeSourceHeaderOptions {
   appVersion?: string;
@@ -67,8 +67,8 @@ export function buildZCodeSourceHeaders(
 ): Record<string, string> {
   const platform = options.platform ?? process.platform;
   const arch = options.arch ?? process.arch;
-  const appVersion = normalizePrintableHeaderValue(options.appVersion ?? ZCODE_VERSION);
-  const releaseChannel = normalizePrintableHeaderValue(options.releaseChannel ?? ZCODE_ENV);
+  const appVersion = normalizePrintableHeaderValue(options.appVersion ?? ONYX_VERSION);
+  const releaseChannel = normalizePrintableHeaderValue(options.releaseChannel ?? ONYX_ENV);
   const clientLanguage =
     normalizePrintableHeaderValue(options.clientLanguage) ?? resolveClientLanguage();
   const clientTimezone =

@@ -1,4 +1,4 @@
-import type { ZCodeTaskMeta } from "@zcode/shared";
+import type { ZCodeTaskMeta } from "@onyx/shared";
 import {
   ContextMenuContent,
   ContextMenuItem,

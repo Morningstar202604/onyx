@@ -8,15 +8,14 @@ import type {
   WebContents,
   WindowOpenHandlerResponse,
 } from "electron";
-import type { DesktopTitleBarTheme, Locale } from "@zcode/shared";
+import type { DesktopTitleBarTheme, Locale } from "@onyx/shared";
 import {
   DEFAULT_LOCALE,
   desktopMenuMessageIds,
   getDesktopMenuMessage,
   isTrustedCodingPlanWebviewOrigin,
-  resolveZaiBusinessBaseUrl,
   PlatformChannels,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { loadWindow, type WindowBootstrapOptions } from "./desktopHostProcess.js";
 import {
   buildWindowsTitleBarOverlayForZoomLevel,
@@ -68,7 +67,7 @@ function isCodingPlanEmbeddedWebviewSrc(src: string | undefined): boolean {
     if (url.protocol !== "http:" && url.protocol !== "https:") return false;
     if (
       !isTrustedCodingPlanWebviewOrigin(url.origin, {
-        e2eStoreBridgeEnabled: process.env.VITE_ZCODE_E2E_STORE_BRIDGE === "1",
+        e2eStoreBridgeEnabled: process.env.VITE_ONYX_E2E_STORE_BRIDGE === "1",
       })
     ) {
       return false;
@@ -95,7 +94,7 @@ function isCodingPlanWebviewUrl(src: string | undefined): boolean {
     if (url.protocol !== "http:" && url.protocol !== "https:") return false;
     if (
       !isTrustedCodingPlanWebviewOrigin(url.origin, {
-        e2eStoreBridgeEnabled: process.env.VITE_ZCODE_E2E_STORE_BRIDGE === "1",
+        e2eStoreBridgeEnabled: process.env.VITE_ONYX_E2E_STORE_BRIDGE === "1",
       })
     ) {
       return false;
@@ -114,7 +113,7 @@ function isCodingPlanPaymentCallbackUrl(src: string | undefined): boolean {
     if (url.protocol !== "http:" && url.protocol !== "https:") return false;
     if (
       !isTrustedCodingPlanWebviewOrigin(url.origin, {
-        e2eStoreBridgeEnabled: process.env.VITE_ZCODE_E2E_STORE_BRIDGE === "1",
+        e2eStoreBridgeEnabled: process.env.VITE_ONYX_E2E_STORE_BRIDGE === "1",
       })
     ) {
       return false;
@@ -287,12 +286,8 @@ function isCodingPlanPaypalNavigationUrl(url: string): boolean {
     const parsed = new URL(url);
     if (parsed.protocol !== "https:") return false;
     if (isPaypalHostname(parsed.hostname)) return true;
-    // 后端下发的 PayPal approveUrl 可能先指向 Z.AI 支付 API 中转地址，
-    // 由该地址再 302 到 PayPal。中转 URL 也必须留在当前 webview，否则会被系统浏览器接管。
-    return (
-      ["https://api.z.ai", resolveZaiBusinessBaseUrl()].includes(parsed.origin) &&
-      parsed.pathname.startsWith("/api/pay/paypal/")
-    );
+    // Onyx 无官方支付/计费网关：不再信任任何上游支付中转域名。
+    return false;
   } catch {
     return false;
   }

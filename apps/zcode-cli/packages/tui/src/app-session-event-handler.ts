@@ -1,5 +1,5 @@
-import type { SessionEvent } from "@zcode/contracts";
-import type { TuiCopy } from "@zcode/i18n";
+import type { SessionEvent } from "@onyx/contracts";
+import type { TuiCopy } from "@onyx/i18n";
 import React from "react";
 import { applySessionEventToState } from "./app-events.js";
 import { describeSessionEvent } from "./state.js";

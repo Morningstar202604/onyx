@@ -1,5 +1,5 @@
-import type { ZCodeConfigOption, ZCodeProvider } from "@zcode/shared";
-import type { ModelSelectionView } from "@zcode/services";
+import type { ZCodeConfigOption, ZCodeProvider } from "@onyx/shared";
+import type { ModelSelectionView } from "@onyx/services";
 import type { ModelSelectGroup, ModelSelectGroupItem } from "@/ModelConfigSelect.js";
 import {
   buildRegistryModelSelectGroups,

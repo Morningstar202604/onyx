@@ -7,11 +7,11 @@ import type {
   RemoteWorkspaceSessionEntry,
   SSHConfigAliasOption,
   WSLDistro,
-} from "@zcode/shared";
-import { TID_REMOTE_KIND_DOCKER, TID_REMOTE_KIND_SSH, TID_REMOTE_KIND_WSL } from "@zcode/shared";
+} from "@onyx/shared";
+import { TID_REMOTE_KIND_DOCKER, TID_REMOTE_KIND_SSH, TID_REMOTE_KIND_WSL } from "@onyx/shared";
 import type {
   IServiceAccessor,
-} from "@zcode/services";
+} from "@onyx/services";
 import {
   AlertTriangleIcon,
   ChevronRightIcon,

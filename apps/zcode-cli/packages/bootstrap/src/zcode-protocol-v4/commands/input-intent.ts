@@ -1,7 +1,7 @@
-import type { TurnInputIntentMetadata } from "@zcode/contracts";
-import type { ModelSelection } from "@zcode/shared";
-import type { AttachmentRef, CommandEnvelope, QueueItem } from "@zcode/shared/zcode-protocol-v4";
-import type { SubmissionMode } from "@zcode/shared/zcode-protocol-v4";
+import type { TurnInputIntentMetadata } from "@onyx/contracts";
+import type { ModelSelection } from "@onyx/shared";
+import type { AttachmentRef, CommandEnvelope, QueueItem } from "@onyx/shared/zcode-protocol-v4";
+import type { SubmissionMode } from "@onyx/shared/zcode-protocol-v4";
 import { commandAdmissionOf } from "./executor.js";
 
 interface CanonicalCommandIntent {

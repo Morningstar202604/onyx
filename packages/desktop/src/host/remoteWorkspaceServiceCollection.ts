@@ -33,7 +33,7 @@ import {
   ISettingsSyncService,
   IPromptAttachmentTransferService,
   type IServiceAccessor,
-} from "@zcode/services";
+} from "@onyx/services";
 import {
   ConversationShareHttpClient,
   ConversationShareService,
@@ -51,12 +51,12 @@ import {
   createSubagentsService,
   createMemoryService,
   createRemoteConversationShareArtifactSource,
-} from "@zcode/services/node";
+} from "@onyx/services/node";
 import {
   buildRuntimeZCodeApiUrl,
-  DEFAULT_ZCODE_MODEL_CONTEXT_BUDGET_STRATEGY,
+  DEFAULT_ONYX_MODEL_CONTEXT_BUDGET_STRATEGY,
   type ZCodeSessionRuntimePreferencesResult,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { assertLegacyRemoteWorkspaceRpcContract } from "./legacyRemoteWorkspaceRpcContract.js";
 import {
   createRemoteProviderProvisioningExecutorFromWorkspace,
@@ -64,7 +64,7 @@ import {
 } from "./remoteProviderProvisioningService.js";
 
 const runtimePreferencesLogger = createServiceLogger("remote-runtime-preferences");
-const ZCODE_JWT_TOKEN_KEY = "zcodejwttoken";
+const ONYX_JWT_TOKEN_KEY = "zcodejwttoken";
 
 export function createRemoteWorkspaceServiceCollection(params: {
   clientConfigService: IClientConfigService;
@@ -99,7 +99,7 @@ export function createRemoteWorkspaceServiceCollection(params: {
     apiClient: localApiClient,
     baseUrl: buildRuntimeZCodeApiUrl(process.env, "/api/v1"),
     tokenProvider: async () =>
-      (await localCredentialService.load(ZCODE_JWT_TOKEN_KEY))?.trim() || null,
+      (await localCredentialService.load(ONYX_JWT_TOKEN_KEY))?.trim() || null,
   });
   const conversationShareService = new ConversationShareService({
     zcodeAgentService: params.connectionServices.zcodeAgentService,
@@ -175,7 +175,7 @@ export function createRemoteWorkspaceServiceCollection(params: {
         try {
           // 与本地 Host 同源：固定预算不依赖配置网关，远程/手机偏好响应不再串行等待网络。
           const settings = await trackStage("settings", localSettingService.get());
-          const modelContextBudgetStrategy = DEFAULT_ZCODE_MODEL_CONTEXT_BUDGET_STRATEGY;
+          const modelContextBudgetStrategy = DEFAULT_ONYX_MODEL_CONTEXT_BUDGET_STRATEGY;
           resolution = {
             status: "resolved",
             preferences: {
@@ -224,7 +224,7 @@ export function createRemoteWorkspaceServiceCollection(params: {
 
   // Web 手机远控进入 SSH task 时只连到 remote workspace host，
   // 没有桌面 renderer 那层 `baseServices + remoteServices` 合并。
-  // 因此这里为 remote workspace host 补齐本地全局 channel；文件、终端、ZCode Agent 仍来自远端，
+  // 因此这里为 remote workspace host 补齐本地全局 channel；文件、终端、Onyx Agent 仍来自远端，
   // 设置、凭据、OAuth、模型供应商和 settings-sync 继续读写本机配置。
   const services = new ServiceCollection()
     .register(IFileService, params.connectionServices.fileService)

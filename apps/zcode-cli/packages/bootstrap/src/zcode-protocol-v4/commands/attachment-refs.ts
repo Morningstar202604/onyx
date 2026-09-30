@@ -1,7 +1,7 @@
 // 附件命令面：AttachmentRef（引用模型）→ core TurnAttachment 的协议边界映射。
 //
 // ref 的两种形态（与投影侧 buildUserInputRow 的「本地路径 / artifact URI」注释对偶）：
-// 1. URI ref（zcode-artifact:// 等带 scheme:/）——经 attachment chunk transaction 寄存的内容引用：
+// 1. URI ref（onyx-artifact:// 等带 scheme:/）——经 attachment chunk transaction 寄存的内容引用：
 //    - 图片：content 直接携带 URI，core 的 attachment-artifacts 解析链在模型请求时
 //      读回 data URL（与 externalizePromptAttachments 的产物同形，不在这里内联解码，
 //      避免大图在命令层放大内存）。
@@ -10,8 +10,8 @@
 //      内容（超限/解不开 → 只保留展示元信息，不伪造内容）。
 // 2. 本地路径 ref（desktop 直传绝对路径）——按旧 mapProtocolPromptAttachment 的
 //    localPath 分支映射为 path 引用，core 已有读取阈值与降级策略。
-import type { TurnAttachment } from "@zcode/core";
-import type { AttachmentRef } from "@zcode/shared/zcode-protocol-v4";
+import type { TurnAttachment } from "@onyx/core";
+import type { AttachmentRef } from "@onyx/shared/zcode-protocol-v4";
 import type { ZCodeApp } from "../../app/types.js";
 
 const URI_REF_PATTERN = /^[a-zA-Z][a-zA-Z\d+.-]*:\/\//;

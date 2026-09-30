@@ -2229,7 +2229,7 @@ const enUS: Record<string, string> = {
   "settings.taskAutoArchiveDays.option.30": "Archive after 30 days",
   "settings.dataBaseDir": "Data storage path",
   "settings.dataBaseDirDescription":
-    "Root directory for app data (defaults to user home directory). Existing data will be copied to the new location. The .zcode/v2 suffix cannot be changed.",
+    "Root directory for app data (defaults to user home directory). Existing data will be copied to the new location. The .onyx/v2 suffix cannot be changed.",
   "settings.dataBaseDirPlaceholder": "Default: user home directory",
   "settings.dataBaseDirBrowse": "Choose folder",
   "settings.dataBaseDirSave": "Save",
@@ -3736,9 +3736,9 @@ const enUS: Record<string, string> = {
   "settings.hooks.title": "Hooks",
   "settings.workspaceFileSearch.title": "Workspace Search Scope",
   "settings.workspaceFileSearch.description":
-    "Edit .zcodeignore rules (gitignore syntax) that scope workspace file search. Takes effect on the next search after saving.",
+    "Edit .onyxignore rules (gitignore syntax) that scope workspace file search. Takes effect on the next search after saving.",
   "settings.workspaceFileSearch.templateHint":
-    ".zcodeignore does not exist yet: the content below is the initial preview (.gitignore copy + default exclusions); it is written to the workspace only after saving.",
+    ".onyxignore does not exist yet: the content below is the initial preview (.gitignore copy + default exclusions); it is written to the workspace only after saving.",
   "settings.workspaceFileSearch.editorLabel": "Workspace search ignore rules editor",
   "settings.workspaceFileSearch.save": "Save",
   "settings.workspaceFileSearch.saved": "Saved; effective on the next search",
@@ -3749,7 +3749,7 @@ const enUS: Record<string, string> = {
   "settings.workspaceFileSearch.transformFailed":
     "Failed to apply the section operation; check the logs",
   "settings.workspaceFileSearch.reveal": "Reveal file location",
-  "settings.workspaceFileSearch.revealHint": "Save first; .zcodeignore lives at the workspace root",
+  "settings.workspaceFileSearch.revealHint": "Save first; .onyxignore lives at the workspace root",
   "settings.workspaceFileSearch.unsaved": "Unsaved changes",
   "settings.workspaceFileSearch.noWorkspace":
     "No workspace is open, so search ignore rules cannot be configured.",
@@ -5375,9 +5375,9 @@ const enUS: Record<string, string> = {
     "Current image attachments are too large. Remove or compress images and try again.",
   "zcode.error.MEDIA_BUDGET_CURRENT_VIDEO_TOO_LARGE":
     "Current video attachments are too large. Remove or compress videos and try again.",
-  "zcode.error.ZCODE_RUNTIME_MODEL_UNAVAILABLE":
+  "zcode.error.ONYX_RUNTIME_MODEL_UNAVAILABLE":
     "The current model is no longer available. Select an available model from the current model list to continue.",
-  "zcode.error.ZCODE_BIGMODEL_TEAM_PLAN_MEMBER_REQUIRED":
+  "zcode.error.ONYX_BIGMODEL_TEAM_PLAN_MEMBER_REQUIRED":
     "The current model is unavailable. Check the model configuration or switch to an available model.",
   "zcode.error.providerBusiness.1006": "Your login session has expired. Please sign in again.",
   "zcode.error.providerBusiness.1005":

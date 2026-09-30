@@ -1,6 +1,6 @@
 import { extname } from "node:path";
-import { formatJson, type PresentationSurface } from "@zcode/core";
-import type { RunContext, GlobalOptions } from "@zcode/shared-types";
+import { formatJson, type PresentationSurface } from "@onyx/core";
+import type { RunContext, GlobalOptions } from "@onyx/shared-types";
 import { loadBootstrapModule } from "./bootstrap-loader.js";
 import {
   buildManualSkillPrompt,
@@ -173,7 +173,7 @@ export const runPrompt = async (
     const appEnv = prepareTelemetry
       ? await prepareTelemetry(env, {
           cliVersion: version,
-          productVersion: env.ZCODE_APP_VERSION,
+          productVersion: env.ONYX_APP_VERSION,
         })
       : env;
     const startProviderRegistryRuntime =

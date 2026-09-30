@@ -1,13 +1,13 @@
-import type { Logger, WorkspaceHookReasonCode } from "@zcode/contracts";
+import type { Logger, WorkspaceHookReasonCode } from "@onyx/contracts";
 import {
   emitWorkspaceHookTelemetry,
   type WorkspaceHookReviewTarget,
   type WorkspaceHookRuntimeAdmissionPort,
-} from "@zcode/core";
+} from "@onyx/core";
 import type {
   WorkspaceHookReviewDecision,
   WorkspaceHookReviewRequestPayload,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@onyx/shared/zcode-protocol-v4";
 
 export class WorkspaceHookReviewTelemetry {
   constructor(

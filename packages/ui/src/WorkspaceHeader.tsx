@@ -5,10 +5,10 @@ import type {
   EditorInfo,
   GitRepositorySummary,
   RemoteTarget,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import type { UserInfo } from "@/lib/userInfo.js";
 import { useState } from "react";
-import { TID_WORKSPACE_HEADER } from "@zcode/shared";
+import { TID_WORKSPACE_HEADER } from "@onyx/shared";
 import type { ConversationDropTargetController } from "@/v4/composer/conversationDropTarget.js";
 import { cn } from "@/components/lib/utils.js";
 import {

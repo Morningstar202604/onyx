@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import type { Hook, HookConfig } from "@zcode/shared";
-import type { IHooksService } from "@zcode/services";
+import type { Hook, HookConfig } from "@onyx/shared";
+import type { IHooksService } from "@onyx/services";
 import { getWorkspaceKey } from "@/lib/workspaceKey.js";
 
 interface HooksStoreState {

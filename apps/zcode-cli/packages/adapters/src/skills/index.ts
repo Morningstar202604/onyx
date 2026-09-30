@@ -13,7 +13,7 @@ import type {
   SkillOperationOptions,
   SkillPort,
   SkillRoot,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import { resolveDefaultSkillRoots, type SkillRootResolutionOptions } from "./roots.js";
 import { scanSkillFilesUnderRoot } from "./scan.js";
 
@@ -28,7 +28,7 @@ const SAFE_FRONTMATTER_KEYS = new Set([
 const DEFAULT_MAX_SKILL_BYTES = 100_000;
 const MAX_PLUGIN_MANIFEST_SEARCH_DEPTH = 5;
 const PLUGIN_MANIFEST_RELATIVE_PATHS = [
-  ".zcode-plugin/plugin.json",
+  ".onyx-plugin/plugin.json",
   ".claude-plugin/plugin.json",
   ".codex-plugin/plugin.json",
   ".cursor-plugin/plugin.json",
@@ -242,7 +242,7 @@ export class NodeSkillAdapter implements SkillPort {
       return true;
     }
     const canonicalPath = await realpath(resolvedPath).catch(() => resolvedPath);
-    // UI 可能把 symlink 目标真实路径写入 config，而 agent 从 ~/.zcode/skills 的链接路径扫描。
+    // UI 可能把 symlink 目标真实路径写入 config，而 agent 从 ~/.onyx/skills 的链接路径扫描。
     // 同时比对扫描路径和真实路径，避免同一个 SKILL.md 因路径形态不同绕过禁用开关。
     return this.disabledPaths.has(canonicalPath);
   }

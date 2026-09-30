@@ -42,7 +42,7 @@ const rootDir = resolve(scriptDir, "..");
 const desktopDir = join(rootDir, "packages/desktop");
 const mockCdnDir = join(desktopDir, "mock-cdn");
 const version = require(join(rootDir, "package.json")).version;
-const ZCODE_AGENT_RUNTIME = {
+const ONYX_AGENT_RUNTIME = {
   glm: {
     version: readZCodeAgentRuntimeVersion(),
   },
@@ -52,10 +52,10 @@ const nodeVersion = "v22.16.0";
 const componentSchemaVersion = 1;
 const remotePlatforms = ["linux-arm64", "linux-x64", "darwin-arm64", "darwin-x64"];
 const pnpmCommand = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
-const isBootstrapWithRemote = process.env.ZCODE_BOOTSTRAP_WITH_REMOTE === "1";
+const isBootstrapWithRemote = process.env.ONYX_BOOTSTRAP_WITH_REMOTE === "1";
 
 /**
- * Node dist 下载源。默认走国内镜像，`ZCODE_NODE_DIST_MIRROR` 可覆盖（与
+ * Node dist 下载源。默认走国内镜像，`ONYX_NODE_DIST_MIRROR` 可覆盖（与
  * `.gitlab/ci/00-workflow.yml` 的同名 CI 变量、`scripts/cua-helper-sea-base.mjs` 同一约定）。
  *
  * 这里原本硬编码 `https://nodejs.org/dist`，而 macOS
@@ -70,12 +70,12 @@ const isBootstrapWithRemote = process.env.ZCODE_BOOTSTRAP_WITH_REMOTE === "1";
 export const DEFAULT_NODE_DIST_BASE = "https://cdn.npmmirror.com/binaries/node";
 
 export function nodeDistBase(env = process.env) {
-  const mirror = env.ZCODE_NODE_DIST_MIRROR?.trim();
+  const mirror = env.ONYX_NODE_DIST_MIRROR?.trim();
   return (mirror || DEFAULT_NODE_DIST_BASE).replace(/\/+$/u, "");
 }
-const BROWSER_USE_PLUGIN_PACKAGE_NAME = "@zcode/browser-use-plugin";
-// node_repl 宿主抽成独立包 @zcode/node-repl-host 之后，browser-use
-// 不再产出 dist/mcp/server.js，CUA 资产也已归 @zcode/zcode-cua-plugin。这是**第三份**平行清单
+const BROWSER_USE_PLUGIN_PACKAGE_NAME = "@onyx/browser-use-plugin";
+// node_repl 宿主抽成独立包 @onyx/node-repl-host 之后，browser-use
+// 不再产出 dist/mcp/server.js，CUA 资产也已归 @onyx/zcode-cua-plugin。这是**第三份**平行清单
 // （另两份：packages/desktop/scripts/prepare-agent-node-bundle.mjs 的生产打包、
 // scripts/build-desktop-agent-cli.mjs 的 dev 构建），当时只改了 dev 那份，于是先后在
 // build:macos:arm64 与 build:remote:assets 上以 "missing runtime" 挂掉两次。
@@ -98,9 +98,9 @@ const remoteOfficialPluginPackages = [
   // 清单、packages/server/src/remote/zcodeAgentOfficialPluginAssets.ts 的远端合同保持一致。
   {
     // 远端 shared-host 必须部署 node_repl runtime，否则只剩 skill 而没有 mcp__node_repl__js ——
-    // 该 runtime 现由 @zcode/node-repl-host 提供（见下一个条目），browser-use 只带自己的
+    // 该 runtime 现由 @onyx/node-repl-host 提供（见下一个条目），browser-use 只带自己的
     // client script 与 skill/docs。
-    packageName: "@zcode/browser-use-plugin",
+    packageName: "@onyx/browser-use-plugin",
     relativePath: "apps/zcode-cli/packages/browser-use-plugin",
     requiresRuntime: true,
     requiredRuntimePaths: browserUseRequiredRuntimePaths,
@@ -110,7 +110,7 @@ const remoteOfficialPluginPackages = [
   {
     // node_repl 宿主：Browser Use 与 Computer Use 共用的 MCP runtime。远端 shared-host 缺它
     // 就没有 mcp__node_repl__js，bua/cua 两边都会连不上。
-    packageName: "@zcode/node-repl-host",
+    packageName: "@onyx/node-repl-host",
     relativePath: "apps/zcode-cli/packages/node-repl-host",
     requiresRuntime: true,
     requiredRuntimePaths: ["dist/mcp/server.js"],
@@ -132,7 +132,7 @@ const remoteBundledSkillPack = {
 };
 const remoteOfficialPluginTopLevelPaths = new Set([
   ".mcp.json",
-  ".zcode-plugin",
+  ".onyx-plugin",
   "README.md",
   // 生产远程预构建有独立顶层白名单，遗漏 agents 会在上传前永久裁掉子代理。
   "agents",
@@ -158,8 +158,8 @@ function shouldCopyOfficialPluginAsset(sourcePath) {
   return !excludedOfficialPluginAssetNames.has(name) && !name.endsWith(".pyc");
 }
 const remoteOfficialPluginRequiredPaths = [
-  "packages/browser-use-plugin/.zcode-plugin/plugin.json",
-  "packages/node-repl-host/.zcode-plugin/plugin.json",
+  "packages/browser-use-plugin/.onyx-plugin/plugin.json",
+  "packages/node-repl-host/.onyx-plugin/plugin.json",
 ];
 
 function readZCodeAgentRuntimeVersion() {
@@ -167,7 +167,7 @@ function readZCodeAgentRuntimeVersion() {
   const runtimeSource = readFileSync(runtimeSourcePath, "utf8");
   const match = runtimeSource.match(/version:\s*["']([^"']+)["']/);
   if (!match?.[1]) {
-    throw new Error("Unable to parse ZCode Agent runtime version");
+    throw new Error("Unable to parse Onyx Agent runtime version");
   }
   return match[1];
 }
@@ -304,7 +304,7 @@ async function prepareNodeBinaries() {
     } catch (error) {
       console.error(`  [error] 下载或解压失败: ${url}`);
       console.error(
-        `  [error] 请检查 CI runner 的外网访问、tar/xz 依赖，或用 ZCODE_NODE_DIST_MIRROR 覆盖下载源（当前 ${nodeDistBase()}）`,
+        `  [error] 请检查 CI runner 的外网访问、tar/xz 依赖，或用 ONYX_NODE_DIST_MIRROR 覆盖下载源（当前 ${nodeDistBase()}）`,
       );
       throw error;
     }
@@ -468,7 +468,7 @@ function assertRemoteOfficialPluginRuntime(plugin) {
 function stageRemoteOfficialPlugins(glmDir) {
   for (const plugin of remoteOfficialPluginPackages) {
     const sourceRoot = join(rootDir, plugin.relativePath);
-    const manifestPath = join(sourceRoot, ".zcode-plugin", "plugin.json");
+    const manifestPath = join(sourceRoot, ".onyx-plugin", "plugin.json");
     if (!existsSync(manifestPath)) {
       throw new Error(
         `[prepare-prebuilds] missing remote official plugin manifest: ${manifestPath}`,
@@ -522,12 +522,12 @@ async function stageRemoteBundledSkillPack(glmDir) {
 // glm/<platform> 组件目录，保持现有 manifest 组件结构不变。
 async function stageRemoteAgentBundles() {
   console.log("==> Building zcode-cli bundle for remote agents");
-  // 复用桌面同款构建脚本（turbo build:desktop-agent --filter=@zcode/cli），命中缓存时几乎瞬时。
+  // 复用桌面同款构建脚本（turbo build:desktop-agent --filter=@onyx/cli），命中缓存时几乎瞬时。
   runCommand(process.execPath, [join(rootDir, "scripts/build-desktop-agent-cli.mjs")], {
     cwd: rootDir,
     env: process.env,
   });
-  // browser-use runtime 的 tsc 依赖 @zcode/core/dist。远端资产也必须先构建
+  // browser-use runtime 的 tsc 依赖 @onyx/core/dist。远端资产也必须先构建
   // agent CLI 依赖，避免 CI 干净检出时被开发机缓存掩盖的 TS2307。
   buildRemoteOfficialPluginRuntimes();
   const cliBundlePath = join(rootDir, "apps/zcode-cli/packages/cli/dist/zcode.cjs");
@@ -837,8 +837,8 @@ export function buildRemoteComponentDefinitions(platformKey) {
     {
       id: "glm",
       // GLM native binary 之前固定成 v1，二进制版本升级后不会触发组件 cache 失效。
-      // 这里复用 ZCODE_AGENT_RUNTIME.glm.version，保持 manifest 版本与运行时描述一致。
-      semanticPrefix: ZCODE_AGENT_RUNTIME.glm.version,
+      // 这里复用 ONYX_AGENT_RUNTIME.glm.version，保持 manifest 版本与运行时描述一致。
+      semanticPrefix: ONYX_AGENT_RUNTIME.glm.version,
       mount: joinPosix("glm", platformKey),
       sourcePath: join(releaseDir, "glm", platformKey),
     },

@@ -2,13 +2,8 @@ import {
   ProviderConfigService,
   type ProviderConfigLayerSnapshot,
   type ProviderConfigLayerUpdate,
-} from "@zcode/provider";
+} from "@onyx/provider";
 import { NodeZCodeBuiltinProviderConfigSource } from "./zcode-builtin-provider-config-source.js";
-import {
-  ZCodeBuiltinRemoteSynchronizer,
-  type ZCodeBuiltinRemoteSynchronizerOptions,
-  type ZCodeBuiltinRefreshResult,
-} from "./zcode-builtin-remote-synchronizer.js";
 import {
   NodePersonalProviderConfigRepository,
   type PersonalProviderConfigRecoveryEvent,
@@ -17,7 +12,6 @@ import {
 export interface NodeProviderConfigRuntimeOptions {
   readonly zcodeBuiltinFilePath: string;
   readonly zcodeBuiltinActiveFilePath?: string;
-  readonly zcodeBuiltinRemote?: Omit<ZCodeBuiltinRemoteSynchronizerOptions, "source">;
   readonly onZCodeBuiltinRefreshError?: (error: unknown) => void;
   readonly onPersonalConfigRecovery?: (event: PersonalProviderConfigRecoveryEvent) => void;
   readonly onPersonalConfigPollingError?: (error: unknown) => void;
@@ -34,7 +28,6 @@ export class NodeProviderConfigRuntime {
   readonly configService: ProviderConfigService;
   readonly #zcodeBuiltinSource: NodeZCodeBuiltinProviderConfigSource;
   readonly #personalRepository: NodePersonalProviderConfigRepository;
-  readonly #remoteSynchronizer?: ZCodeBuiltinRemoteSynchronizer;
   readonly #onRemoteRefreshError?: (error: unknown) => void;
   #startPromise: Promise<void> | null = null;
   #disposed = false;
@@ -48,12 +41,6 @@ export class NodeProviderConfigRuntime {
       activeFilePath: options.zcodeBuiltinActiveFilePath,
       watch: options.watch,
     });
-    this.#remoteSynchronizer = options.zcodeBuiltinRemote
-      ? new ZCodeBuiltinRemoteSynchronizer({
-          source: this.#zcodeBuiltinSource,
-          ...options.zcodeBuiltinRemote,
-        })
-      : undefined;
     this.#onRemoteRefreshError = options.onZCodeBuiltinRefreshError;
     this.#personalRepository = new NodePersonalProviderConfigRepository({
       filePath: options.personalFilePath,
@@ -76,7 +63,7 @@ export class NodeProviderConfigRuntime {
     return Promise.resolve(this.#zcodeBuiltinSource.activeFilePath);
   }
 
-  get personalRepository(): import("@zcode/provider").PersonalProviderConfigRepository {
+  get personalRepository(): import("@onyx/provider").PersonalProviderConfigRepository {
     return this.#personalRepository;
   }
 
@@ -92,8 +79,8 @@ export class NodeProviderConfigRuntime {
     const startPromise = this.configService.read().then(() => {
       if (this.#disposed) return;
       void this.#checkBackground();
-      // Managed Worker 无下载配置也无恢复 owner，不建立周期任务。
-      if (this.#remoteSynchronizer || this.#checkListeners.size > 0) {
+      // Onyx 内置配置随包静态分发：无远端同步，仅在有监听者时建立周期任务。
+      if (this.#checkListeners.size > 0) {
         this.#checkTimer = setInterval(() => {
           void this.#checkBackground();
         }, 60_000);
@@ -107,18 +94,12 @@ export class NodeProviderConfigRuntime {
     return startPromise;
   }
 
-  refreshZCodeBuiltin(options?: { readonly force?: boolean }): Promise<ZCodeBuiltinRefreshResult> {
-    if (this.#disposed) return Promise.resolve("disposed");
-    return this.#remoteSynchronizer?.refresh(options) ?? Promise.resolve("skipped");
-  }
-
   #checkBackground(): Promise<void> {
     if (this.#disposed) return Promise.resolve();
     if (this.#checkInFlight) return this.#checkInFlight;
-    const check = Promise.allSettled([
-      this.refreshZCodeBuiltin(),
-      ...[...this.#checkListeners].map((listener) => Promise.resolve().then(listener)),
-    ])
+    const check = Promise.allSettled(
+      [...this.#checkListeners].map((listener) => Promise.resolve().then(listener)),
+    )
       .then((results) => {
         if (this.#disposed) return;
         for (const result of results)
@@ -137,7 +118,6 @@ export class NodeProviderConfigRuntime {
     if (this.#checkTimer) clearInterval(this.#checkTimer);
     this.#checkTimer = null;
     this.#checkListeners.clear();
-    this.#remoteSynchronizer?.dispose();
     this.configService.dispose();
     this.#personalRepository.dispose();
     this.#zcodeBuiltinSource.dispose();

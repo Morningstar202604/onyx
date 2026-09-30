@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { modelConfigDataSchema } from "@zcode/shared/model-config";
+import { modelConfigDataSchema } from "@onyx/shared/model-config";
 import { providerConfigDataSchema } from "./provider-data-schema.js";
 import { ModelConfig, ModelConfigRules } from "./model-config.js";
 import {

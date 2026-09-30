@@ -19,16 +19,16 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   TID_V4_MODEL_CONFIG,
   TID_V4_COMPOSER_INPUT,
-  ZCODE_AGENT_PROVIDER,
+  ONYX_AGENT_PROVIDER,
   type ZCodeConfigOption,
   type ZCodeProvider,
-} from "@zcode/shared";
+} from "@onyx/shared";
 
 import type {
   SessionConfigState,
   SessionPhase,
   SessionUsageState,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@onyx/shared/zcode-protocol-v4";
 import { ModelConfigSelect, type ModelSelectGroup } from "@/ModelConfigSelect.js";
 import { Button } from "@/components/ui/button.js";
 import { ChatContextUsage } from "@/chat-input-toolbar/display.js";
@@ -44,7 +44,7 @@ import { resolveV4ModelTriggerDisplay } from "@/v4/composer/modelTriggerDisplay.
 
 import { setPendingSettingsSectionIntent } from "@/lib/settingsNavigation.js";
 import { useTabStore } from "@/store/TabStoreProvider.js";
-import type { ModelSelectionView } from "@zcode/services";
+import type { ModelSelectionView } from "@onyx/services";
 import type { ModelSelectionState } from "@/hooks/useModelSelectionView.js";
 import { useToolbarConfigOptions } from "@/hooks/useZCodeConfig.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
@@ -132,7 +132,7 @@ function V4ComposerModelControlsImpl({
   onRecoverCustomModelSelection,
 }: V4ComposerToolbarProps) {
   const { intl, locale } = useZCodeIntl();
-  const displayProvider = provider ?? ZCODE_AGENT_PROVIDER;
+  const displayProvider = provider ?? ONYX_AGENT_PROVIDER;
   // 配置面读取：workspace 缺省目录（taskId=null），不读旧会话态。
   const { error: configOptionsError } = useToolbarConfigOptions(
     workspacePath,
@@ -551,4 +551,4 @@ function V4ComposerModelControlsImpl({
 }
 
 export const V4ComposerModelControls = memo(V4ComposerModelControlsImpl);
-import { isApiKeyAccess } from "@zcode/provider";
+import { isApiKeyAccess } from "@onyx/provider";

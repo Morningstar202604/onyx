@@ -6,7 +6,7 @@ export const REMOTE_AGENT_OFFICIAL_PLUGIN_PACKAGE_NAMES = ["browser-use-plugin"]
 
 export const REMOTE_AGENT_OFFICIAL_PLUGIN_INCLUDED_TOP_LEVEL_PATHS = [
   ".mcp.json",
-  ".zcode-plugin",
+  ".onyx-plugin",
   "README.md",
   // 开发态远程插件复制使用独立白名单，遗漏 agents 会只在远端丢失子代理。
   "agents",
@@ -25,12 +25,12 @@ export const REMOTE_AGENT_OFFICIAL_PLUGIN_INCLUDED_TOP_LEVEL_PATHS = [
 
 export const REMOTE_AGENT_OFFICIAL_PLUGIN_REQUIRED_RELATIVE_PATHS = [
   ...REMOTE_AGENT_OFFICIAL_PLUGIN_PACKAGE_NAMES.map(
-    (packageName) => `${packageName}/.zcode-plugin/plugin.json`,
+    (packageName) => `${packageName}/.onyx-plugin/plugin.json`,
   ),
   // 只校验 Browser Use manifest 会把“有插件壳”的残缺目录
   // 误判为可复用。生产 remote、开发态 remote 与 release source 校验共用这份必需资产合同。
   //
-  // 这里只能列 browser-use **自己产出**的资产。node_repl 宿主抽成 @zcode/node-repl-host 后
+  // 这里只能列 browser-use **自己产出**的资产。node_repl 宿主抽成 @onyx/node-repl-host 后
   // browser-use 不再产出 dist/mcp/server.js；
   // 本清单里指向不存在的文件，会让远端资产校验对着幽灵路径报缺失。
   // 远程工作区当前不承载 Browser Use / Computer Use，因此宿主 runtime 不进这份远端合同——

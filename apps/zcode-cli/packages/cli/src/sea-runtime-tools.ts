@@ -2,7 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { chmod, mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { basename, dirname, join } from "node:path";
-import { getRuntimeToolRuntime, type RuntimeToolId } from "@zcode/shared/runtime-tool-runtime";
+import { getRuntimeToolRuntime, type RuntimeToolId } from "@onyx/shared/runtime-tool-runtime";
 
 type CliEnv = Record<string, string | undefined>;
 
@@ -46,7 +46,7 @@ interface EnsureSeaRuntimeToolsOptions {
 
 const assetPrefix = "zcode-runtime-tools/";
 const manifestAssetKey = `${assetPrefix}manifest.json`;
-const markerFileName = ".zcode-runtime-tool.json";
+const markerFileName = ".onyx-runtime-tool.json";
 const runtimeToolIds = new Set<RuntimeToolId>(["bfs", "ripgrep", "ugrep"]);
 
 export async function ensureSeaRuntimeTools(
@@ -65,8 +65,8 @@ export async function ensureSeaRuntimeTools(
   }
 
   const env = options.env ?? process.env;
-  const configuredStorageRoot = options.storageRoot ?? env.ZCODE_STORAGE_DIR?.trim();
-  const storageRoot = configuredStorageRoot || join(homedir(), ".zcode");
+  const configuredStorageRoot = options.storageRoot ?? env.ONYX_STORAGE_DIR?.trim();
+  const storageRoot = configuredStorageRoot || join(homedir(), ".onyx");
   const runtimeEnv: CliEnv = {};
 
   for (const tool of manifest.tools) {

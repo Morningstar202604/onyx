@@ -3,7 +3,7 @@ import {
   CodingPlanWebviewChannels,
   isTrustedCodingPlanWebviewOrigin,
   PlatformChannels,
-} from "@zcode/shared";
+} from "@onyx/shared";
 
 // Coding Plan 官网页 preload：
 // - 在官网页主世界挂 window.zcodeBridge，暴露三个能力：
@@ -37,7 +37,7 @@ function isTrustedCodingPlanBridgeLocation(): boolean {
     if (url.protocol !== "http:" && url.protocol !== "https:") return false;
     if (
       !isTrustedCodingPlanWebviewOrigin(url.origin, {
-        e2eStoreBridgeEnabled: process.env.VITE_ZCODE_E2E_STORE_BRIDGE === "1",
+        e2eStoreBridgeEnabled: process.env.VITE_ONYX_E2E_STORE_BRIDGE === "1",
       })
     ) {
       return false;
@@ -81,7 +81,7 @@ if (isTrustedCodingPlanBridgeLocation()) {
         ipcRenderer.sendToHost(CodingPlanWebviewChannels.PurchaseComplete, {
           provider: payload.provider,
           timestamp: Date.now(),
-        } satisfies import("@zcode/shared").CodingPlanPurchaseCompletePayload);
+        } satisfies import("@onyx/shared").CodingPlanPurchaseCompletePayload);
       } catch {
         // host renderer 尚未 attach 或 webview 被销毁时 sendToHost 会抛；
         // 官网页自身不依赖此调用成功，静默即可。

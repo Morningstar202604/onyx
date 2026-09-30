@@ -1,5 +1,5 @@
 {
-  "name": "@zcode/cli",
+  "name": "@onyx/cli",
   "version": "0.1.0",
   "private": true,
   "description": "Main CLI application for onyx",
@@ -14,7 +14,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "build:desktop-agent": "node scripts/build.mjs --desktop-agent",
-    "build:sea": "pnpm --dir ../../../.. exec turbo --skip-infer --cwd apps/zcode-cli run build --filter=!@zcode/cli --force && pnpm build && node scripts/build-sea.mjs --all",
+    "build:sea": "pnpm --dir ../../../.. exec turbo --skip-infer --cwd apps/zcode-cli run build --filter=!@onyx/cli --force && pnpm build && node scripts/build-sea.mjs --all",
     "sea": "node scripts/build-sea.mjs",
     "upload:sea": "node scripts/upload-sea-smb.mjs",
     "clean": "node ../../scripts/clean-dist.mjs",
@@ -24,16 +24,16 @@
     "lint:fix": "oxlint --write src"
   },
   "dependencies": {
-    "@zcode/adapters": "workspace:*",
-    "@zcode/bootstrap": "workspace:*",
-    "@zcode/contracts": "workspace:*",
-    "@zcode/core": "workspace:*",
-    "@zcode/dynamic-workflow-runtime": "workspace:*",
-    "@zcode/i18n": "workspace:*",
-    "@zcode/provider-node": "workspace:*",
-    "@zcode/shared": "workspace:*",
-    "@zcode/shared-types": "workspace:*",
-    "@zcode/tui": "workspace:*",
+    "@onyx/adapters": "workspace:*",
+    "@onyx/bootstrap": "workspace:*",
+    "@onyx/contracts": "workspace:*",
+    "@onyx/core": "workspace:*",
+    "@onyx/dynamic-workflow-runtime": "workspace:*",
+    "@onyx/i18n": "workspace:*",
+    "@onyx/provider-node": "workspace:*",
+    "@onyx/shared": "workspace:*",
+    "@onyx/shared-types": "workspace:*",
+    "@onyx/tui": "workspace:*",
     "dotenv": "^17.4.2",
     "playwright-core": "1.59.1"
   }

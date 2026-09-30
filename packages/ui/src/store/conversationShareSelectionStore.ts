@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import type { ConversationShareAccessMode } from "@zcode/shared";
-import type { ConversationShareFailureIssue } from "@zcode/services";
+import type { ConversationShareAccessMode } from "@onyx/shared";
+import type { ConversationShareFailureIssue } from "@onyx/services";
 
 type ConversationShareScope = "all" | "partial";
 type ConversationShareSelectionView = "selection" | "timeline";

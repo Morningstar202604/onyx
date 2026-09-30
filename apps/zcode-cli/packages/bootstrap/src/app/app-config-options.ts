@@ -1,10 +1,10 @@
-import type { ConfigResult } from "@zcode/adapters/config";
-import { detectLocale, resolveLocale } from "@zcode/i18n";
-import type { RuntimeConfigPatch, SupportedLocale, UiLocale } from "@zcode/contracts";
+import type { ConfigResult } from "@onyx/adapters/config";
+import { detectLocale, resolveLocale } from "@onyx/i18n";
+import type { RuntimeConfigPatch, SupportedLocale, UiLocale } from "@onyx/contracts";
 import type { ZCodeAppOptions } from "./types.js";
 
 export function isMessageEnabled(env: NodeJS.ProcessEnv): boolean {
-  return env.ZCODE_MESSAGE_ENABLED === "1" || env.ZCODE_MESSAGE_ENABLED === "true";
+  return env.ONYX_MESSAGE_ENABLED === "1" || env.ONYX_MESSAGE_ENABLED === "true";
 }
 
 export function createConfigCliOverrides(options: ZCodeAppOptions): RuntimeConfigPatch | undefined {

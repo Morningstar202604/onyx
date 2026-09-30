@@ -1,9 +1,9 @@
-import type { AppUsageRequest, AppUsageSnapshot } from "@zcode/shared";
+import type { AppUsageRequest, AppUsageSnapshot } from "@onyx/shared";
 import type { IZCodeAgentService } from "../zcode-agent/zcodeAgent.js";
 import type { IUsageStatsService } from "./usageStats.js";
 
 interface UsageStatsServiceDependencies {
-  /** App Usage 经 ZCode Protocol 读取 agent 数据库真实统计。 */
+  /** App Usage 经 Onyx Protocol 读取 agent 数据库真实统计。 */
   zcodeAgentService: Pick<IZCodeAgentService, "getAppUsageStats">;
 }
 

@@ -10,7 +10,7 @@ const { loadBuiltinProviderConfig } = await import(
 const { content: zcodeBuiltinProviderConfigJson } = await loadBuiltinProviderConfig();
 
 export const SERVER_CLI_DEFINES = {
-  __ZCODE_BUILTIN_PROVIDER_CONFIG_JSON__: JSON.stringify(zcodeBuiltinProviderConfigJson),
+  __ONYX_BUILTIN_PROVIDER_CONFIG_JSON__: JSON.stringify(zcodeBuiltinProviderConfigJson),
 };
 
 export default defineConfig({
@@ -27,7 +27,7 @@ export default defineConfig({
   banner: {
     js: 'import { fileURLToPath as __zcodeFileURLToPath } from "node:url"; import { dirname as __zcodeDirname } from "node:path"; const __filename = __zcodeFileURLToPath(import.meta.url); const __dirname = __zcodeDirname(__filename);',
   },
-  noExternal: ["@zcode/shared", "@zcode/rpc", "@zcode/services"],
+  noExternal: ["@onyx/shared", "@onyx/rpc", "@onyx/services"],
   define: SERVER_CLI_DEFINES,
   external: [
     "node-pty",

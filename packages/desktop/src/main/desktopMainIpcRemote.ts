@@ -1,20 +1,18 @@
 /* eslint-disable max-lines -- 远程连接、OAuth 回调、遥测和通知 IPC 共用窗口级上下文，集中注册避免跨文件状态漂移。 */
 import { app, BrowserWindow, ipcMain, shell } from "electron";
-import armsRum from "@arms/rum-electron";
+import armsRum from "./armsRumStub.js";
 import {
   armsCustomEventPayloadSchema,
   formatZodError,
   normalizeUnknownError,
   InternalChannels,
   isTrustedCodingPlanWebviewOrigin,
-  resolveZaiBusinessBaseUrl,
   PlatformChannels,
   remoteTargetSchema,
   rendererTelemetryEventPayloadSchema,
   type ArmsRumEnv,
   type RemoteTarget,
-  type TelemetryEventPayload,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { dispatchTaskNotification } from "./desktopNotifications.js";
 import {
   clearOAuthRoutesForWindow,
@@ -73,10 +71,8 @@ function isCodingPlanPaypalNavigationUrl(url: string): boolean {
     const parsed = new URL(url);
     if (parsed.protocol !== "https:") return false;
     if (isPaypalHostname(parsed.hostname)) return true;
-    return (
-      ["https://api.z.ai", resolveZaiBusinessBaseUrl()].includes(parsed.origin) &&
-      parsed.pathname.startsWith("/api/pay/paypal/")
-    );
+    // Onyx 无官方支付/计费网关：不再信任任何上游支付中转域名。
+    return false;
   } catch {
     return false;
   }
@@ -89,7 +85,7 @@ function isCodingPlanWebviewUrl(src: string | undefined): boolean {
     if (url.protocol !== "http:" && url.protocol !== "https:") return false;
     if (
       !isTrustedCodingPlanWebviewOrigin(url.origin, {
-        e2eStoreBridgeEnabled: process.env.VITE_ZCODE_E2E_STORE_BRIDGE === "1",
+        e2eStoreBridgeEnabled: process.env.VITE_ONYX_E2E_STORE_BRIDGE === "1",
       })
     ) {
       return false;
@@ -108,7 +104,7 @@ function isCodingPlanPaymentCallbackUrl(src: string | undefined): boolean {
     if (url.protocol !== "http:" && url.protocol !== "https:") return false;
     if (
       !isTrustedCodingPlanWebviewOrigin(url.origin, {
-        e2eStoreBridgeEnabled: process.env.VITE_ZCODE_E2E_STORE_BRIDGE === "1",
+        e2eStoreBridgeEnabled: process.env.VITE_ONYX_E2E_STORE_BRIDGE === "1",
       })
     ) {
       return false;
@@ -160,7 +156,7 @@ export function registerRemoteIpcHandlers(options: {
     appVersion: string;
     armsEnv: ArmsRumEnv;
   };
-  /** 仅由 VITE_ZCODE_E2E_STORE_BRIDGE + test runner 双门禁打开。 */
+  /** 仅由 VITE_ONYX_E2E_STORE_BRIDGE + test runner 双门禁打开。 */
   finalArmsCustomEventE2EEnabled?: boolean;
   createRemoteWorkspaceSession: (
     win: BrowserWindow,

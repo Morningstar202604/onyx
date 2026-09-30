@@ -7,7 +7,7 @@ import {
   type FileSystemPort,
   type SessionId,
   type TraceContext,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import {
   systemReminderAttachmentEntry,
   type RuntimeMessageEntry,
@@ -21,7 +21,7 @@ function resolveApprovedPlanFilePath(input: {
 }): string {
   return join(
     input.workspaceRoot,
-    ".zcode",
+    ".onyx",
     "plans",
     `plan-${sanitizePlanFileSessionId(input.sessionId)}.md`,
   );

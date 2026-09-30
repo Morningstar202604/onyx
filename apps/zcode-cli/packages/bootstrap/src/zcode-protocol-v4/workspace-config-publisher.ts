@@ -7,8 +7,8 @@ import type {
   WorkspaceConfigState,
   WorkspaceConfigTopicFrame,
   TopicFrameDeliveryKind,
-} from "@zcode/shared/zcode-protocol-v4";
-import { workspaceConfigTopic } from "@zcode/shared/zcode-protocol-v4";
+} from "@onyx/shared/zcode-protocol-v4";
+import { workspaceConfigTopic } from "@onyx/shared/zcode-protocol-v4";
 import type { TopicFrameReservation } from "./topic-frame-reservation.js";
 
 interface ConfigSubscription {

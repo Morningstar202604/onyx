@@ -1,6 +1,6 @@
 import { restorePermissionGrantMarker } from "../helpers/permission-grant-resume.js";
-import { executionStateSchema, resolveExecutionState } from "@zcode/shared";
-import { SESSION_ENTRY_EXECUTION_STATE } from "@zcode/contracts";
+import { executionStateSchema, resolveExecutionState } from "@onyx/shared";
+import { SESSION_ENTRY_EXECUTION_STATE } from "@onyx/contracts";
 import {
   CoreErrorType,
   HookEventName,

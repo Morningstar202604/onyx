@@ -6,12 +6,12 @@ import { randomUUID } from "node:crypto";
 import { homedir, uptime } from "node:os";
 import { basename, dirname, isAbsolute, join, resolve } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
-import type { WorkspaceHookTrustRecord, WorkspaceHookTrustStoreFile } from "@zcode/contracts";
+import type { WorkspaceHookTrustRecord, WorkspaceHookTrustStoreFile } from "@onyx/contracts";
 import {
   WORKSPACE_HOOK_TRUST_STORE_SCHEMA_VERSION,
   workspaceHookTrustRecordSchema,
   workspaceHookTrustStoreFileSchema,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 
 const DEFAULT_LOCK_TIMEOUT_MS = 5_000;
 const DEFAULT_STALE_LOCK_MS = 30_000;
@@ -132,12 +132,12 @@ export async function resolveWorkspaceHookTrustStorePath(
 ): Promise<string> {
   const home = resolve(options.homeDir ?? homedir());
   const userConfigPath = resolve(
-    options.userConfigPath ?? join(home, ".zcode", "cli", "config.json"),
+    options.userConfigPath ?? join(home, ".onyx", "cli", "config.json"),
   );
   const config = await readUserConfig(userConfigPath);
   const storage = isRecord(config.storage) ? config.storage : {};
   const configured = typeof storage.dir === "string" ? storage.dir.trim() : "";
-  const storageRoot = configured ? resolveTrustedUserPath(configured, home) : join(home, ".zcode");
+  const storageRoot = configured ? resolveTrustedUserPath(configured, home) : join(home, ".onyx");
   return join(storageRoot, SECURITY_DIRECTORY, TRUST_STORE_FILE);
 }
 

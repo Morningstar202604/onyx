@@ -1,12 +1,12 @@
 import { mkdir, open, readFile, rename, stat, unlink, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
-import { createUuid } from "@zcode/shared";
+import { createUuid } from "@onyx/shared";
 
 const LOCK_RETRY_DELAY_MS = 10;
 const LOCK_RETRY_COUNT = 200;
 const LOCK_STALE_MS = 5 * 60 * 1000;
-const ZCODE_DATA_BASE_DIR_ENV_KEY = "ZCODE_DATA_BASE_DIR";
+const ONYX_DATA_BASE_DIR_ENV_KEY = "ONYX_DATA_BASE_DIR";
 
 interface TelemetryState {
   deviceMid?: unknown;
@@ -55,9 +55,9 @@ export function ensureCliDeviceMid(options: EnsureCliDeviceMidOptions = {}): Pro
 function resolveCliTelemetryStateFile(options: EnsureCliDeviceMidOptions): string {
   const env = options.env ?? process.env;
   const configuredBaseDir =
-    options.baseDir ?? env[ZCODE_DATA_BASE_DIR_ENV_KEY]?.trim() ?? homedir();
+    options.baseDir ?? env[ONYX_DATA_BASE_DIR_ENV_KEY]?.trim() ?? homedir();
   const baseDir = configuredBaseDir.length > 0 ? configuredBaseDir : homedir();
-  return join(resolveUserPath(baseDir), ".zcode", "v2", "telemetry-state.json");
+  return join(resolveUserPath(baseDir), ".onyx", "v2", "telemetry-state.json");
 }
 
 async function ensurePersistedDeviceMid(input: {

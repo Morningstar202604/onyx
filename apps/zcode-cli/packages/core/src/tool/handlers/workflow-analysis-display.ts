@@ -13,8 +13,8 @@ import {
   type CreateWorkflowCausalityGraph,
   type CreateWorkflowOutput,
   type ToolResultDisplayPayload,
-} from "@zcode/contracts";
-import type { AnalyzeResult } from "@zcode/dynamic-workflow";
+} from "@onyx/contracts";
+import type { AnalyzeResult } from "@onyx/dynamic-workflow";
 import { createCreateWorkflowDisplay } from "../executor/result-display.js";
 import { boundCausalityGraph } from "./create-workflow-graph-bounds.js";
 

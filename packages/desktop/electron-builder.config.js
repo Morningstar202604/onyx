@@ -72,7 +72,7 @@ const targetPlatform = getTargetPlatform();
 const builtinProviderConfig = await loadBuiltinProviderConfig();
 const desktopProductIdentity = resolveDesktopProductIdentity({
   ...process.env,
-  ZCODE_ENV: builtinProviderConfig.environment,
+  ONYX_ENV: builtinProviderConfig.environment,
 });
 const nativeSearchReleasePlan = resolveNativeSearchReleasePlan({
   platform: targetPlatform.os,
@@ -82,7 +82,7 @@ const rawMacSigningIdentity = process.env.APPLE_SIGNING_IDENTITY || process.env.
 const macSigningIdentity =
   rawMacSigningIdentity?.replace(/^Developer ID Application:\s*/, "") ?? null;
 const shouldEnableMacSigning =
-  process.env.ZCODE_ENABLE_MAC_SIGN === "1" && Boolean(macSigningIdentity);
+  process.env.ONYX_ENABLE_MAC_SIGN === "1" && Boolean(macSigningIdentity);
 const workspaceRoot = resolve(import.meta.dirname, "../..");
 const desktopPackageRoot = import.meta.dirname;
 const runtimeModuleLookupRoots = [
@@ -91,7 +91,7 @@ const runtimeModuleLookupRoots = [
   resolve(desktopPackageRoot, "node_modules", ".pnpm", "node_modules"),
   resolve(workspaceRoot, "node_modules", ".pnpm", "node_modules"),
 ];
-const desktopDistDir = process.env.ZCODE_DESKTOP_DIST_DIR || "dist";
+const desktopDistDir = process.env.ONYX_DESKTOP_DIST_DIR || "dist";
 const DEFAULT_ELECTRON_MIRROR = "https://npmmirror.com/mirrors/electron/";
 // `pnpm exec asar` 依赖 `.bin/asar`，但 @electron/asar 仅是 electron-builder 传递依赖时，
 // Linux CI（pnpm hoisted）往往解析不到该二进制，`asar list` 未运行即 exit 1。
@@ -117,7 +117,7 @@ const REQUIRED_ASAR_RUNTIME_MODULES = [
   "@opentelemetry/exporter-trace-otlp-proto",
   "@opentelemetry/exporter-metrics-otlp-proto",
   "pngjs",
-  // @zcode/services 的代理连通性探测会动态 require("undici") 取 ProxyAgent。
+  // @onyx/services 的代理连通性探测会动态 require("undici") 取 ProxyAgent。
   // tsup 虽然把 services 代码并进了主/host 产物，但不会把这个运行时 require 的包内联进去，
   // electron-builder 产物又可能漏掉 hoisted 的 undici，最终 mac 安装包启动即报 Cannot find module "undici"。
   // 这里把 undici 和其他兜底依赖一样强制注入 app.asar，避免用户在已安装应用里主进程直接崩溃。
@@ -165,7 +165,7 @@ const PACMAN_RUNTIME_DEPENDENCIES = [
   "xdg-utils",
 ];
 
-const WINDOWS_INSTALL_MANIFEST_NAME = ".zcode-install-manifest";
+const WINDOWS_INSTALL_MANIFEST_NAME = ".onyx-install-manifest";
 
 async function writeWindowsInstallManifest(context) {
   if (context.electronPlatformName !== "win32") return;
@@ -191,7 +191,7 @@ async function writeWindowsInstallManifest(context) {
 
 function resolveElectronDownloadMirror(env = process.env) {
   const existingMirror =
-    env.ZCODE_ELECTRON_RUNTIME_MIRROR ||
+    env.ONYX_ELECTRON_RUNTIME_MIRROR ||
     env.NPM_CONFIG_ELECTRON_MIRROR ||
     env.npm_config_electron_mirror ||
     env.npm_package_config_electron_mirror ||
@@ -211,11 +211,11 @@ const desktopArtifactEnvSuffix = resolveDesktopArtifactSuffix(process.env);
 // 避免“产物存在”被误认为已经走完和生产版相同的签名链路。
 if (
   desktopProductIdentity.flavor === "preview" &&
-  process.env.ZCODE_ENABLE_MAC_SIGN === "1" &&
+  process.env.ONYX_ENABLE_MAC_SIGN === "1" &&
   !macSigningIdentity
 ) {
   throw new Error(
-    "ZCode Preview macOS packaging requires APPLE_SIGNING_IDENTITY or CSC_NAME when ZCODE_ENABLE_MAC_SIGN=1",
+    "ZCode Preview macOS packaging requires APPLE_SIGNING_IDENTITY or CSC_NAME when ONYX_ENABLE_MAC_SIGN=1",
   );
 }
 
@@ -491,7 +491,7 @@ export default {
     // 默认也会原样进入安装包。这里统一在主包层做一次裁剪，只移除非运行时文件，LICENSE 继续保留。
     ...PACKAGING_PRUNE_PATTERNS,
     ...createDesktopNativePackagePrunePatterns(targetPlatform.key),
-    "!node_modules/@zcode/**",
+    "!node_modules/@onyx/**",
     "!node_modules/react/**",
     "!node_modules/react-dom/**",
   ],
@@ -695,7 +695,7 @@ export default {
   linux: {
     target: ["AppImage", "deb", "rpm", "pacman"],
     artifactName: buildDesktopArtifactName("linux"),
-    // desktop 包名是 scoped package（@zcode/desktop），electron-builder 默认会把
+    // desktop 包名是 scoped package（@onyx/desktop），electron-builder 默认会把
     // Linux executable/Icon 推成 @zcodedesktop。部分桌面环境无法按这个 icon name 命中
     // hicolor 图标，最终回退成系统齿轮。这里固定成稳定的小写名称，让 Icon=zcode
     // 与 /usr/share/icons/hicolor/*/apps/zcode.png 保持一致。

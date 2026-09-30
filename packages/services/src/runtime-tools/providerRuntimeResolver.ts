@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
 import { resolve as resolvePath } from "node:path";
-import { ZCODE_AGENT_RUNTIME } from "@zcode/shared";
+import { ONYX_AGENT_RUNTIME } from "@onyx/shared";
 
 const packagedResourcesPath =
   typeof (process as NodeJS.Process & { resourcesPath?: string }).resourcesPath === "string"
@@ -22,8 +22,8 @@ function resolvePlatformScopedBundledAgentRoots(moduleDir?: string): Array<strin
   return [
     resolvePath(process.cwd(), "bundled-agents", platformKey),
     resolvePath(process.cwd(), "packages", "desktop", "bundled-agents", platformKey),
-    // dev:web 会用 pnpm --filter @zcode/server dev 启动，cwd 落在 packages/server。
-    // ZCode Agent 资源可能位于桌面包或仓库根的 bundled-agents/<platform>。
+    // dev:web 会用 pnpm --filter @onyx/server dev 启动，cwd 落在 packages/server。
+    // Onyx Agent 资源可能位于桌面包或仓库根的 bundled-agents/<platform>。
     // 这里统一补齐仓库内所有平台化目录候选，desktop/web/server 共享一套解析链路。
     resolvePath(process.cwd(), "..", "desktop", "bundled-agents", platformKey),
     moduleDir ? resolvePath(moduleDir, "..", "..", "desktop", "bundled-agents", platformKey) : null,
@@ -42,7 +42,7 @@ function resolveLegacyBundledResourceRoots(moduleDir?: string): Array<string | n
 }
 
 export function findZCodeAgentRuntimeBinary(): string | null {
-  const runtime = ZCODE_AGENT_RUNTIME;
+  const runtime = ONYX_AGENT_RUNTIME;
   const entrySegments = runtime.resolveEntrySegments(process.platform);
   const resourceSegments = [runtime.bundledResourceDir, ...entrySegments];
   const envPath = process.env[runtime.binaryEnvVar];
@@ -59,7 +59,7 @@ export function findZCodeAgentRuntimeBinary(): string | null {
 
   const candidates = [
     packagedResourcesPath ? resolvePath(packagedResourcesPath, ...resourceSegments) : null,
-    resolvePath(homedir(), ".zcode", "server", "agents", ...resourceSegments),
+    resolvePath(homedir(), ".onyx", "server", "agents", ...resourceSegments),
     ...platformScopedRoots.map((root) =>
       root ? resolvePath(root, runtime.bundledResourceDir, ...entrySegments) : null,
     ),
@@ -75,7 +75,7 @@ export function findZCodeAgentRuntimeBinary(): string | null {
  * 不查 GLM_BINARY_PATH——那个 env 指向原生二进制，语义不同。
  */
 export function findZCodeAgentRuntimeNodeBundle(): string | null {
-  const runtime = ZCODE_AGENT_RUNTIME;
+  const runtime = ONYX_AGENT_RUNTIME;
   const entrySegments = runtime.resolveNodeBundleSegments();
   const resourceSegments = [runtime.bundledResourceDir, ...entrySegments];
 
@@ -87,7 +87,7 @@ export function findZCodeAgentRuntimeNodeBundle(): string | null {
 
   const candidates = [
     packagedResourcesPath ? resolvePath(packagedResourcesPath, ...resourceSegments) : null,
-    resolvePath(homedir(), ".zcode", "server", "agents", ...resourceSegments),
+    resolvePath(homedir(), ".onyx", "server", "agents", ...resourceSegments),
     ...platformScopedRoots.map((root) =>
       root ? resolvePath(root, runtime.bundledResourceDir, ...entrySegments) : null,
     ),

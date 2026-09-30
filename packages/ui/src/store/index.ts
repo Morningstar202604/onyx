@@ -5,7 +5,7 @@
  * 广播频道前缀 "state:" 表示状态同步类消息。
  */
 import { create } from "zustand";
-import type { IBroadcastService, BroadcastMessage } from "@zcode/services";
+import type { IBroadcastService, BroadcastMessage } from "@onyx/services";
 import type { UserInfo } from "@/lib/userInfo.js";
 
 /** 官方 OAuth 提供商标识已移除；保留字符串占位供历史状态字段使用。 */

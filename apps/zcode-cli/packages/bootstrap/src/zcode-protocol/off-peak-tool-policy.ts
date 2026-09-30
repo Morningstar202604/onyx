@@ -1,4 +1,4 @@
-import { zcodeWorkspaceUpdateOffPeakToolPolicyParamsSchema } from "@zcode/shared";
+import { zcodeWorkspaceUpdateOffPeakToolPolicyParamsSchema } from "@onyx/shared";
 import { parseParams, type ZCodeProtocolAgentServerContext } from "./server-types.js";
 
 /**

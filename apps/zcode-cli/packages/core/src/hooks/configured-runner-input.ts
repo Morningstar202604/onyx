@@ -1,7 +1,7 @@
 import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { resolveWorkspaceHookTimeoutMs } from "@zcode/shared/workspace-hook-discovery";
+import { resolveWorkspaceHookTimeoutMs } from "@onyx/shared/workspace-hook-discovery";
 import {
   CoreErrorType,
   HookEventName,
@@ -9,7 +9,7 @@ import {
   type HookConfig,
   type HookInput,
   type HookPluginContext,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 
 export async function createCompatibleHookStdin(input: HookInput): Promise<{
   cleanup: () => Promise<void>;
@@ -80,8 +80,8 @@ export function createPluginEnvOverlay(
     CLAUDE_CODE_SESSION_ID: input.sessionId,
     CLAUDE_PROJECT_DIR: input.cwd || workingDirectory,
     CLAUDE_SESSION_ID: input.sessionId,
-    ZCODE_PROJECT_DIR: input.cwd || workingDirectory,
-    ZCODE_SESSION_ID: input.sessionId,
+    ONYX_PROJECT_DIR: input.cwd || workingDirectory,
+    ONYX_SESSION_ID: input.sessionId,
   };
   if (!plugin) return { set };
   return {
@@ -89,10 +89,10 @@ export function createPluginEnvOverlay(
       ...set,
       CLAUDE_PLUGIN_DATA: plugin.dataPath,
       CLAUDE_PLUGIN_ROOT: plugin.rootPath,
-      ZCODE_PLUGIN_DATA: plugin.dataPath,
-      ZCODE_PLUGIN_ID: plugin.id,
-      ZCODE_PLUGIN_NAME: plugin.name,
-      ZCODE_PLUGIN_ROOT: plugin.rootPath,
+      ONYX_PLUGIN_DATA: plugin.dataPath,
+      ONYX_PLUGIN_ID: plugin.id,
+      ONYX_PLUGIN_NAME: plugin.name,
+      ONYX_PLUGIN_ROOT: plugin.rootPath,
     },
   };
 }
@@ -107,19 +107,19 @@ export function expandPluginVariables(
     CLAUDE_CODE_SESSION_ID: input.sessionId,
     CLAUDE_PROJECT_DIR: input.cwd || workingDirectory,
     CLAUDE_SESSION_ID: input.sessionId,
-    ZCODE_PROJECT_DIR: input.cwd || workingDirectory,
-    ZCODE_SESSION_ID: input.sessionId,
+    ONYX_PROJECT_DIR: input.cwd || workingDirectory,
+    ONYX_SESSION_ID: input.sessionId,
   };
   if (plugin) {
     replacements.CLAUDE_PLUGIN_DATA = plugin.dataPath;
     replacements.CLAUDE_PLUGIN_ROOT = plugin.rootPath;
-    replacements.ZCODE_PLUGIN_DATA = plugin.dataPath;
-    replacements.ZCODE_PLUGIN_ROOT = plugin.rootPath;
+    replacements.ONYX_PLUGIN_DATA = plugin.dataPath;
+    replacements.ONYX_PLUGIN_ROOT = plugin.rootPath;
   }
   return value.replace(
-    /\$\{(CLAUDE_CODE_SESSION_ID|CLAUDE_PLUGIN_DATA|CLAUDE_PLUGIN_ROOT|CLAUDE_PROJECT_DIR|CLAUDE_SESSION_ID|CLAUDE_SKILL_DIR|ZCODE_PLUGIN_DATA|ZCODE_PLUGIN_ROOT|ZCODE_PROJECT_DIR|ZCODE_SESSION_ID|ZCODE_SKILL_DIR)\}/gu,
+    /\$\{(CLAUDE_CODE_SESSION_ID|CLAUDE_PLUGIN_DATA|CLAUDE_PLUGIN_ROOT|CLAUDE_PROJECT_DIR|CLAUDE_SESSION_ID|CLAUDE_SKILL_DIR|ONYX_PLUGIN_DATA|ONYX_PLUGIN_ROOT|ONYX_PROJECT_DIR|ONYX_SESSION_ID|ONYX_SKILL_DIR)\}/gu,
     (_match, key: string) => {
-      if (key === "CLAUDE_SKILL_DIR" || key === "ZCODE_SKILL_DIR") {
+      if (key === "CLAUDE_SKILL_DIR" || key === "ONYX_SKILL_DIR") {
         // hook 运行时没有“当前 skill”语义，不能把该变量交给 shell 展开为空字符串。
         // 这里提前报错，插件诊断/日志能看到明确的上下文缺失原因。
         throw createCoreError(

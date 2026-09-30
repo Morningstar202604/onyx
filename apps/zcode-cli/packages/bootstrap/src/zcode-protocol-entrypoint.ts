@@ -1,21 +1,21 @@
-import { createConfig } from "@zcode/adapters/config";
-import { createNodeModelSelectionFacade } from "@zcode/provider-node";
-import { createNodeLoggerFactory } from "@zcode/adapters/logging";
+import { createConfig } from "@onyx/adapters/config";
+import { createNodeModelSelectionFacade } from "@onyx/provider-node";
+import { createNodeLoggerFactory } from "@onyx/adapters/logging";
 import {
   createMcpAdapterConnectionPool,
   createMcpTelemetryTracker,
   type McpConnectionPool,
   type McpTelemetryTracker,
-} from "@zcode/adapters/mcp";
+} from "@onyx/adapters/mcp";
 import {
   zcodeProtocolNotifications,
   type ZCodeMcpResourceSample,
   type ZCodeMcpTelemetryEvent,
-} from "@zcode/shared";
-import type { SqliteSessionStore } from "@zcode/adapters/storage";
-import { traceContextToLogContext, createRootTraceContext } from "@zcode/contracts";
-import type { McpPort, ModelSelection } from "@zcode/contracts";
-import type { PresentationSurface } from "@zcode/core";
+} from "@onyx/shared";
+import type { SqliteSessionStore } from "@onyx/adapters/storage";
+import { traceContextToLogContext, createRootTraceContext } from "@onyx/contracts";
+import type { McpPort, ModelSelection } from "@onyx/contracts";
+import type { PresentationSurface } from "@onyx/core";
 import type { RunZCodeProtocolAgentOptions, ZCodeAppOptions } from "./app/types.js";
 import { createZCodeApp } from "./app/create-app.js";
 import {
@@ -38,9 +38,9 @@ import {
 import {
   createOfficialMcpTrustedOriginRegistry,
   OFFICIAL_MCP_DEV_TRUSTED_ORIGINS_ENV,
-  ZCODE_WORKSPACE_IDENTITY_ENV,
+  ONYX_WORKSPACE_IDENTITY_ENV,
   resolveRuntimeZCodeEndpointOrigin,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { ZCodeProtocolAgentServer } from "./zcode-protocol/server.js";
 import { ZCodeProtocolNdjsonConnection } from "./zcode-protocol/transport.js";
 import { cleanupProtocolRuntime } from "./zcode-protocol/runtime-cleanup.js";
@@ -115,7 +115,7 @@ export async function runZCodeProtocolAgent(
     },
     startupStartedAt,
   );
-  startupTimer.start("ZCode Protocol agent startup started", {
+  startupTimer.start("Onyx Protocol agent startup started", {
     context: { version: options.version },
     event: "zcode_protocol.startup.started",
     stage: "start",
@@ -175,11 +175,11 @@ export async function runZCodeProtocolAgent(
       create: () =>
         prepareZCodeTelemetryEnv(runtimeEnv, {
           cliVersion: options.version,
-          productVersion: options.env?.ZCODE_APP_VERSION,
+          productVersion: options.env?.ONYX_APP_VERSION,
           runtimeSurface,
         }),
     });
-    const telemetryDeviceMid = telemetryEnv.ZCODE_TELEMETRY_DEVICE_MID;
+    const telemetryDeviceMid = telemetryEnv.ONYX_TELEMETRY_DEVICE_MID;
     mcpTelemetryTracker =
       configResult.config.features.mcp === false
         ? undefined
@@ -196,7 +196,7 @@ export async function runZCodeProtocolAgent(
     // 与下面 trustedOrigins 的 resolveZCodeApiOrigin 必须是同一个表达式，否则两侧判定分叉。
     const resolveZCodeApiOrigin = (): string =>
       resolveRuntimeZCodeEndpointOrigin(options.env ?? process.env);
-    const workspaceIdentity = (options.env ?? process.env)[ZCODE_WORKSPACE_IDENTITY_ENV]?.trim();
+    const workspaceIdentity = (options.env ?? process.env)[ONYX_WORKSPACE_IDENTITY_ENV]?.trim();
     const officialMcpAuth = {
       authHeadersPort: createOfficialMcpAuthHeadersPort({
         resolveContext: () => officialMcpAuthContext,
@@ -265,7 +265,7 @@ export async function runZCodeProtocolAgent(
           env: {
             ...telemetryEnv,
             ...appOptions.env,
-            ...(telemetryDeviceMid ? { ZCODE_TELEMETRY_DEVICE_MID: telemetryDeviceMid } : {}),
+            ...(telemetryDeviceMid ? { ONYX_TELEMETRY_DEVICE_MID: telemetryDeviceMid } : {}),
           },
           ...(nodeReplBrowserBroker ? { nodeReplBrowserBroker } : {}),
           ...(mcpConnectionPool
@@ -337,7 +337,7 @@ export async function runZCodeProtocolAgent(
       (message) => connection.send(message),
       logger,
     );
-    startupTimer.complete("ZCode Protocol agent startup completed", {
+    startupTimer.complete("Onyx Protocol agent startup completed", {
       event: "zcode_protocol.startup.completed",
       stage: "total",
     });
@@ -347,7 +347,7 @@ export async function runZCodeProtocolAgent(
     options.lifecycle?.requestShutdown(
       error instanceof Error ? error : new Error("Protocol runtime failed", { cause: error }),
     );
-    startupTimer.fail("ZCode Protocol agent startup failed", error, {
+    startupTimer.fail("Onyx Protocol agent startup failed", error, {
       event: "zcode_protocol.startup.failed",
       stage: "total",
     });
@@ -366,7 +366,7 @@ export async function runZCodeProtocolAgent(
       sessionStore,
       providerRegistryRuntime,
     });
-    logger.info("ZCode Protocol agent shutdown completed", {
+    logger.info("Onyx Protocol agent shutdown completed", {
       ...traceContextToLogContext(traceContext),
       event: "zcode_protocol.shutdown.completed",
       module: "bootstrap.zcode_protocol",
@@ -379,7 +379,7 @@ function resolveProtocolRuntimeSurface(
   env: NodeJS.ProcessEnv,
 ): "desktop_local_host" | "remote_workspace_host" {
   // Bug 根因：入口曾无条件覆盖 Host 注入值，远程 SSH/WSL/容器 Trace 被归入本地 Desktop。
-  return env.ZCODE_TELEMETRY_RUNTIME_SURFACE?.trim() === "remote_workspace_host"
+  return env.ONYX_TELEMETRY_RUNTIME_SURFACE?.trim() === "remote_workspace_host"
     ? "remote_workspace_host"
     : "desktop_local_host";
 }

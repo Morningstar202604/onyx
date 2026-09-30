@@ -18,7 +18,7 @@ import type { ErrorAttribution } from "./zcode-protocol-v4/snapshot.js";
 /**
  * ZCode task/session 投影共享类型定义
  *
- * 跨 renderer、host process、ZCode agent service 使用的类型。
+ * 跨 renderer、host process、Onyx agent service 使用的类型。
  */
 
 // ---- 可观测性 ----
@@ -31,7 +31,7 @@ export type InputId = string;
 export type QueryId = string;
 // ---- ZCode Provider ----
 
-/** 支持的 ZCode agent 提供方；当前仅保留 glm。 */
+/** 支持的 Onyx agent 提供方；当前仅保留 glm。 */
 export type ZCodeProvider = "glm";
 export type ZCodeGlmAgentModelStateUpdateReason =
   | "session_initialized"
@@ -262,7 +262,7 @@ export interface ZCodeTaskPendingInteraction {
 }
 
 export interface ZCodeTaskMeta {
-  /** UI taskId 与 ZCode agent sessionId 保持一致，用于列表选择、日志关联和恢复会话。 */
+  /** UI taskId 与 Onyx agent sessionId 保持一致，用于列表选择、日志关联和恢复会话。 */
   taskId: string;
   /** session/任务级观测 traceId，不用于区分单次用户输入 */
   traceId: TraceId;
@@ -773,7 +773,7 @@ export interface ZCodeTaskTokenUsageDelta {
   traceId: TraceId;
   inputId?: InputId;
   queryId?: QueryId;
-  /** 稳定去重键，通常来自 ZCode Protocol eventId。 */
+  /** 稳定去重键，通常来自 Onyx Protocol eventId。 */
   eventKey: string;
   eventId?: string;
   querySource?: string;
@@ -988,7 +988,7 @@ export interface ZCodeSessionRuntimeSnapshot {
   activeTurnKind?: ZCodeSessionActiveTurnKind;
   /** Agent API 网络重试是运行态提示，只随 snapshot 恢复，不写入 session JSON。 */
   apiRetry?: ZCodeApiRetryStatus | null;
-  /** ZCode Protocol projection 中的上下文窗口用量，用于恢复旧 task UI 的右下角 context meter。 */
+  /** Onyx Protocol projection 中的上下文窗口用量，用于恢复旧 task UI 的右下角 context meter。 */
   contextUsage?: {
     used: number;
     size: number;

@@ -4,8 +4,8 @@ import {
   type IPlatformService,
   type RemoteTarget,
   type ZCodeTaskClientMode,
-} from "@zcode/shared";
-import type { IServiceAccessor } from "@zcode/services";
+} from "@onyx/shared";
+import type { IServiceAccessor } from "@onyx/services";
 import type { CreateTaskRequest } from "@/app-shell/types.js";
 import { useConfirmDialog } from "@/hooks/useConfirmDialog.js";
 import { isRendererReloadNavigation } from "@/lib/rendererNavigation.js";

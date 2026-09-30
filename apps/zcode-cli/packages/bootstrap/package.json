@@ -1,5 +1,5 @@
 {
-  "name": "@zcode/bootstrap",
+  "name": "@onyx/bootstrap",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -23,23 +23,23 @@
     "lint:fix": "oxlint --write src"
   },
   "dependencies": {
-    "@zcode/adapters": "workspace:*",
-    "@zcode/contracts": "workspace:*",
-    "@zcode/core": "workspace:*",
-    "@zcode/dynamic-workflow": "workspace:*",
-    "@zcode/dynamic-workflow-runtime": "workspace:*",
-    "@zcode/i18n": "workspace:*",
-    "@zcode/provider": "workspace:*",
-    "@zcode/provider-node": "workspace:*",
-    "@zcode/shared": "workspace:*",
-    "@zcode/telemetry": "workspace:*",
+    "@onyx/adapters": "workspace:*",
+    "@onyx/contracts": "workspace:*",
+    "@onyx/core": "workspace:*",
+    "@onyx/dynamic-workflow": "workspace:*",
+    "@onyx/dynamic-workflow-runtime": "workspace:*",
+    "@onyx/i18n": "workspace:*",
+    "@onyx/provider": "workspace:*",
+    "@onyx/provider-node": "workspace:*",
+    "@onyx/shared": "workspace:*",
+    "@onyx/telemetry": "workspace:*",
     "diff": "^9.0.0",
     "zod": "4.6.5"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "@types/yazl": "^3.3.1",
-    "@zcode/formal-proof": "workspace:*",
+    "@onyx/formal-proof": "workspace:*",
     "yazl": "^3.3.1"
   }
 }

@@ -1,8 +1,8 @@
-import { ZCODE_OFFICIAL_PLUGIN_MARKETPLACE } from "@zcode/contracts";
+import { ONYX_OFFICIAL_PLUGIN_MARKETPLACE } from "@onyx/contracts";
 
 // 内置插件的商店信息 seed（原样写入官方 marketplace.json 的条目 raw，键名与 CDN 目录
 // schema 一致：displayName_i18n / examplePrompts_i18n 等），解析复用 adapter 的
-// parseEntryStoreListing。icon 指向官方 assets CDN；请求失败时 UI 会安全降级为默认图标。
+// parseEntryStoreListing。Onyx 无官方 assets CDN：不提供远端 icon，UI 使用默认图标。
 export interface OfficialPluginListingSeed {
   displayName?: string;
   displayName_i18n?: Record<string, string>;
@@ -19,7 +19,7 @@ export interface OfficialPluginListingSeed {
 }
 
 const OFFICIAL_BROWSER_USE_PLUGIN_NAME = "browser-use";
-export const OFFICIAL_BROWSER_USE_PLUGIN_ID = `${OFFICIAL_BROWSER_USE_PLUGIN_NAME}@${ZCODE_OFFICIAL_PLUGIN_MARKETPLACE}`;
+export const OFFICIAL_BROWSER_USE_PLUGIN_ID = `${OFFICIAL_BROWSER_USE_PLUGIN_NAME}@${ONYX_OFFICIAL_PLUGIN_MARKETPLACE}`;
 /**
  * node_repl 宿主。它不是面向用户的插件：没有 skill、没有 listing、不进市场，唯一职责是
  * 携带 `dist/mcp/server.js` 这个 Browser Use 与 Computer Use 共用的运行时产物。
@@ -30,9 +30,9 @@ export const OFFICIAL_BROWSER_USE_PLUGIN_ID = `${OFFICIAL_BROWSER_USE_PLUGIN_NAM
  * 各自只贡献自己的领域资产，谁启用都能拿到同一个宿主。
  */
 export const OFFICIAL_NODE_REPL_HOST_PLUGIN_NAME = "node-repl-host";
-export const OFFICIAL_NODE_REPL_HOST_PLUGIN_ID = `${OFFICIAL_NODE_REPL_HOST_PLUGIN_NAME}@${ZCODE_OFFICIAL_PLUGIN_MARKETPLACE}`;
+export const OFFICIAL_NODE_REPL_HOST_PLUGIN_ID = `${OFFICIAL_NODE_REPL_HOST_PLUGIN_NAME}@${ONYX_OFFICIAL_PLUGIN_MARKETPLACE}`;
 const OFFICIAL_CUA_PLUGIN_NAME = "computer-use";
-export const OFFICIAL_CUA_PLUGIN_ID = `${OFFICIAL_CUA_PLUGIN_NAME}@${ZCODE_OFFICIAL_PLUGIN_MARKETPLACE}`;
+export const OFFICIAL_CUA_PLUGIN_ID = `${OFFICIAL_CUA_PLUGIN_NAME}@${ONYX_OFFICIAL_PLUGIN_MARKETPLACE}`;
 
 export interface OfficialPluginDefinition {
   // 内容型 plugin (无 MCP server / 无系统依赖) 可以设为 true,
@@ -54,8 +54,7 @@ export interface OfficialPluginDefinition {
   version: string;
 }
 
-const ZAI_AUTHOR = { name: "Z.ai", url: "https://z.ai" } as const;
-const OFFICIAL_PLUGIN_ASSETS_BASE_URL = "https://cdn-zcode.z.ai/zcode/official-plugin/assets";
+const ONYX_AUTHOR = { name: "Onyx", url: "https://gitcode.com/badhope/onyx" } as const;
 
 const OFFICIAL_NODE_REPL_HOST_REQUIRED_SEED_PATHS = ["dist/mcp/server.js"] as const;
 
@@ -77,9 +76,9 @@ const OFFICIAL_CUA_REQUIRED_SEED_PATHS = [
   "skills/computer-use/SKILL.md",
 ] as const;
 
-// zcode-guide 原本没有 requiredSeedPaths，seed 丢文件时会静默装出一个
+// onyx-guide 原本没有 requiredSeedPaths，seed 丢文件时会静默装出一个
 // 没有 /workflow 命令的插件——症状是命令不存在，没有任何诊断。commands/ 与技能正文都钉住。
-const OFFICIAL_ZCODE_GUIDE_REQUIRED_SEED_PATHS = [
+const OFFICIAL_ONYX_GUIDE_REQUIRED_SEED_PATHS = [
   "commands/workflow.md",
   "skills/dynamic-workflows/SKILL.md",
   "skills/dynamic-workflows/examples.md",
@@ -107,11 +106,10 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
   },
   {
     listing: {
-      author: ZAI_AUTHOR,
+      author: ONYX_AUTHOR,
       category: "developer-tools",
       displayName: "Android Emulator",
       displayName_i18n: { "zh-CN": "Android 模拟器" },
-      icon: `${OFFICIAL_PLUGIN_ASSETS_BASE_URL}/android-emulator/icon.png`,
       description_i18n: {
         "zh-CN": "提供 Android 开发工作流与模拟器自动化能力。",
       },
@@ -131,11 +129,10 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
     defaultEnabled: true,
     hostMcpServerNames: ["node_repl"],
     listing: {
-      author: ZAI_AUTHOR,
+      author: ONYX_AUTHOR,
       category: "productivity",
       displayName: "Browser Use",
       displayName_i18n: { "zh-CN": "浏览器操作" },
-      icon: `${OFFICIAL_PLUGIN_ASSETS_BASE_URL}/browser-use/icon.png`,
       description_i18n: {
         "zh-CN": "操作 ZCode 内置浏览器，检查网页并验证交互。",
       },
@@ -163,12 +160,11 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
     ([name, skill, displayName, chineseName]): OfficialPluginDefinition => ({
       defaultEnabled: true,
       listing: {
-        author: ZAI_AUTHOR,
+        author: ONYX_AUTHOR,
         category: "productivity",
         displayName,
         displayName_i18n: { "zh-CN": chineseName },
         // 复用已发布的文档图标，拆分插件无需依赖新 CDN 资源。
-        icon: `${OFFICIAL_PLUGIN_ASSETS_BASE_URL}/document-skills/icon.png`,
         description_i18n: { "zh-CN": `创建、编辑与审阅${chineseName}（${skill.toUpperCase()}）。` },
       },
       name,
@@ -186,7 +182,7 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
     // 沿用原聚合文档插件的官方搜图能力，仅拆出独立开关；认证仍由官方 MCP adapter 注入。
     defaultEnabled: true,
     listing: {
-      author: ZAI_AUTHOR,
+      author: ONYX_AUTHOR,
       category: "productivity",
       displayName: "Image Search",
       displayName_i18n: { "zh-CN": "搜图" },
@@ -204,11 +200,10 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
   },
   {
     listing: {
-      author: ZAI_AUTHOR,
+      author: ONYX_AUTHOR,
       category: "developer-tools",
       displayName: "iOS Simulator",
       displayName_i18n: { "zh-CN": "iOS 模拟器" },
-      icon: `${OFFICIAL_PLUGIN_ASSETS_BASE_URL}/ios-simulator/icon.png`,
       description_i18n: {
         "zh-CN": "提供 iOS 开发工作流与模拟器自动化能力。",
       },
@@ -224,11 +219,10 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
   },
   {
     listing: {
-      author: ZAI_AUTHOR,
+      author: ONYX_AUTHOR,
       category: "utilities",
       displayName: "Restore Legacy Sessions",
       displayName_i18n: { "zh-CN": "恢复旧版会话" },
-      icon: `${OFFICIAL_PLUGIN_ASSETS_BASE_URL}/restore-legacy-sessions/icon.png`,
       description_i18n: {
         "zh-CN": "将旧版会话恢复为 ZCode 任务与会话记录。",
       },
@@ -247,7 +241,7 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
     name: "plugin-creator",
     version: "0.1.1",
     listing: {
-      author: ZAI_AUTHOR,
+      author: ONYX_AUTHOR,
       category: "utilities",
       displayName: "Plugin Creator",
       // 创建器使用客户端自带图标，不再借用 skill-creator 的远端图片。
@@ -276,11 +270,10 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
   {
     defaultEnabled: true,
     listing: {
-      author: ZAI_AUTHOR,
+      author: ONYX_AUTHOR,
       category: "utilities",
       displayName: "Skill Creator",
       displayName_i18n: { "zh-CN": "技能创建器" },
-      icon: `${OFFICIAL_PLUGIN_ASSETS_BASE_URL}/skill-creator/icon.png`,
       description_i18n: { "zh-CN": "创建、编辑和验证可复用的 ZCode 技能。" },
     },
     name: "skill-creator",
@@ -297,11 +290,10 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
     // 让用户/agent 开箱即用地拿到 ZCode 配置指南、自诊断技能与 dynamic workflow 编写指南。
     defaultEnabled: true,
     listing: {
-      author: ZAI_AUTHOR,
+      author: ONYX_AUTHOR,
       category: "utilities",
       displayName: "ZCode Guide",
       displayName_i18n: { "zh-CN": "ZCode 使用指南" },
-      icon: `${OFFICIAL_PLUGIN_ASSETS_BASE_URL}/zcode-guide/icon.png`,
       description_i18n: {
         "zh-CN": "提供 ZCode 配置指南与插件、技能、MCP、命令和钩子诊断。",
       },
@@ -313,13 +305,13 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
         "zh-CN": ["ZCode 里怎么配置 MCP 服务器？", "帮我诊断当前的 ZCode 配置"],
       },
     },
-    name: "zcode-guide",
-    requiredSeedPaths: OFFICIAL_ZCODE_GUIDE_REQUIRED_SEED_PATHS,
+    name: "onyx-guide",
+    requiredSeedPaths: OFFICIAL_ONYX_GUIDE_REQUIRED_SEED_PATHS,
     rootCandidates: [
-      "packages/zcode-guide-plugin",
-      "../zcode-guide-plugin",
-      "../../zcode-guide-plugin",
-      "../../../zcode-guide-plugin",
+      "packages/onyx-guide-plugin",
+      "../onyx-guide-plugin",
+      "../../onyx-guide-plugin",
+      "../../../onyx-guide-plugin",
     ],
     version: "0.2.0",
   },
@@ -338,7 +330,7 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
     // 以兼容原生 Helper identity；EN 描述基线走 manifest
     // description，这里只放 zh-CN 覆盖；resolveLocalizedText 在 en-US 时回退到 manifest。
     listing: {
-      author: ZAI_AUTHOR,
+      author: ONYX_AUTHOR,
       category: "productivity",
       displayName: "Computer Use",
       displayName_i18n: { "zh-CN": "电脑控制" },
@@ -346,7 +338,6 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
         "zh-CN": "自动化桌面应用：智能体驱动鼠标、键盘与界面元素，代你完成实际任务。",
       },
       // 插件更名为 computer-use 后，CDN 图标仍发布在 zcode-cua 目录；沿用资源路径避免 404。
-      icon: `${OFFICIAL_PLUGIN_ASSETS_BASE_URL}/zcode-cua/icon.png`,
     },
     rootCandidates: [
       "packages/zcode-cua-plugin",
@@ -369,13 +360,13 @@ export const OFFICIAL_PLUGIN_DEFINITIONS: readonly OfficialPluginDefinition[] = 
 // 都必须把这个集合传给 discoverNodePluginsSync, 否则 defaultEnabled 不生效。
 export const DEFAULT_ENABLED_OFFICIAL_PLUGIN_IDS: ReadonlySet<string> = new Set(
   OFFICIAL_PLUGIN_DEFINITIONS.filter((definition) => definition.defaultEnabled).map(
-    (definition) => `${definition.name}@${ZCODE_OFFICIAL_PLUGIN_MARKETPLACE}`,
+    (definition) => `${definition.name}@${ONYX_OFFICIAL_PLUGIN_MARKETPLACE}`,
   ),
 );
 
 export function resolveOfficialPluginHostMcpServerNames(pluginId: string): string[] {
   const definition = OFFICIAL_PLUGIN_DEFINITIONS.find(
-    (candidate) => `${candidate.name}@${ZCODE_OFFICIAL_PLUGIN_MARKETPLACE}` === pluginId,
+    (candidate) => `${candidate.name}@${ONYX_OFFICIAL_PLUGIN_MARKETPLACE}` === pluginId,
   );
   return definition?.hostMcpServerNames ? [...definition.hostMcpServerNames] : [];
 }

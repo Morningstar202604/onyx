@@ -1,4 +1,4 @@
-import { ProviderRegistryService } from "@zcode/provider";
+import { ProviderRegistryService } from "@onyx/provider";
 import {
   NodeProviderConfigRuntime,
   type NodeProviderConfigRuntimeOptions,

@@ -1,20 +1,20 @@
 /* eslint-disable max-lines -- autoUpdater 需要集中维护 Electron 事件、菜单状态与 IPC 交互，过度拆分会让更新状态流更难追踪 */
-import type { ISettingService } from "@zcode/services";
+import type { ISettingService } from "@onyx/services";
 import {
   DEFAULT_LOCALE,
-  DEFAULT_ZCODE_ENDPOINT_ORIGIN,
+  DEFAULT_ONYX_ENDPOINT_ORIGIN,
   desktopMenuMessageIds,
   formatDesktopMenuMessage,
   getDesktopMenuMessage,
   PlatformChannels,
   resolveRuntimeZCodeEndpointOrigin,
-  ZCODE_VERSION,
+  ONYX_VERSION,
   type ElectronReleaseChannel,
   type Locale,
   type PostUpdateReleaseNotesPayload,
   type UpdateCheckResultPayload,
   type UpdateStatePayload,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { app, BrowserWindow, ipcMain, Menu } from "electron";
 import pkg, { CancellationToken } from "electron-updater";
 import semver from "semver";
@@ -24,11 +24,11 @@ const { autoUpdater } = pkg;
 
 export const CHECK_FOR_UPDATE_MENU_ID = "check-for-update";
 const AUTO_UPDATE_POLL_INTERVAL_MS = 60 * 60 * 1000;
-const UPDATE_FEED_URL_ENV = "ZCODE_UPDATE_FEED_URL";
+const UPDATE_FEED_URL_ENV = "ONYX_UPDATE_FEED_URL";
 const UPDATE_FEED_URL_SWITCH = "--zcode-update-feed-url";
-const DEV_AUTO_UPDATE_ENV = "ZCODE_AUTO_UPDATE_DEV";
+const DEV_AUTO_UPDATE_ENV = "ONYX_AUTO_UPDATE_DEV";
 const DEV_AUTO_UPDATE_SWITCH = "--zcode-auto-update-dev";
-const DEV_AUTO_UPDATE_VERSION_ENV = "ZCODE_AUTO_UPDATE_DEV_VERSION";
+const DEV_AUTO_UPDATE_VERSION_ENV = "ONYX_AUTO_UPDATE_DEV_VERSION";
 const DEV_AUTO_UPDATE_VERSION_SWITCH = "--zcode-auto-update-dev-version";
 let readyUpdateVersion: string | null = null;
 let readyUpdateReleaseNotes: PostUpdateReleaseNotesPayload | null = null;
@@ -167,7 +167,7 @@ function resolveDevAutoUpdateVersion(): string | null {
   const configuredVersion =
     process.env[DEV_AUTO_UPDATE_VERSION_ENV]?.trim() ||
     readCommandLineSwitchValue(DEV_AUTO_UPDATE_VERSION_SWITCH)?.trim() ||
-    ZCODE_VERSION;
+    ONYX_VERSION;
   const parsed = semver.parse(configuredVersion);
   if (!parsed) {
     logger.warn(`[auto-update] ignore invalid dev update version=${configuredVersion}`);
@@ -753,10 +753,18 @@ async function syncAutoUpdateCheckChannelFromSettings(
 
 function applyManifestUpdateProvider(options: InitAutoUpdaterOptions): void {
   const manifestUrl = options.updateFeedSource?.url.trim();
+  const configuredEndpointOrigin = resolveRuntimeZCodeEndpointOrigin(process.env).trim();
+  if (!configuredEndpointOrigin && !manifestUrl) {
+    // Onyx 无官方更新服务器：未配置任何更新源（endpoint origin 或 manifest URL）时整体禁用自动更新，
+    // 也不构造 ManifestUpdateProvider（空 origin 无法解析）。
+    autoUpdaterDisabledForProductFlavor = true;
+    logger.warn("[auto-update] disabled: no update feed configured (no official server)");
+    return;
+  }
   autoUpdater.setFeedURL({
     provider: "custom",
     updateProvider: ManifestUpdateProvider,
-    endpointOrigin: DEFAULT_ZCODE_ENDPOINT_ORIGIN,
+    endpointOrigin: DEFAULT_ONYX_ENDPOINT_ORIGIN,
     ...(manifestUrl ? { manifestUrl } : {}),
     releasePlatform: getElectronReleasePlatform(),
     deviceMid: options.deviceMid,

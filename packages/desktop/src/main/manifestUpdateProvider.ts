@@ -1,10 +1,10 @@
 import { posix } from "node:path";
 import type { CustomPublishOptions, PackageFileInfo } from "builder-util-runtime";
 import {
-  DEFAULT_ZCODE_ENDPOINT_ORIGIN,
+  DEFAULT_ONYX_ENDPOINT_ORIGIN,
   normalizeZCodeEndpointOrigin,
   type ElectronReleaseChannel,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import {
   Provider,
   AppImageUpdater,
@@ -182,7 +182,9 @@ export class ManifestUpdateProvider extends Provider<UpdateInfo> {
   private readonly options: ManifestUpdateProviderOptions;
   private readonly releasePlatform: string;
   private readonly linuxExtensions: readonly string[] | null;
-  private resolveBaseUrl = new URL(DEFAULT_ZCODE_ENDPOINT_ORIGIN);
+  // Onyx 无官方服务器：endpoint origin 可能为空。构造阶段不做 URL 解析（空 origin 会抛错），
+  // 真实 base 在 getLatestVersion 成功后按 manifest URL 重建；为空时 resolveFiles 返回空列表。
+  private resolveBaseUrl: URL | undefined;
 
   constructor(
     options: ManifestUpdateProviderOptions,
@@ -193,9 +195,7 @@ export class ManifestUpdateProvider extends Provider<UpdateInfo> {
     this.options = options;
     this.linuxExtensions = getLinuxUpdateExtensions(updater);
     this.releasePlatform = options.releasePlatform?.trim() || getElectronReleasePlatform();
-    this.resolveBaseUrl = new URL(
-      normalizeZCodeEndpointOrigin(options.endpointOrigin ?? DEFAULT_ZCODE_ENDPOINT_ORIGIN),
-    );
+    this.resolveBaseUrl = undefined;
   }
 
   override get isUseMultipleRangeRequest(): boolean {
@@ -240,6 +240,9 @@ export class ManifestUpdateProvider extends Provider<UpdateInfo> {
   }
 
   override resolveFiles(updateInfo: UpdateInfo): ResolvedUpdateFileInfo[] {
+    if (!this.resolveBaseUrl) {
+      return [];
+    }
     return resolveManifestFiles(updateInfo, this.resolveBaseUrl, this.linuxExtensions);
   }
 
@@ -247,8 +250,14 @@ export class ManifestUpdateProvider extends Provider<UpdateInfo> {
     const resolved =
       (await this.options.resolveEndpointOrigin?.()) ??
       this.options.endpointOrigin ??
-      DEFAULT_ZCODE_ENDPOINT_ORIGIN;
-    return normalizeZCodeEndpointOrigin(resolved);
+      DEFAULT_ONYX_ENDPOINT_ORIGIN;
+    const trimmed = resolved.trim();
+    if (!trimmed && !this.options.manifestUrl?.trim()) {
+      throw new Error(
+        "Update source is not configured: neither endpoint origin nor manifest URL is set",
+      );
+    }
+    return trimmed ? normalizeZCodeEndpointOrigin(trimmed) : "";
   }
 
   private async resolveReleaseChannel(): Promise<ElectronReleaseChannel> {

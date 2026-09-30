@@ -4,16 +4,16 @@ import {
   zcodeProtocolMethods,
   zcodeWorkspaceCancelGenerateTextParamsSchema,
   zcodeWorkspaceHookTrustGrantParamsSchema,
-} from "@zcode/shared";
-import type { BrowserControlPort } from "@zcode/contracts";
-import { InMemoryWorkspaceHookPolicyProvider } from "@zcode/core";
+} from "@onyx/shared";
+import type { BrowserControlPort } from "@onyx/contracts";
+import { InMemoryWorkspaceHookPolicyProvider } from "@onyx/core";
 import {
   V4_METHODS,
   V4_NOTIFICATIONS,
   parseConversationTopic,
   parseSessionsIndexTopic,
   parseWorkspaceConfigTopic,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@onyx/shared/zcode-protocol-v4";
 import type {
   ZCodeProtocolError,
   ZCodeProtocolMessage,
@@ -22,7 +22,7 @@ import type {
   ZCodeProtocolRequest,
   ZCodeProtocolRequestId,
   ZCodeProtocolResponse,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import {
   cancelBackgroundTask,
   closeSession,
@@ -113,7 +113,7 @@ import {
   type ZCodeProtocolAgentServerContext,
   type ZCodeProtocolSessionRecord,
 } from "./server-types.js";
-import { createInMemorySessionEventStore } from "@zcode/contracts";
+import { createInMemorySessionEventStore } from "@onyx/contracts";
 
 export type { ZCodeProtocolAgentDependencies, ZCodeProtocolSessionRecord };
 
@@ -357,7 +357,7 @@ export class ZCodeProtocolAgentServer {
   shutdown(): Promise<void> {
     if (this.shutdownPromise) return this.shutdownPromise;
     this.shutdownPromise = this.runtimeResources.close();
-    const error = new Error("ZCode Protocol runtime stopping");
+    const error = new Error("Onyx Protocol runtime stopping");
     this.disconnectClient(error);
     this.messageSink = undefined;
     this.clearPostResponseMessages();
@@ -421,7 +421,7 @@ export class ZCodeProtocolAgentServer {
       return await this.handleRequest(message);
     }
     if (isNotification(message)) {
-      this.logger?.debug("ZCode Protocol notification ignored", {
+      this.logger?.debug("Onyx Protocol notification ignored", {
         event: "zcode_protocol.notification.ignored",
         method: message.method,
         module: "bootstrap.zcode_protocol",
@@ -809,7 +809,7 @@ export class ZCodeProtocolAgentServer {
       throw this.clientDisconnectError;
     }
     if (!this.messageSink) {
-      throw new ProtocolRequestError(-32020, `No ZCode Protocol client is attached for ${method}`);
+      throw new ProtocolRequestError(-32020, `No Onyx Protocol client is attached for ${method}`);
     }
 
     return new Promise<T>((resolve, reject) => {

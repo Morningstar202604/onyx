@@ -1,4 +1,4 @@
-import type { GitRepositorySummary, SystemInfo } from "@zcode/shared";
+import type { GitRepositorySummary, SystemInfo } from "@onyx/shared";
 
 interface GitAutoRefreshWatchPath {
   path: string;

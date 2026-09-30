@@ -1,17 +1,17 @@
 import { join } from "node:path";
-import { createNodeContextSourceAdapter } from "@zcode/adapters/context";
-import { createNodeExecutionAdapter } from "@zcode/adapters/exec";
-import { createNodeFileSystemAdapter } from "@zcode/adapters/fs";
-import { createNodeWebFetchHttpClientAdapter } from "@zcode/adapters/http";
-import { createNodeSkillAdapter } from "@zcode/adapters/skills";
-import type { ConfigResult } from "@zcode/adapters/config";
+import { createNodeContextSourceAdapter } from "@onyx/adapters/context";
+import { createNodeExecutionAdapter } from "@onyx/adapters/exec";
+import { createNodeFileSystemAdapter } from "@onyx/adapters/fs";
+import { createNodeWebFetchHttpClientAdapter } from "@onyx/adapters/http";
+import { createNodeSkillAdapter } from "@onyx/adapters/skills";
+import type { ConfigResult } from "@onyx/adapters/config";
 import {
   AgentRuntime,
   type AgentRuntimeConfig,
   type AgentRuntimeDeps,
   type ChildClientPortsContext,
   type PermissionService,
-} from "@zcode/core";
+} from "@onyx/core";
 import {
   type AgentExecutionTelemetryPort,
   type ContextSourcePort,
@@ -30,7 +30,7 @@ import {
   type WorkflowAgentCallInput,
   type WorkflowEscalatePort,
   type WorkflowSubmitPort,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import { collectDisabledPaths } from "../skill-command-overrides.js";
 import { parseProviderQualifiedModelSelection } from "./provider-registry-selection.js";
 import type { ZCodeAppOptions } from "./types.js";

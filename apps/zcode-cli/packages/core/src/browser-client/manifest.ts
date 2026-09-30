@@ -4,7 +4,7 @@ import { join } from "node:path";
 import type {
   BrowserBackendDescriptor,
   BrowserBackendType,
-} from "@zcode/contracts/browser-control";
+} from "@onyx/contracts/browser-control";
 
 export type BrowserApiMemberKind = "method" | "property";
 

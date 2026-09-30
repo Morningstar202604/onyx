@@ -3,7 +3,7 @@ import type {
   ZCodeAutomationScheduleRule,
   ZCodeMcpListMode,
   ModelSelection,
-} from "@zcode/shared";
+} from "@onyx/shared";
 
 export interface ZCodeAgentWorkspaceTarget {
   workspacePath: string;

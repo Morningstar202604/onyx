@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { Emitter, VSBuffer, SocketProtocol, ChannelServer, type ISocket } from "@zcode/rpc";
+import { Emitter, VSBuffer, SocketProtocol, ChannelServer, type ISocket } from "@onyx/rpc";
 import {
   IZCodeAgentService,
   createZCodeAgentConnectionScope,
   type ServiceCollection,
-} from "@zcode/services";
+} from "@onyx/services";
 
 /**
  * Wrap process.stdin/stdout as an ISocket for RPC communication.

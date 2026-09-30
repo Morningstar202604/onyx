@@ -77,9 +77,9 @@ pnpm typecheck       # 全量类型检查
 
 | 配置 | 用途 |
 | --- | --- |
-| `ZCODE_DATA_BASE_DIR` | 应用数据基目录（写入其下 `.zcode/`） |
-| `ZCODE_SERVER_WORKSPACE` | Web 后端工作区路径 |
-| `ZCODE_BUILTIN_PROVIDER_CONFIG_FILE` | 本地模型供应商配置路径 |
+| `ONYX_DATA_BASE_DIR` | 应用数据基目录（写入其下 `.onyx/`） |
+| `ONYX_SERVER_WORKSPACE` | Web 后端工作区路径 |
+| `ONYX_BUILTIN_PROVIDER_CONFIG_FILE` | 本地模型供应商配置路径 |
 
 ## 已知限制
 

@@ -1,13 +1,13 @@
 import { createRoot } from "react-dom/client";
-import type { ResourceUsageSnapshot, StorageManagementBridge } from "@zcode/shared";
-import "@zcode/ui/styles.css";
+import type { ResourceUsageSnapshot, StorageManagementBridge } from "@onyx/shared";
+import "@onyx/ui/styles.css";
 import {
   ResourceManagerApp,
   ZCodeIntlProvider,
   applyUiFontSizePx,
   loadUiFontSizePx,
   subscribeToUiFontSizeStorageChanges,
-} from "@zcode/ui";
+} from "@onyx/ui";
 
 declare global {
   interface Window {

@@ -1,5 +1,5 @@
-import armsRum from "@arms/rum-electron";
-import type { ZCodeMcpTelemetryEvent } from "@zcode/shared";
+import armsRum from "./armsRumStub.js";
+import type { ZCodeMcpTelemetryEvent } from "@onyx/shared";
 
 interface DesktopMcpTelemetryContext {
   appVersion: string;

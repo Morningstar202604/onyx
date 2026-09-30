@@ -5,7 +5,7 @@ import type {
   EditorInfo,
   GitRepositorySummary,
   RemoteTarget,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import type { UserInfo } from "@/lib/userInfo.js";
 
 export interface WorkspaceHeaderState {

@@ -4,11 +4,11 @@ import type { TraceContext } from "../tracing/tracer.js";
  * BrowserControlPort —— agent 侧浏览器控制端口。
  *
  * browser-client 库把 agent.browsers.* 的每个调用构造成 BrowserCommand，经此端口执行；
- * 实现（ProtocolBrowserControlBroker）把它翻译成 ZCode Protocol 的
+ * 实现（ProtocolBrowserControlBroker）把它翻译成 Onyx Protocol 的
  * interaction/browserExecute 反向请求，由 app（host→main WebContentsView/CDP）执行。
  *
- * 类型说明：BrowserCommand/BrowserCommandResult 与 @zcode/shared 的 browser-use 契约同构。
- * 此处定义结构镜像（不 import @zcode/shared，避免 agent contracts 的 zod v3 与 shared zod v4
+ * 类型说明：BrowserCommand/BrowserCommandResult 与 @onyx/shared 的 browser-use 契约同构。
+ * 此处定义结构镜像（不 import @onyx/shared，避免 agent contracts 的 zod v3 与 shared zod v4
  * 跨包耦合）；协议边界用 shared 的 zod schema 做运行时校验，两侧一致性由 round-trip 测保证。
  */
 
@@ -36,7 +36,7 @@ export interface BrowserBackendDescriptor {
   metadata?: Record<string, string>;
 }
 
-/** ZCode Protocol 使用包装结果；BrowserControlPort.list 会解包并直接返回 browsers。 */
+/** Onyx Protocol 使用包装结果；BrowserControlPort.list 会解包并直接返回 browsers。 */
 export interface BrowserBackendListResult {
   browsers: BrowserBackendDescriptor[];
 }
@@ -264,7 +264,7 @@ export interface BrowserRecordingOptions {
 }
 
 // tabId（可选）：agent 对象模型用于寻址指定受控 tab（含 human 开的 tab）；缺省作用于会话默认 view。
-// 与 @zcode/shared 的 browserCommandSchema 各变体结构镜像同步。
+// 与 @onyx/shared 的 browserCommandSchema 各变体结构镜像同步。
 export type BrowserCommand =
   | { method: "navigate"; url: string; tabId?: string }
   | { method: "back"; tabId?: string }
@@ -436,7 +436,7 @@ export interface BrowserSnapshot {
   domTruncated?: boolean;
 }
 
-/** 受控 tab 摘要（list 命令返回）；与 @zcode/shared 的 browserTabSummarySchema 镜像同步。 */
+/** 受控 tab 摘要（list 命令返回）；与 @onyx/shared 的 browserTabSummarySchema 镜像同步。 */
 export interface BrowserTabSummary {
   tabId: string;
   url: string;

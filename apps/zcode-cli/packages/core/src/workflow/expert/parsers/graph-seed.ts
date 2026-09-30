@@ -2,7 +2,7 @@ import {
   WorkflowGraphSeedSchema,
   type WorkflowGraphEdge,
   type WorkflowGraphSeed,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import { edgeId } from "../ids.js";
 import {
   isRecord,

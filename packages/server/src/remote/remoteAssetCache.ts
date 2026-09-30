@@ -22,8 +22,8 @@ import { dirname, join, resolve, sep } from "node:path";
 import { Readable, Transform } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { setTimeout as sleep } from "node:timers/promises";
-import { fileExists } from "@zcode/server/remote/deployShared.js";
-import { extractTarGzArchive } from "@zcode/server/remote/localTarGz.js";
+import { fileExists } from "@onyx/server/remote/deployShared.js";
+import { extractTarGzArchive } from "@onyx/server/remote/localTarGz.js";
 import {
   assertRemoteCdnBaseVersionMatches,
   buildComponentArtifactUrlCandidates,
@@ -31,11 +31,11 @@ import {
   buildReleaseBaseCandidates,
   normalizeRemoteAssetRelativePath,
   resolveRemoteCdnBaseUrls,
-} from "@zcode/server/remote/remoteAssetCdn.js";
+} from "@onyx/server/remote/remoteAssetCdn.js";
 import {
   resolveRemoteAssetFetch,
   type RemoteAssetNetworkPort,
-} from "@zcode/server/remote/remoteAssetNetwork.js";
+} from "@onyx/server/remote/remoteAssetNetwork.js";
 
 const MANIFEST_FILE_NAME_PREFIX = "manifest-";
 const REMOTE_ASSET_READY_MARKER = ".ready";
@@ -1300,7 +1300,7 @@ export async function parseRemoteAssetManifestFromResponse(
     const mountRule = REMOTE_COMPONENT_MOUNT_RULES[id];
     if (!mountRule) {
       // 旧 release manifest 可能仍包含已退役的三方 agent 组件。
-      // 当前客户端只认识 ZCode Agent 与基础运行时，未知组件应跳过，不能阻断当前组件下载。
+      // 当前客户端只认识 Onyx Agent 与基础运行时，未知组件应跳过，不能阻断当前组件下载。
       continue;
     }
 

@@ -1,7 +1,7 @@
 import {
-  ZCODE_OFFICIAL_PLUGIN_MARKETPLACE_ID,
+  ONYX_OFFICIAL_PLUGIN_MARKETPLACE_ID,
   type ZCodePluginsResolveSuggestedReferenceResult,
-} from "@zcode/shared";
+} from "@onyx/shared";
 
 export interface DraftSuggestedPluginFlow {
   anchorItemId: string;
@@ -44,7 +44,7 @@ export function resolveDraftSuggestedPluginFlowStage(
   const { status } = result;
   if (
     (status === "ready" || status === "disabled" || status === "missing") &&
-    (result.marketplace !== ZCODE_OFFICIAL_PLUGIN_MARKETPLACE_ID ||
+    (result.marketplace !== ONYX_OFFICIAL_PLUGIN_MARKETPLACE_ID ||
       result.sourceTrust !== "official" ||
       !result.pluginName)
   ) {

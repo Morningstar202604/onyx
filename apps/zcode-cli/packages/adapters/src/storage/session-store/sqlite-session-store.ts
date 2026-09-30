@@ -58,9 +58,9 @@ import type {
   UpdateSessionInput,
   UpdateScriptWorkflowRunInput,
   UsageStorePort,
-} from "@zcode/contracts";
-// 端口留在领域包 @zcode/dynamic-workflow，这里只做类型引用：adapters 运行时不依赖它。
-import type { JournalStorePort } from "@zcode/dynamic-workflow";
+} from "@onyx/contracts";
+// 端口留在领域包 @onyx/dynamic-workflow，这里只做类型引用：adapters 运行时不依赖它。
+import type { JournalStorePort } from "@onyx/dynamic-workflow";
 import {
   accountSessionTargetUsage,
   clearSessionTarget,

@@ -4,8 +4,8 @@
  * 拆出原因：useWorkspacePrepare.ts 只保留可单测的轻量判定入口；
  * 这里只读取 workspace presentation（mode/slash commands）；模型选择事实由目标 Host View 提供。
  */
-import type { IZCodeSessionService } from "@zcode/services";
-import { type ZCodeProvider, type ZCodeWorkspacePrepareResult } from "@zcode/shared";
+import type { IZCodeSessionService } from "@onyx/services";
+import { type ZCodeProvider, type ZCodeWorkspacePrepareResult } from "@onyx/shared";
 import { getChatErrorMessage } from "@/lib/chatPrepareError.js";
 import { logger } from "@/logger.js";
 import { zcodeWorkspacePresentationToConfigOptions } from "@/lib/zcodeSessionProjection.js";
@@ -56,7 +56,7 @@ export async function prepareWorkspaceWithZCodeSessionService(params: {
   return {
     workspacePath: params.workspacePath,
     preparedSessionId: "",
-    version: "ZCode Protocol/1",
+    version: "Onyx Protocol/1",
     provider: params.provider,
     configOptions,
     slashCommands: presentation.slashCommands,

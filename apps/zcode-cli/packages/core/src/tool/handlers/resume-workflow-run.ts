@@ -23,7 +23,7 @@ import {
   type ModelMessageContent,
   type ResumeWorkflowRunInput,
   type ResumeWorkflowRunOutput,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import type {
   ToolEntry,
   ToolExecutionContext,

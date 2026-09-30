@@ -66,7 +66,7 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: ^1.27.1
         version: 1.29.0(zod@4.4.3)
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
       ai:
@@ -122,16 +122,16 @@ importers:
 
   packages/bootstrap:
     dependencies:
-      '@zcode/adapters':
+      '@onyx/adapters':
         specifier: workspace:*
         version: link:../adapters
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@zcode/core':
+      '@onyx/core':
         specifier: workspace:*
         version: link:../core
-      '@zcode/i18n':
+      '@onyx/i18n':
         specifier: workspace:*
         version: link:../i18n
     devDependencies:
@@ -141,25 +141,25 @@ importers:
 
   packages/cli:
     dependencies:
-      '@zcode/adapters':
+      '@onyx/adapters':
         specifier: workspace:*
         version: link:../adapters
-      '@zcode/bootstrap':
+      '@onyx/bootstrap':
         specifier: workspace:*
         version: link:../bootstrap
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@zcode/core':
+      '@onyx/core':
         specifier: workspace:*
         version: link:../core
-      '@zcode/i18n':
+      '@onyx/i18n':
         specifier: workspace:*
         version: link:../i18n
-      '@zcode/shared-types':
+      '@onyx/shared-types':
         specifier: workspace:*
         version: link:../shared-types
-      '@zcode/tui':
+      '@onyx/tui':
         specifier: workspace:*
         version: link:../tui
       dotenv:
@@ -184,10 +184,10 @@ importers:
 
   packages/core:
     dependencies:
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@zcode/shared-types':
+      '@onyx/shared-types':
         specifier: workspace:*
         version: link:../shared-types
       cheerio:
@@ -261,7 +261,7 @@ importers:
 
   packages/i18n:
     dependencies:
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
     devDependencies:
@@ -295,7 +295,7 @@ importers:
 
   packages/swift-bridge:
     dependencies:
-      '@zcode/shared-types':
+      '@onyx/shared-types':
         specifier: workspace:*
         version: link:../shared-types
 
@@ -307,13 +307,13 @@ importers:
       '@mbears/opentui-react':
         specifier: 0.2.15
         version: 0.2.15(react-devtools-core@7.0.1)(react@19.2.5)(typescript@5.9.3)(web-tree-sitter@0.25.10)(ws@8.18.0)
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@zcode/i18n':
+      '@onyx/i18n':
         specifier: workspace:*
         version: link:../i18n
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../../../../packages/shared
       react:

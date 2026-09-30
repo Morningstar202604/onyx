@@ -4,10 +4,10 @@ import {
   SessionEventType,
   type DynamicWorkflowRunProgressPayload,
   type SessionEvent,
-} from "@zcode/contracts";
-import { createDenyPermissionBroker } from "@zcode/core";
-import type { GlobalOptions } from "@zcode/shared-types";
-import type { ZCodeAppOptions } from "@zcode/bootstrap";
+} from "@onyx/contracts";
+import { createDenyPermissionBroker } from "@onyx/core";
+import type { GlobalOptions } from "@onyx/shared-types";
+import type { ZCodeAppOptions } from "@onyx/bootstrap";
 import { readRuntimeFunction } from "./runtime-event-subscriber.js";
 
 /**

@@ -29,8 +29,8 @@
 import type {
   DynamicWorkflowRunArtifactBytes,
   ToolArtifactStorePort,
-} from "@zcode/contracts";
-import type { JournalStorePort } from "@zcode/dynamic-workflow";
+} from "@onyx/contracts";
+import type { JournalStorePort } from "@onyx/dynamic-workflow";
 
 import {
   artifactRowId,

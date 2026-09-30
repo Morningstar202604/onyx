@@ -1,4 +1,4 @@
-import type { TuiSubmitPromptResult } from "@zcode/tui";
+import type { TuiSubmitPromptResult } from "@onyx/tui";
 import {
   formatAvailableCommandCenterModes,
   isSwitchableCommandCenterMode,

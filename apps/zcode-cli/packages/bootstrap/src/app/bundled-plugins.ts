@@ -9,9 +9,9 @@ import {
   writeFileSync,
 } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
-import { writeBundledOfficialMarketplacePartitionSync } from "@zcode/adapters";
-import { ZCODE_OFFICIAL_PLUGIN_MARKETPLACE, type Logger } from "@zcode/contracts";
-import { isZCodeCuaInternalFeatureEnabled, ZCODE_CUA_OFFICIAL_PLUGIN_ID } from "@zcode/shared";
+import { writeBundledOfficialMarketplacePartitionSync } from "@onyx/adapters";
+import { ONYX_OFFICIAL_PLUGIN_MARKETPLACE, type Logger } from "@onyx/contracts";
+import { isZCodeCuaInternalFeatureEnabled, ONYX_CUA_OFFICIAL_PLUGIN_ID } from "@onyx/shared";
 import {
   createOfficialPluginCacheRetryBudget,
   getOfficialPluginCacheRetryAttempts,
@@ -30,15 +30,15 @@ import {
   withOfficialPluginSeedLock,
 } from "./official-plugin-seed-lock.js";
 
-const OFFICIAL_PLUGIN_MARKETPLACE = ZCODE_OFFICIAL_PLUGIN_MARKETPLACE;
+const OFFICIAL_PLUGIN_MARKETPLACE = ONYX_OFFICIAL_PLUGIN_MARKETPLACE;
 const SEA_PLUGIN_ASSET_PREFIX = "zcode-official-plugins/";
 const SEA_PLUGIN_MANIFEST_ASSET_KEY = `${SEA_PLUGIN_ASSET_PREFIX}manifest.json`;
-const SEED_MARKER_FILE = ".zcode-plugin-seed.json";
+const SEED_MARKER_FILE = ".onyx-plugin-seed.json";
 const SEED_LOCK_TOTAL_BUDGET_MS = 15_000;
 
 const includedTopLevelPaths = new Set([
   ".mcp.json",
-  ".zcode-plugin",
+  ".onyx-plugin",
   "README.md",
   // 官方内容插件新增 agents 后，filesystem seed 的顶层白名单未同步，目录被静默裁掉。
   "agents",
@@ -116,7 +116,7 @@ function seedBundledOfficialPlugins(input: {
           new Error(
             `Bundled official plugin ${plugin.definition.name} is missing required seed assets: ${plugin.missingSeedPaths.join(", ")}`,
           ),
-          { code: "ZCODE_PLUGIN_SEED_INCOMPLETE" },
+          { code: "ONYX_PLUGIN_SEED_INCOMPLETE" },
         ),
         missingSeedPaths: plugin.missingSeedPaths,
         operation: "seed_plugin",
@@ -235,7 +235,7 @@ export function resolveOfficialPluginRoots(input: {
   // zcode-cua 内置 plugin 默认不启用，由 feature flag 控制加载。在 seed/discovery 层门控
   // （而非只隐藏某个 UI 面），这样开关关闭时用户无法经 plugin 列表/marketplace/MCP 设置/CLI 命令看到它。
   if (!isZCodeCuaInternalFeatureEnabled(input.env ?? process.env)) {
-    suppressedBuiltins.add(ZCODE_CUA_OFFICIAL_PLUGIN_ID);
+    suppressedBuiltins.add(ONYX_CUA_OFFICIAL_PLUGIN_ID);
   }
   const failedSeeds = seedBundledOfficialPlugins({
     logger: input.logger,
@@ -245,7 +245,7 @@ export function resolveOfficialPluginRoots(input: {
   const fallbackRoots = failedSeeds.flatMap((definition) => {
     // CUA 的 frame contract 随 wrapper 与 producer 原子升级。加载旧版本
     // cache 会把旧 block 布局接到新 consumer 上；当前 cache 不可用时宁可不注册 CUA。
-    if (`${definition.name}@${OFFICIAL_PLUGIN_MARKETPLACE}` === ZCODE_CUA_OFFICIAL_PLUGIN_ID) {
+    if (`${definition.name}@${OFFICIAL_PLUGIN_MARKETPLACE}` === ONYX_CUA_OFFICIAL_PLUGIN_ID) {
       return [];
     }
     const fallbackRoot = findUsableOfficialPluginFallback(input.storageRoot, definition);
@@ -346,7 +346,7 @@ function resolveFilesystemPluginRoot(definition: OfficialPluginDefinition): stri
   for (const baseDir of candidateBaseDirs()) {
     for (const relativePath of definition.rootCandidates) {
       const rootPath = resolve(baseDir, relativePath);
-      if (existsSync(join(rootPath, ".zcode-plugin", "plugin.json"))) return rootPath;
+      if (existsSync(join(rootPath, ".onyx-plugin", "plugin.json"))) return rootPath;
     }
   }
   return undefined;
@@ -435,7 +435,7 @@ function readSeedPluginDescription(
   source: OfficialPluginSeedSource,
   plugin: OfficialPluginSeedPluginSource,
 ): string | undefined {
-  const manifestFile = plugin.files.find((file) => file.path === ".zcode-plugin/plugin.json");
+  const manifestFile = plugin.files.find((file) => file.path === ".onyx-plugin/plugin.json");
   if (!manifestFile) return undefined;
   try {
     const parsed = JSON.parse(readSeedFileBytes(source, plugin, manifestFile).toString("utf8")) as {
@@ -467,7 +467,7 @@ function isSeedCurrent(targetRoot: string, plugin: OfficialPluginSeedPluginSourc
 function isSeedUsable(targetRoot: string, definition: OfficialPluginDefinition): boolean {
   try {
     const manifest = JSON.parse(
-      readFileSync(join(targetRoot, ".zcode-plugin", "plugin.json"), "utf8"),
+      readFileSync(join(targetRoot, ".onyx-plugin", "plugin.json"), "utf8"),
     ) as { name?: unknown };
     if (manifest.name !== definition.name) return false;
   } catch {

@@ -10,8 +10,8 @@ import {
   databaseStartupErrorDetailsSchema,
   zcodeStoragePreparationFrameSchema,
   type DatabaseStartupState,
-} from "@zcode/shared";
-import { resolveDefaultZCodeAgentCommand } from "@zcode/services/storage-startup";
+} from "@onyx/shared";
+import { resolveDefaultZCodeAgentCommand } from "@onyx/services/storage-startup";
 
 type Phase = NonNullable<DatabaseStartupState["databasePhase"]>;
 const workerMessageSchema = z.discriminatedUnion("type", [

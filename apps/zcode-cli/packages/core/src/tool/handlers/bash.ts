@@ -21,7 +21,7 @@ import {
   type ExecutionResult,
   type ExecutionRunOptions,
   type TraceContext,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import {
   shouldInjectEmbeddedSearchBashPrelude,
   supportsEmbeddedSearchShellSelection,

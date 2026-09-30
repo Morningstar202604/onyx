@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import type { Locale } from "@zcode/shared";
-import { TID_LOCALE_TOGGLE } from "@zcode/shared";
+import type { Locale } from "@onyx/shared";
+import { TID_LOCALE_TOGGLE } from "@onyx/shared";
 import { useZCodeIntl } from "./IntlProvider.js";
 
 const LOCALE_CYCLE: Locale[] = ["zh-CN", "en-US"];

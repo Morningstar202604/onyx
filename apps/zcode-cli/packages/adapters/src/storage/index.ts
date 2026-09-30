@@ -18,18 +18,18 @@ import type {
   ToolArtifactWriteRequest,
   ToolArtifactWriteResult,
   ToolBinaryArtifactReadResult,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import { maybeThrowStorageFsFault } from "./fs-fault-injection.js";
 
 export * from "./session-store.js";
 
-// 内存 event store 实现已下沉到 @zcode/contracts，
-// 这里保持 `@zcode/adapters/storage` 的导出路径不变，避免调用方改 import。
+// 内存 event store 实现已下沉到 @onyx/contracts，
+// 这里保持 `@onyx/adapters/storage` 的导出路径不变，避免调用方改 import。
 export {
   InMemorySessionEventStore,
   createInMemorySessionEventStore,
   type InMemorySessionEventStoreOptions,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 
 export interface NodeToolArtifactStoreOptions {
   imageCacheRootDir: string;
@@ -79,7 +79,7 @@ export class NodeToolArtifactStore implements ToolArtifactStorePort {
 
     return {
       id: artifactId,
-      uri: `zcode-artifact://${encodeURIComponent(request.sessionId)}/${encodeURIComponent(artifactId)}`,
+      uri: `onyx-artifact://${encodeURIComponent(request.sessionId)}/${encodeURIComponent(artifactId)}`,
       path,
       bytes: Buffer.byteLength(request.content, "utf8"),
       contentType,
@@ -113,7 +113,7 @@ export class NodeToolArtifactStore implements ToolArtifactStorePort {
 
     return {
       id: artifactId,
-      uri: `zcode-artifact://${encodeURIComponent(request.sessionId)}/${encodeURIComponent(artifactId)}`,
+      uri: `onyx-artifact://${encodeURIComponent(request.sessionId)}/${encodeURIComponent(artifactId)}`,
       path,
       bytes: content.byteLength,
       contentType: request.contentType,
@@ -483,7 +483,7 @@ function parseArtifactUri(uri: string): { artifactId: string; sessionId: string 
     });
   }
 
-  if (parsed.protocol !== "zcode-artifact:") {
+  if (parsed.protocol !== "onyx-artifact:") {
     throw new Error(`Unsupported tool artifact URI: ${uri}`);
   }
 

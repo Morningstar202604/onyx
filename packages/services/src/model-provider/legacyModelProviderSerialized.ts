@@ -9,7 +9,7 @@ export interface ClaudeModelMapping {
 }
 
 /**
- * 各 ZCode Agent Provider 的模型槽位映射（按 provider 区分）。
+ * 各 Onyx Agent Provider 的模型槽位映射（按 provider 区分）。
  * 目前只实现 claude，后续扩展其他 provider 时在此加字段。
  */
 export interface ProviderModelMappings {

@@ -7,7 +7,7 @@ import {
   type PermissionUpdate,
   type ProjectId,
   type TraceContext,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import { applyPermissionUpdates } from "./permission-rules.js";
 import type { ToolExecutorDeps } from "./types.js";
 

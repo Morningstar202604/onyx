@@ -14,14 +14,14 @@ import { randomUUID } from "node:crypto";
 import {
   boundDynamicWorkflowRunEventPayload,
   CoreErrorType,
-  ZCODE_DWF_CHILD_COMMAND,
+  ONYX_DWF_CHILD_COMMAND,
   type CreateSessionTaskLinkInput,
   type DynamicWorkflowRunEvent,
   type DynamicWorkflowRunProgressPayload,
   type SessionId,
-} from "@zcode/contracts";
-import type { AgentRuntime } from "@zcode/core";
-import { parseModelPickerValue, type ModelSelection } from "@zcode/shared/model-selection";
+} from "@onyx/contracts";
+import type { AgentRuntime } from "@onyx/core";
+import { parseModelPickerValue, type ModelSelection } from "@onyx/shared/model-selection";
 import {
   type ActorSubmitProfile,
   refToString,
@@ -35,8 +35,8 @@ import {
   type RunEvent,
   type RunSettlement,
   type ValidateFn,
-} from "@zcode/dynamic-workflow";
-import { runWorkflowScript } from "@zcode/dynamic-workflow-runtime";
+} from "@onyx/dynamic-workflow";
+import { runWorkflowScript } from "@onyx/dynamic-workflow-runtime";
 import { createJournalSequenceCapture } from "./dynamic-workflow-run-sequence-capture.js";
 import { isResumableSettlement } from "./dynamic-workflow-run-observation.js";
 import {
@@ -330,7 +330,7 @@ export function launchDynamicWorkflowRun(
     cwd,
     lowered: compiled.lowered,
     makeDriver,
-    // 入口文件写不进项目 `.zcode/` 时 harness 回落到 OS 临时目录并报一声——run 照常启动，
+    // 入口文件写不进项目 `.onyx/` 时 harness 回落到 OS 临时目录并报一声——run 照常启动，
     // 但这条日志是排查「项目里为什么没有 workflow-runs 存档」的唯一线索。
     onWarning: (warning) => {
       deps.logger?.warn?.("Dynamic workflow entry file fell back to the OS temp dir", {
@@ -378,14 +378,14 @@ export function launchDynamicWorkflowRun(
  * （official-plugin-runtime.ts 的 `officialPluginHostPrefixArgs`）。
  *
  * SEA 判定留在 bootstrap 而不下沉到 harness：harness 是 app-free 的（只依赖
- * `@zcode/dynamic-workflow` 与 node 内建），既拿不到 contracts 的子命令常量，也不该知道
+ * `@onyx/dynamic-workflow` 与 node 内建），既拿不到 contracts 的子命令常量，也不该知道
  * 自己被哪种宿主打包。`isSea` 可注入只为可测——默认探针在测试进程里必然返回 false，
  * 于是「非 SEA 不得带 argsPrefix」也是一条可断言的事实。
  */
 export function dynamicWorkflowChildSpawn(
   isSea: boolean = isSeaRuntime(),
 ): { argsPrefix: readonly string[] } | undefined {
-  return isSea ? { argsPrefix: [ZCODE_DWF_CHILD_COMMAND] } : undefined;
+  return isSea ? { argsPrefix: [ONYX_DWF_CHILD_COMMAND] } : undefined;
 }
 
 /** SEA 运行时探针（official-plugin-runtime.ts 私有同名 helper 的本地镜像，刻意不跨文件复用）。 */

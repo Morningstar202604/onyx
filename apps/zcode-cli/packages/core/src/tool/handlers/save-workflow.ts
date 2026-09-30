@@ -32,7 +32,7 @@ import {
   type SaveWorkflowInput,
   type SaveWorkflowOutput,
   type SavedWorkflowMeta,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import type {
   ToolApprovalGate,
   ToolEntry,

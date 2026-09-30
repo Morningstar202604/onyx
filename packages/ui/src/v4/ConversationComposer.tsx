@@ -42,12 +42,12 @@ import {
   TID_V4_STOP,
   testId,
   type ZCodeProvider,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import type {
   AttachmentRef,
   ConversationSnapshot,
   SessionConfigState,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@onyx/shared/zcode-protocol-v4";
 import {
   ArrowUpIcon,
   ClipboardPenLineIcon,
@@ -117,7 +117,7 @@ import {
 } from "@/lib/workspaceFileDrag.js";
 import { appendWorkspaceFileMentionToComposer } from "@/lib/workspaceFileComposer.js";
 import { resolveProviderBaseURL } from "@/lib/registryProviderView.js";
-import type { ModelSelectionView } from "@zcode/services";
+import type { ModelSelectionView } from "@onyx/services";
 import type { ModelSelectionState } from "@/hooks/useModelSelectionView.js";
 import type { ZCodeUiError } from "@/lib/zcodeUiError.js";
 import {

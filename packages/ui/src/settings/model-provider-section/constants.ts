@@ -1,4 +1,4 @@
-import { createUuid, type BuiltinModelProviderId } from "@zcode/shared";
+import { createUuid, type BuiltinModelProviderId } from "@onyx/shared";
 import type { ProviderSettingsFormProvider } from "@/lib/providerSettingsFormTypes.js";
 import { getProviderFormLabel } from "@/lib/providerSettingsFormTypes.js";
 

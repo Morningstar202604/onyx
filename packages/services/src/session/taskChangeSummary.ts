@@ -2,8 +2,8 @@ import type {
   ZCodePersistedFileChange,
   ZCodeTaskChangeSummary,
   ZCodeTaskChangedFileSummary,
-} from "@zcode/shared";
-import { computeLineChangeStat } from "@zcode/shared";
+} from "@onyx/shared";
+import { computeLineChangeStat } from "@onyx/shared";
 
 interface AggregatedFileChange {
   path: string;

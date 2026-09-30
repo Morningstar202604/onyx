@@ -1,6 +1,6 @@
 import { ingestToolExecResource } from "./desktopResourceTelemetry.js";
 import { ingestMcpResourceSamples } from "./processResourceMcpTelemetrySource.js";
-/* eslint-disable max-lines -- host process 统一处理 main↔host 生命周期、日志、ZCode Agent，拆分前先保持跨进程消息收口。 */
+/* eslint-disable max-lines -- host process 统一处理 main↔host 生命周期、日志、Onyx Agent，拆分前先保持跨进程消息收口。 */
 import { bindDatabaseStartupRelay } from "./databaseStartupRelay.js";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
@@ -27,12 +27,12 @@ import {
   hostResponseMessageSchema,
   InternalChannels,
   LAUNCH_MARKS_QUERY_KEY,
-  RUNTIME_ZCODE_DEBUG,
+  RUNTIME_ONYX_DEBUG,
   serializeLaunchMarks,
   type RemoteTarget,
   type WorkspacePurpose,
-  ZCODE_DESKTOP_CONTEXT_PROMPT_ENABLED_ENV,
-} from "@zcode/shared";
+  ONYX_DESKTOP_CONTEXT_PROMPT_ENABLED_ENV,
+} from "@onyx/shared";
 import { getMainLaunchPartialMarks } from "./desktopLaunchMarks.js";
 import { BroadcastHub } from "./broadcastHub.js";
 import type { TaskRealtimeBus } from "./taskRealtimeBus.js";
@@ -251,7 +251,7 @@ export function spawnHostProcess(
   const hostId = randomUUID();
   const glmBinaryPath = resolveBundledGlmBinaryPath();
   const execArgv = [
-    ...(RUNTIME_ZCODE_DEBUG ? [`--inspect-brk=${RUNTIME_ZCODE_DEBUG}`] : []),
+    ...(RUNTIME_ONYX_DEBUG ? [`--inspect-brk=${RUNTIME_ONYX_DEBUG}`] : []),
     "--no-warnings",
   ];
   const child = electronUtilityProcess.fork(hostModulePath, [], {
@@ -260,17 +260,17 @@ export function spawnHostProcess(
     env: {
       ...buildHostProcessEnv(dependencies.hostProcessLocalEnv),
       ...buildHostE2ECoverageEnv(),
-      ZCODE_PROCESS_LABEL: label,
+      ONYX_PROCESS_LABEL: label,
       // macOS-only: the Computer Use Helper launcher runs inside this forked host utilityProcess, whose
       // code-signing identity is a nested Electron helper (NOT dev.zcode.app). Publish THIS (main
       // Electron) process's pid — which IS dev.zcode.app — so helperLauncher passes it as
       // `--launcher-pid` and the Helper's signature/peer verification succeeds instead of
       // health-timing out. Env-name mirror of services' LAUNCHER_PID_ENV. Not set on
       // Windows/Linux (CUA is macOS-only; nothing reads it there) to keep the host env pristine.
-      ...(process.platform === "darwin" ? { ZCODE_CUA_LAUNCHER_PID: String(process.pid) } : {}),
+      ...(process.platform === "darwin" ? { ONYX_CUA_LAUNCHER_PID: String(process.pid) } : {}),
       ...(dependencies.desktopContextPromptEnabled
         ? {
-            [ZCODE_DESKTOP_CONTEXT_PROMPT_ENABLED_ENV]: dependencies.desktopContextPromptEnabled()
+            [ONYX_DESKTOP_CONTEXT_PROMPT_ENABLED_ENV]: dependencies.desktopContextPromptEnabled()
               ? "1"
               : "0",
           }
@@ -656,7 +656,7 @@ export function spawnHostProcess(
           type: HostMessageTypes.BotRemoteWorkspaceRuntimePort,
           requestId: request.requestId,
           ok: false,
-          // Bugfix: 远端 Bot 不能在缺少 runtime bridge 时回落到本地 ZCode Agent，
+          // Bugfix: 远端 Bot 不能在缺少 runtime bridge 时回落到本地 Onyx Agent，
           // 否则会把 remote workspace 的任务写到本地并触发错误模型。
           error: "未注入 Bot 远端 workspace runtime 处理器。",
         });

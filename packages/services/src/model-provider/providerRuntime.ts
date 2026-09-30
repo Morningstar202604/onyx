@@ -1,12 +1,12 @@
 import {
   NodeModelSelectionConfigRepository,
   createNodeModelSelectionFacade,
-} from "@zcode/provider-node";
+} from "@onyx/provider-node";
 import {
   ProviderRegistryService,
   ProviderSettingsFacade,
   type ProviderSettingsMutationTarget,
-} from "@zcode/provider";
+} from "@onyx/provider";
 import {
   createProviderConfigRuntime,
   type ProviderConfigRuntime,
@@ -130,15 +130,8 @@ function createSettingsMutationTarget(
       ),
     refresh: (reason) => registryService.refresh(reason),
     refreshSources: async (reason) => {
-      const sourceResults = await Promise.allSettled([
-        configRuntime.refreshZCodeBuiltin({ force: true }),
-      ]);
-      const snapshot = await registryService.refresh(reason);
-      const failed = sourceResults.find(
-        (result): result is PromiseRejectedResult => result.status === "rejected",
-      );
-      if (failed) throw failed.reason;
-      return snapshot;
+      // Onyx 内置配置随包静态分发，无远端源可刷新；内置文件变化由文件 watcher 自动触发。
+      return registryService.refresh(reason);
     },
   };
 }

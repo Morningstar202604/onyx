@@ -41,7 +41,7 @@ import type {
   TelemetryIdentitySnapshot,
   ToolExecutionSpanWriter,
   ToolTraceStart,
-} from "@zcode/contracts/telemetry";
+} from "@onyx/contracts/telemetry";
 import {
   activeWriterContext,
   BaseSpanWriter,

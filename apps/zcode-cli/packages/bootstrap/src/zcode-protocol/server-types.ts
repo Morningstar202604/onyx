@@ -9,9 +9,9 @@ import {
   type SessionTaskType,
   type SessionStorePort,
   type TraceContext,
-} from "@zcode/contracts";
-import type { McpTelemetryTracker } from "@zcode/adapters";
-import type { WorkspaceHookPolicyProvider } from "@zcode/core";
+} from "@onyx/contracts";
+import type { McpTelemetryTracker } from "@onyx/adapters";
+import type { WorkspaceHookPolicyProvider } from "@onyx/core";
 import {
   zcodeProtocolErrorCodes,
   type ZCodeAutomationBotDeliveryTarget,
@@ -27,7 +27,7 @@ import {
   type ZCodeSessionMode,
   type ZCodeSessionPersistence,
   type ZCodeWorkspaceRef,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import type { ZCodeApp, ZCodeAppOptions } from "../app/types.js";
 import type { V4InteractionRegistry } from "../zcode-protocol-v4/interaction-registry.js";
 import type { ConversationV4Gateway } from "../zcode-protocol-v4/v4-gateway.js";
@@ -309,7 +309,7 @@ export function requireSession(
   if (!record) {
     // 诊断：readSession 只读取活跃 runtime；记录缺失时要区分“冷会话尚未恢复”和“ID 已失效”，
     // 不能只留下相同的错误文本，否则无法判断 UI 是读早了还是 task index 带来了脏引用。
-    context.logger?.warn("ZCode Protocol session runtime missing", {
+    context.logger?.warn("Onyx Protocol session runtime missing", {
       activeSessionCount: context.sessions.size,
       event: "zcode_protocol.session.require_missing",
       hasSessionStore: Boolean(context.deps.sessionStore),

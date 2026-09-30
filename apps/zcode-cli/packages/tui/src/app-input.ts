@@ -1,4 +1,4 @@
-import type { ModelSelection } from "@zcode/shared";
+import type { ModelSelection } from "@onyx/shared";
 import { modelOptionValue } from "./app-model-ref.js";
 import type {
   DraftAttachment,

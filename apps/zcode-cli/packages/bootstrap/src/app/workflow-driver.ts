@@ -1,7 +1,7 @@
 // ============================================================
 // AgentRuntime-backed WorkflowDriver（Boundary B）
 // ============================================================
-// 把 dynamic-workflow 引擎核心的向下副作用端口 WorkflowDriver 落到真实 ZCode AgentRuntime 上：
+// 把 dynamic-workflow 引擎核心的向下副作用端口 WorkflowDriver 落到真实 Onyx AgentRuntime 上：
 // 每个 actor 一个**持久** child runtime（重复 executeTurn 累积 messageHistory），每次 ask 一次
 // executeTurn，typed ask 的结果经会话级 WorkflowSubmitPort 桥接回引擎裁决。
 //
@@ -45,8 +45,8 @@
 //   - **会话静默登记**：dispose 时记下每个会话是否还有在写的 turn。修订一个在飞前驱时，amend
 //     要据它判断「此刻数出来的消息条数可不可信」，才谈得上接续那条未完的 ask。
 
-import type { SessionId, WorkflowEscalatePort } from "@zcode/contracts";
-import type { TurnResult } from "@zcode/core";
+import type { SessionId, WorkflowEscalatePort } from "@onyx/contracts";
+import type { TurnResult } from "@onyx/core";
 import {
   GENERIC_SUBMIT_PROFILE,
   refToString,
@@ -65,7 +65,7 @@ import {
   type WorkflowDriver,
   type WorkflowReportSink,
   type WorldReadOp,
-} from "@zcode/dynamic-workflow";
+} from "@onyx/dynamic-workflow";
 import { executeArtifactPublish } from "./workflow-artifact-publish.js";
 import { qualityEpilogue } from "./workflow-ask-epilogue.js";
 import { ensureSubmitProfileFits } from "./workflow-driver-submit-profile.js";

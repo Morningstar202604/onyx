@@ -1,5 +1,5 @@
-import type { Event, IDisposable } from "@zcode/rpc";
-import type { ZCodeProtocolMessage } from "@zcode/shared";
+import type { Event, IDisposable } from "@onyx/rpc";
+import type { ZCodeProtocolMessage } from "@onyx/shared";
 
 export type ZCodeProtocolTransportKind = "stdio" | "websocket" | "memory";
 

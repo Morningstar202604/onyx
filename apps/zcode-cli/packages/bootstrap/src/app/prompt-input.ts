@@ -1,12 +1,12 @@
 import { createHash } from "node:crypto";
-import type { TurnAttachment } from "@zcode/core";
+import type { TurnAttachment } from "@onyx/core";
 import type {
   InputHistoryAttachment,
   InputHistoryEntry,
   SessionId,
   ToolArtifactStorePort,
   TraceContext,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import type { PromptInput } from "./types.js";
 
 export function normalizePromptInput(input: PromptInput): {
@@ -83,7 +83,7 @@ export async function materializeInputHistoryEntry(
   if (!entry?.attachments || !artifactStore) return entry;
   const attachments = await Promise.all(
     entry.attachments.map(async (attachment): Promise<InputHistoryAttachment> => {
-      if (!attachment.content?.startsWith("zcode-artifact://")) return attachment;
+      if (!attachment.content?.startsWith("onyx-artifact://")) return attachment;
       try {
         const artifact = await artifactStore.readToolResultArtifact({ uri: attachment.content });
         return {

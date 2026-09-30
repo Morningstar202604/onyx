@@ -1,10 +1,10 @@
-import { createLocalServices, type ZCodeAgentCommandResolver } from "@zcode/services/node";
+import { createLocalServices, type ZCodeAgentCommandResolver } from "@onyx/services/node";
 import {
   parseServiceAuthorityMode,
-  ZCODE_REMOTE_HTTP_PROXY_ENV_KEY,
-  ZCODE_REMOTE_NO_PROXY_ENV_KEY,
-  ZCODE_REMOTE_RUNTIME_NETWORK_AUTHORITY_ENV_KEY,
-} from "@zcode/shared";
+  ONYX_REMOTE_HTTP_PROXY_ENV_KEY,
+  ONYX_REMOTE_NO_PROXY_ENV_KEY,
+  ONYX_REMOTE_RUNTIME_NETWORK_AUTHORITY_ENV_KEY,
+} from "@onyx/shared";
 
 interface CreateStdioServicesOptions {
   env?: Record<string, string | undefined>;
@@ -20,12 +20,12 @@ interface RemoteAgentNetworkOptions {
 function resolveRemoteAgentNetworkFromEnv(
   env: Record<string, string | undefined>,
 ): RemoteAgentNetworkOptions | undefined {
-  if (env[ZCODE_REMOTE_RUNTIME_NETWORK_AUTHORITY_ENV_KEY]?.trim() !== "1") {
+  if (env[ONYX_REMOTE_RUNTIME_NETWORK_AUTHORITY_ENV_KEY]?.trim() !== "1") {
     return undefined;
   }
   return {
-    httpProxy: env[ZCODE_REMOTE_HTTP_PROXY_ENV_KEY]?.trim() || undefined,
-    noProxy: env[ZCODE_REMOTE_NO_PROXY_ENV_KEY]?.trim() || undefined,
+    httpProxy: env[ONYX_REMOTE_HTTP_PROXY_ENV_KEY]?.trim() || undefined,
+    noProxy: env[ONYX_REMOTE_NO_PROXY_ENV_KEY]?.trim() || undefined,
   };
 }
 

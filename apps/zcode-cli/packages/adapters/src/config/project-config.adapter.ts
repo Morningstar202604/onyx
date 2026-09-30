@@ -1,11 +1,11 @@
 import { basename, dirname, isAbsolute, resolve } from "node:path";
-import type { McpServerConfig, RuntimeConfigPatch } from "@zcode/contracts";
+import type { McpServerConfig, RuntimeConfigPatch } from "@onyx/contracts";
 import {
   createWorkspaceHookSourceInput,
   discoverWorkspaceHookConfigPaths,
   workspaceHooksConfigSchema,
   type WorkspaceHookSourceInput,
-} from "@zcode/shared/workspace-hook-discovery";
+} from "@onyx/shared/workspace-hook-discovery";
 import { loadFileConfig, type LoadedConfig } from "./file-config.adapter.js";
 
 const CURRENT_DIRECTORY = ".";
@@ -116,7 +116,7 @@ export function summarizeProjectConfigs(files: ProjectConfigFile[]): ProjectConf
 
 function getProjectConfigBaseDir(path: string): string {
   const configDirectory = dirname(path);
-  return basename(configDirectory) === ".zcode" ? dirname(configDirectory) : configDirectory;
+  return basename(configDirectory) === ".onyx" ? dirname(configDirectory) : configDirectory;
 }
 
 function normalizeProjectConfig(config: RuntimeConfigPatch, baseDir: string): RuntimeConfigPatch {

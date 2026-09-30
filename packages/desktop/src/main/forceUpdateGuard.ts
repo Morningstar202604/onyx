@@ -1,16 +1,16 @@
 import {
-  DEFAULT_ZCODE_ENDPOINT_ORIGIN,
-  ZCODE_VERSION,
+  DEFAULT_ONYX_ENDPOINT_ORIGIN,
+  ONYX_VERSION,
   buildZCodeEndpointUrls,
   getForceUpdateMinimalVersionFromConfig,
   resolveForceUpdateRequirement,
   type ForceUpdateRequirement,
   type Locale,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { requestForceAutoUpdate, type ForceAutoUpdateState } from "./autoUpdater.js";
 import { showForceUpdatePrompt } from "./forceUpdatePrompt.js";
 
-const ZCODE_CLIENT_CONFIG_API_PATH = "/api/v1/client/configs";
+const ONYX_CLIENT_CONFIG_API_PATH = "/api/v1/client/configs";
 const FORCE_UPDATE_CONFIG_REQUEST_TIMEOUT_MS = 10_000;
 const FORCE_UPDATE_CONFIG_MAX_RESPONSE_BYTES = 1024 * 1024;
 
@@ -44,11 +44,13 @@ interface ForceUpdateGuardOptions {
   onBlocked?: (requirement: ForceUpdateRequirement) => void;
 }
 
-function resolveForceUpdateClientConfigUrl(endpointOrigin = DEFAULT_ZCODE_ENDPOINT_ORIGIN): string {
+function resolveForceUpdateClientConfigUrl(endpointOrigin = DEFAULT_ONYX_ENDPOINT_ORIGIN): string {
+  // Onyx 未配置 endpoint：强制升级远端配置不可用（自动更新默认关闭）。
+  if (!endpointOrigin) return "";
   const url = new URL(
-    `${buildZCodeEndpointUrls(endpointOrigin).origin}${ZCODE_CLIENT_CONFIG_API_PATH}`,
+    `${buildZCodeEndpointUrls(endpointOrigin).origin}${ONYX_CLIENT_CONFIG_API_PATH}`,
   );
-  url.searchParams.set("app_version", ZCODE_VERSION);
+  url.searchParams.set("app_version", ONYX_VERSION);
   url.searchParams.set("platform", `${process.platform}-${process.arch}`);
   return url.toString();
 }
@@ -154,7 +156,7 @@ async function resolveDesktopForceUpdateRequirement(options: {
 }): Promise<ForceUpdateRequirement | null> {
   const resolveFromConfig = (config: unknown) =>
     resolveForceUpdateRequirement({
-      currentVersion: ZCODE_VERSION,
+      currentVersion: ONYX_VERSION,
       forceUpdate: {
         minimalVersion:
           getForceUpdateMinimalVersionFromClientConfig(config) ??
@@ -183,7 +185,7 @@ async function resolveDesktopForceUpdateRequirement(options: {
 
 function resolveForceUpdateDownloadUrl(
   locale: Locale,
-  endpointOrigin = DEFAULT_ZCODE_ENDPOINT_ORIGIN,
+  endpointOrigin = DEFAULT_ONYX_ENDPOINT_ORIGIN,
 ): string {
   const origin = buildZCodeEndpointUrls(endpointOrigin).origin;
   return locale === "zh-CN" ? `${origin}/cn` : `${origin}/en`;

@@ -1,5 +1,5 @@
-import type { Event } from "@zcode/rpc";
-import { ServiceChannels } from "@zcode/shared";
+import type { Event } from "@onyx/rpc";
+import { ServiceChannels } from "@onyx/shared";
 import {
   type ModelConfigObject,
   type ModelId,
@@ -15,9 +15,9 @@ import {
   type ProviderSettingsView,
   type ResolveModelConfigInput,
   type SavePersonalModelDraftInput,
-} from "@zcode/provider";
+} from "@onyx/provider";
 import { createServiceDescriptor } from "../descriptors.js";
-import type { ModelConnectivityResult } from "@zcode/shared";
+import type { ModelConnectivityResult } from "@onyx/shared";
 import { createServiceLogger } from "../logger/serviceLogger.js";
 
 export type {
@@ -25,7 +25,7 @@ export type {
   ModelSelectionView,
   ModelSelectionViewInput,
   ProviderSettingsView,
-} from "@zcode/provider";
+} from "@onyx/provider";
 
 export interface IProviderSettingsService {
   readonly onDidChange: Event<ProviderSettingsView>;

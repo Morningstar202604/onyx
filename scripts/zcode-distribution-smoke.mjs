@@ -19,7 +19,7 @@ const runner = join(root, "bin/zcode.mjs");
 const workspace = join(directory, "workspace");
 const env = {
   ...process.env,
-  ZCODE_DATA_BASE_DIR: join(directory, "data"),
+  ONYX_DATA_BASE_DIR: join(directory, "data"),
   NODE_PATH: "",
   NODE_OPTIONS: "",
   TERM: "xterm-256color",
@@ -38,7 +38,7 @@ try {
   const runtimeCheck = join(root, "agent/check-tui.mjs");
   await writeFile(
     runtimeCheck,
-    'import { runTui } from "@zcode/tui"; if (typeof runTui !== "function") throw new Error("Missing TUI export"); console.log("tui-runtime-ok");',
+    'import { runTui } from "@onyx/tui"; if (typeof runTui !== "function") throw new Error("Missing TUI export"); console.log("tui-runtime-ok");',
   );
   const imported = await exec(process.execPath, [runtimeCheck], { cwd: workspace, env });
   assert.match(imported.stdout, /tui-runtime-ok/);

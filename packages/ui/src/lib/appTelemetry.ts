@@ -2,7 +2,7 @@ import {
   collectTelemetryRendererContext,
   sanitizeTelemetryEventDetail,
   type IPlatformService,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { logger } from "@/logger.js";
 
 export function resolveProviderTelemetryLabel(providerId: string): string {

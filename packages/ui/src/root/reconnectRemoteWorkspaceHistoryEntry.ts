@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
-import type { IPlatformService, RemoteWorkspaceSessionEntry } from "@zcode/shared";
-import { stripRemoteTargetSecrets } from "@zcode/shared";
-import type { IServiceAccessor } from "@zcode/services";
+import type { IPlatformService, RemoteWorkspaceSessionEntry } from "@onyx/shared";
+import { stripRemoteTargetSecrets } from "@onyx/shared";
+import type { IServiceAccessor } from "@onyx/services";
 import { toast } from "@/components/ui/toast.js";
 import {
   buildRemoteWorkspaceSessionMutation,

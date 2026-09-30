@@ -1,6 +1,6 @@
 import { create } from "zustand";
-import type { ZCodeTaskMeta } from "@zcode/shared";
-import type { IZCodeTaskService } from "@zcode/services";
+import type { ZCodeTaskMeta } from "@onyx/shared";
+import type { IZCodeTaskService } from "@onyx/services";
 import { logger } from "@/logger.js";
 import { buildTaskWorkspaceKey } from "@/lib/taskQueryCache.js";
 import { getRemoteWorkspaceSession } from "@/store/remoteWorkspaceSessionStore.js";

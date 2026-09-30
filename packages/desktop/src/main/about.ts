@@ -5,11 +5,11 @@ import { join } from "node:path";
 import {
   DEFAULT_LOCALE,
   type Locale,
-  ZCODE_BUILD_TIME,
-  ZCODE_COMMIT,
-  ZCODE_ENV,
-  ZCODE_VERSION,
-} from "@zcode/shared";
+  ONYX_BUILD_TIME,
+  ONYX_COMMIT,
+  ONYX_ENV,
+  ONYX_VERSION,
+} from "@onyx/shared";
 import { createCustomAboutDialogHtml } from "./aboutWindow.js";
 
 interface DesktopBuildMetadata {
@@ -150,10 +150,10 @@ export function createAboutSnapshot(options: AboutSnapshotOptions = {}): AboutSn
   };
 
   return {
-    appVersion: normalizeValue(options.appVersion ?? buildMetadata?.appVersion ?? ZCODE_VERSION),
-    buildCommitId: normalizeValue(buildMetadata?.buildCommitId ?? ZCODE_COMMIT),
-    buildTime: normalizeValue(buildMetadata?.buildTime ?? ZCODE_BUILD_TIME),
-    environment: normalizeValue(options.environment ?? ZCODE_ENV),
+    appVersion: normalizeValue(options.appVersion ?? buildMetadata?.appVersion ?? ONYX_VERSION),
+    buildCommitId: normalizeValue(buildMetadata?.buildCommitId ?? ONYX_COMMIT),
+    buildTime: normalizeValue(buildMetadata?.buildTime ?? ONYX_BUILD_TIME),
+    environment: normalizeValue(options.environment ?? ONYX_ENV),
     electronVersion: normalizeValue(runtimeVersions.electron),
     electronBuilderVersion: resolveElectronBuilderVersion(buildMetadata),
     chromiumVersion: normalizeValue(runtimeVersions.chrome),

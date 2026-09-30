@@ -1,6 +1,6 @@
-import { formatJson } from "@zcode/core";
-import type { GlobalOptions, RunContext } from "@zcode/shared-types";
-import type { SetZCodePluginEnabledResult, ZCodePluginInstallData } from "@zcode/bootstrap";
+import { formatJson } from "@onyx/core";
+import type { GlobalOptions, RunContext } from "@onyx/shared-types";
+import type { SetZCodePluginEnabledResult, ZCodePluginInstallData } from "@onyx/bootstrap";
 import {
   formatAvailablePluginJson,
   formatDiagnosticJson,

@@ -14,7 +14,7 @@ import {
   type HttpClientRequest,
   type HttpClientResponse,
   type HttpClientRunOptions,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import {
   loadTlsCaCertificates,
   resolveProxyForRequest,

@@ -1,4 +1,4 @@
-import type { ExecutionResult } from "@zcode/contracts";
+import type { ExecutionResult } from "@onyx/contracts";
 import { analyzeBashCommand, isBashCommandPermissionSafe } from "./bash-command-parser.js";
 import {
   analysisContainsGitAndDirectoryChange,

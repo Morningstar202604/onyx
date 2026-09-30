@@ -8,7 +8,7 @@ import {
   Event,
   emitNetworkTelemetryObservation,
   type NetworkObservation,
-} from "@zcode/rpc";
+} from "@onyx/rpc";
 import {
   coalesceConsecutiveZCodeAssistants,
   createSessionTraceId,
@@ -31,7 +31,7 @@ import {
   resolveWorkspaceKey,
   resolveZCodeVisibleSessionTitle,
   textFromZCodeMessageParts,
-  ZCODE_AGENT_PROVIDER,
+  ONYX_AGENT_PROVIDER,
   zcodeBackgroundTaskNotificationToolUpdateStatus,
   appendZCodeStreamingToolInputDelta,
   buildZCodeStreamingToolInputPreview,
@@ -109,7 +109,7 @@ import {
   type ZCodeUserInputRequestParams,
   type ZCodeUserInputResponse,
   type ZCodeAgentMcpServer,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import type {
   ZCodeTaskListQuery,
   ZCodeTaskListResult,
@@ -141,7 +141,7 @@ import type {
   ZCodeTaskIndexTerminalEvent,
 } from "./zcodeTaskIndexSyncer.js";
 import { readModelTrajectory } from "./modelTrajectory.js";
-import { errorAttributionSchema, type CommandPayloadMap } from "@zcode/shared/zcode-protocol-v4";
+import { errorAttributionSchema, type CommandPayloadMap } from "@onyx/shared/zcode-protocol-v4";
 import {
   assertV4CommandAckOk,
   createHostCommandEnvelope,
@@ -206,7 +206,7 @@ type ZCodeTerminalStreamEvent =
   | Extract<ZCodeStreamEvent, { type: "task_complete" }>
   | Extract<ZCodeStreamEvent, { type: "task_error" }>;
 
-const GLM_PROVIDER: ZCodeProvider = ZCODE_AGENT_PROVIDER;
+const GLM_PROVIDER: ZCodeProvider = ONYX_AGENT_PROVIDER;
 const EMPTY_SLASH_COMMANDS: ZCodeSlashCommand[] = [];
 const logger = createServiceLogger("zcode-task-service");
 const ASK_USER_QUESTION_TOOL_NAME = "AskUserQuestion";
@@ -243,8 +243,8 @@ function formatZCodeAgentLogDate(now: Date): string {
 }
 
 function resolveZCodeAgentCurrentLogFilePath(now = new Date()): string {
-  const configuredLogDir = process.env.ZCODE_LOG_DIR?.trim();
-  const logDir = configuredLogDir || join(homedir(), ".zcode", "cli", "log");
+  const configuredLogDir = process.env.ONYX_LOG_DIR?.trim();
+  const logDir = configuredLogDir || join(homedir(), ".onyx", "cli", "log");
   return join(logDir, `zcode-${formatZCodeAgentLogDate(now)}.jsonl`);
 }
 
@@ -289,7 +289,7 @@ export function createZCodeTaskServiceAdapter(
     throw Object.assign(
       new Error(`ZCode task service adapter does not support IZCodeTaskService.${name} yet.`),
       {
-        code: "ZCODE_AGENT_UNSUPPORTED_LEGACY_TASK_METHOD",
+        code: "ONYX_AGENT_UNSUPPORTED_LEGACY_TASK_METHOD",
       },
     );
   }
@@ -397,7 +397,7 @@ export function createZCodeTaskServiceAdapter(
     clearLiveToolProjection(target);
     clearStreamingToolInputCache(target);
     // ZCode task wrapper 的字段仍叫 traceId，但这里语义已经是单次输入 inputId。
-    // 先记录 inputId，后续 ZCode session 事件回投 ZCode Agent 时才能让 UI 终态按输入轮次收口。
+    // 先记录 inputId，后续 ZCode session 事件回投 Onyx Agent 时才能让 UI 终态按输入轮次收口。
     activePromptInputIds.set(taskKey(target), params.traceId);
     logger.info(params.traceId, "ZCode task facade sendPrompt 开始", {
       attachmentCount: params.attachments?.length ?? 0,
@@ -983,7 +983,7 @@ export function createZCodeTaskServiceAdapter(
     const target = taskTargets.get(taskId);
     if (!target) {
       throw Object.assign(new Error(`ZCode session target is not loaded: ${taskId}`), {
-        code: "ZCODE_SESSION_TARGET_NOT_FOUND",
+        code: "ONYX_SESSION_TARGET_NOT_FOUND",
       });
     }
     return target;
@@ -2817,12 +2817,12 @@ export function createZCodeTaskServiceAdapter(
 
     async getTaskNativeSessionLogFile() {
       const path = resolveZCodeAgentCurrentLogFilePath();
-      // 返回 ZCode Agent 的结构化日志 JSONL；日志行中的 sessionId 用于按当前任务排查。
+      // 返回 Onyx Agent 的结构化日志 JSONL；日志行中的 sessionId 用于按当前任务排查。
       return { provider: GLM_PROVIDER, path, exists: existsSync(path) };
     },
 
     async getModelTrajectory(params) {
-      // ZCode Agent 把 taskId 当作 sessionId 落盘 model-io（见本文件其它 sessionId: params.taskId 用法），
+      // Onyx Agent 把 taskId 当作 sessionId 落盘 model-io（见本文件其它 sessionId: params.taskId 用法），
       // 这里按 sessionId 还原该 task 的模型调用轨迹，供 UI 侧边栏可视化。
       const trajectory = await readModelTrajectory(params.taskId, params.limit);
       logger.info(
@@ -2833,7 +2833,7 @@ export function createZCodeTaskServiceAdapter(
 
     async getTaskTokenUsage(params): Promise<ZCodeTaskTokenUsageResult> {
       // 摘要面板需要展示 task 的累计模型消耗，不能复用 usage_update 的 context window。
-      // 这里通过 ZCode Protocol 读 agent SQLite 的 model_usage 聚合，保持桌面和远控同一事实源。
+      // 这里通过 Onyx Protocol 读 agent SQLite 的 model_usage 聚合，保持桌面和远控同一事实源。
       return options.zcodeAgentService.getTaskTokenUsage({
         workspacePath: params.workspacePath,
         workspaceIdentity: params.workspaceIdentity,
@@ -3727,7 +3727,7 @@ function mapToolPart(
 ): ZCodePersistedToolCall {
   const state = part.state;
   const taskNotification = backgroundTaskNotifications?.get(part.callId);
-  // ZCode Protocol 的 part.callId 是实时流和终态 snapshot 共同的工具身份。
+  // Onyx Protocol 的 part.callId 是实时流和终态 snapshot 共同的工具身份。
   // 以前只保存 metadata 会丢掉 toolCallId，手机 replayable 里 result-only 临时工具就无法被终态快照覆盖。
   const raw = attachZCodeBackgroundTaskNotificationToRaw(
     attachToolCallIdToRaw("metadata" in state ? (state.metadata ?? state) : state, part.callId),
@@ -3933,7 +3933,7 @@ function mapSessionEvent(
   const inputId = stringValue(payload.inputId);
   const queryId = stringValue(payload.queryId);
   // 兼容层对外的 traceId 语义是“一次用户输入到本轮回复结束”的轮次标识。
-  // ZCode Protocol runtime trace 只在事件没有 inputId 时兜底，避免同一轮 chunk/tool/complete 被拆成不同 trace。
+  // Onyx Protocol runtime trace 只在事件没有 inputId 时兜底，避免同一轮 chunk/tool/complete 被拆成不同 trace。
   const eventInputId = inputId ?? activePromptInputId;
   const traceId = eventInputId ?? protocolTraceId;
   if (eventInputId && eventInputId !== protocolTraceId) {
@@ -4649,8 +4649,8 @@ function mapToolUpdated(
   }
   if ("result" in payload) {
     const result = asRecord(payload.result);
-    // ZCode Protocol 的 ToolCallResult 只有 toolCallId/result，不再重复带 toolName。
-    // 去掉 ZCode Agent 后如果不记住前序 ToolCallScheduled 的 TodoWrite 名称，result 里的 todos
+    // Onyx Protocol 的 ToolCallResult 只有 toolCallId/result，不再重复带 toolName。
+    // 去掉 Onyx Agent 后如果不记住前序 ToolCallScheduled 的 TodoWrite 名称，result 里的 todos
     // 就只能当普通字符串输出，无法继续投射成顶部 todo/plan 事件。
     const toolName = rememberedToolName;
     const content = normalizeToolResultContent(toolName, result);
@@ -4817,7 +4817,7 @@ function isSubagentDispatchToolName(toolName: string | undefined): boolean {
 }
 
 function parentToolUseIdFromToolPayload(payload: Record<string, unknown>): string | null {
-  // ZCode Protocol 发送的父级字段叫 parentToolCallId；
+  // Onyx Protocol 发送的父级字段叫 parentToolCallId；
   // UI stream 模型统一消费 parentToolUseId，必须在服务投影层完成一次性归一。
   return stringValue(payload.parentToolUseId) ?? stringValue(payload.parentToolCallId) ?? null;
 }
@@ -5556,7 +5556,7 @@ function contextUsageFromPayload(payload: Record<string, unknown>): ContextUsage
   if (size === undefined || size <= 0) {
     return null;
   }
-  // ZCode Protocol 的 session.updated 里 contextUsed/contextWindow 是 projection 事实源；
+  // Onyx Protocol 的 session.updated 里 contextUsed/contextWindow 是 projection 事实源；
   // 旧 task stream 只认识 usage_update，adapter 不转换就会让右下角 context meter 永远拿不到数据。
   // used=0 只表示初始化或异常兜底，不能渲染成可用的 context meter。
   if (used === undefined || used <= 0) {

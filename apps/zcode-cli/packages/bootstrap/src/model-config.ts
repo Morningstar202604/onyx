@@ -2,12 +2,12 @@ import type {
   AiSdkModelExecutionConfig,
   AiSdkNetworkConfig,
   EnvRecord,
-} from "@zcode/adapters/model";
+} from "@onyx/adapters/model";
 import {
   resolveRuntimeZCodeEnv,
   resolveRuntimeZCodeEndpointOrigin,
-  ZCODE_APP_VERSION_ENV,
-} from "@zcode/shared";
+  ONYX_APP_VERSION_ENV,
+} from "@onyx/shared";
 import {
   createRuntimePlatformHeaders,
   normalizePrintableHeaderValue,
@@ -69,7 +69,7 @@ function resolveAppVersionForHeaders(
   env: EnvRecord,
   options: Pick<RuntimeExecutionConfigOptions, "appVersion">,
 ): string | undefined {
-  return normalizePrintableHeaderValue(env[ZCODE_APP_VERSION_ENV] ?? options.appVersion);
+  return normalizePrintableHeaderValue(env[ONYX_APP_VERSION_ENV] ?? options.appVersion);
 }
 
 function detectDefaultProviderSourceTitle(): ModelProviderSourceTitle {

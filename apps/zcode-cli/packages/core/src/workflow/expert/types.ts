@@ -6,7 +6,7 @@ import type {
   WorkflowEvent,
   WorkflowRunStatus,
   WorkflowStorePort,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 
 export interface ExpertWorkflowAgentRunInput {
   abortSignal?: AbortSignal;

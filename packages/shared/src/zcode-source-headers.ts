@@ -1,8 +1,8 @@
-import { DEFAULT_ZCODE_ENDPOINT_ORIGIN } from "./zcodeEndpoint.js";
+import { DEFAULT_ONYX_ENDPOINT_ORIGIN } from "./zcodeEndpoint.js";
 
-export const ZCODE_SOURCE_HEADERS = {
+export const ONYX_SOURCE_HEADERS = {
   "User-Agent": "ZCode/unknown",
-  "HTTP-Referer": DEFAULT_ZCODE_ENDPOINT_ORIGIN,
+  "HTTP-Referer": DEFAULT_ONYX_ENDPOINT_ORIGIN,
   "X-Title": "Z Code@electron",
 } as const;
 
@@ -36,14 +36,14 @@ export function buildZCodeSourceHeadersFromContext(
   const clientTimezone = normalizeZCodeSourceHeaderValue(options.clientTimezone) ?? "unknown";
   const deviceMid = normalizeZCodeSourceHeaderValue(options.deviceMid);
   const endpointOrigin =
-    normalizeZCodeSourceHeaderValue(options.endpointOrigin) ?? DEFAULT_ZCODE_ENDPOINT_ORIGIN;
+    normalizeZCodeSourceHeaderValue(options.endpointOrigin) ?? DEFAULT_ONYX_ENDPOINT_ORIGIN;
   const osVersion = normalizeZCodeSourceHeaderValue(options.osVersion);
   const platform = normalizeZCodeSourceHeaderValue(options.platform);
   const releaseChannel = normalizeZCodeSourceHeaderValue(options.releaseChannel);
   const sourceTitle = normalizeZCodeSourceHeaderValue(options.sourceTitle) ?? "electron";
 
   return {
-    ...ZCODE_SOURCE_HEADERS,
+    ...ONYX_SOURCE_HEADERS,
     "HTTP-Referer": endpointOrigin,
     "User-Agent": `ZCode/${appVersion ?? "unknown"}`,
     ...(appVersion ? { "X-ZCode-App-Version": appVersion } : {}),

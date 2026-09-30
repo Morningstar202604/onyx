@@ -1,6 +1,6 @@
 import { join, resolve } from "node:path";
 
-import type { FileSystemPort, Logger, TraceContext } from "@zcode/contracts";
+import type { FileSystemPort, Logger, TraceContext } from "@onyx/contracts";
 
 import { ensureMemoryDirectoryExists } from "../memory/directory.js";
 import type { AgentRuntimeConfig, MemoryRuntimeConfig } from "../runtime/types.js";
@@ -26,8 +26,8 @@ function resolvePersistentAgentMemoryRoot(input: {
   }
   const workspace = resolve(input.workspaceRoot);
   return input.scope === "project"
-    ? join(workspace, ".zcode", "agent-memory", agentKey)
-    : join(workspace, ".zcode", "agent-memory-local", agentKey);
+    ? join(workspace, ".onyx", "agent-memory", agentKey)
+    : join(workspace, ".onyx", "agent-memory-local", agentKey);
 }
 
 function isPersistentAgentMemoryEnabled(

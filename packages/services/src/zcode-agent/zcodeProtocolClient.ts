@@ -1,14 +1,14 @@
 import { ZCodeStorageStartupGate } from "#src/zcode-agent/zcodeStorageStartupGate.js";
-import { Emitter } from "@zcode/rpc";
-import type { IDisposable } from "@zcode/rpc";
+import { Emitter } from "@onyx/rpc";
+import type { IDisposable } from "@onyx/rpc";
 import type {
   ZCodeProtocolMethod,
   ZCodeProtocolNotification,
   ZCodeProtocolRequest,
   ZCodeProtocolRequestId,
   ZCodeProtocolTrace,
-} from "@zcode/shared";
-import type { V4Method } from "@zcode/shared/zcode-protocol-v4";
+} from "@onyx/shared";
+import type { V4Method } from "@onyx/shared/zcode-protocol-v4";
 import type { z } from "zod";
 import type { ZCodeProtocolTransport } from "./zcodeProtocolTransport.js";
 
@@ -45,7 +45,7 @@ interface ZCodeProtocolClientRequestOptions {
   timeoutMs?: number;
 }
 
-const DEFAULT_ZCODE_PROTOCOL_REQUEST_TIMEOUT_MS = 3 * 60_000;
+const DEFAULT_ONYX_PROTOCOL_REQUEST_TIMEOUT_MS = 3 * 60_000;
 
 class ZCodeProtocolClientError extends Error {
   constructor(
@@ -64,7 +64,7 @@ export class ZCodeProtocolRequestTimeoutError extends Error {
     readonly requestId: ZCodeProtocolRequestId,
     readonly timeoutMs: number,
   ) {
-    super(`ZCode Protocol request timed out: ${method}`);
+    super(`Onyx Protocol request timed out: ${method}`);
     this.name = "ZCodeProtocolRequestTimeoutError";
   }
 }
@@ -87,7 +87,7 @@ export class ZCodeProtocolClient implements IDisposable {
    * client 是否已 dispose（进程被回收/transport 关闭后为 true）。
    * 调用方（如 getClient 复用 active entry）必须在复用前检查此标记，
    * 避免对一个已被 processManager 回收但尚未触发 onClose 的 client 发请求，
-   * 否则会立即抛 "ZCode Protocol client is disposed"。
+   * 否则会立即抛 "Onyx Protocol client is disposed"。
    */
   get isDisposed(): boolean {
     return this.disposed;
@@ -115,13 +115,13 @@ export class ZCodeProtocolClient implements IDisposable {
     options?: ZCodeProtocolClientOptions,
   ) {
     this.storageStartup = new ZCodeStorageStartupGate(options?.requireStorageStartup ?? false);
-    this.requestTimeoutMs = options?.requestTimeoutMs ?? DEFAULT_ZCODE_PROTOCOL_REQUEST_TIMEOUT_MS;
+    this.requestTimeoutMs = options?.requestTimeoutMs ?? DEFAULT_ONYX_PROTOCOL_REQUEST_TIMEOUT_MS;
     this.disposables.push(
       transport.onMessage((message) => this.handleMessage(message)),
       transport.onClose((event) => {
         this.storageStartup.dispose();
         const suffix = event.reason ? `: ${event.reason}` : "";
-        this.rejectAll(new Error(`ZCode agent transport closed${suffix}`));
+        this.rejectAll(new Error(`Onyx agent transport closed${suffix}`));
         this.closeEmitter.fire();
       }),
     );
@@ -335,7 +335,7 @@ export class ZCodeProtocolClient implements IDisposable {
       pending.reject(
         error instanceof Error
           ? error
-          : new Error(`ZCode Protocol response parse failed: ${pending.method}`),
+          : new Error(`Onyx Protocol response parse failed: ${pending.method}`),
       );
     }
   }
@@ -376,7 +376,7 @@ export class ZCodeProtocolClient implements IDisposable {
   }
 
   private disposeLocalResources(): void {
-    this.rejectAll(new Error("ZCode Protocol client disposed"));
+    this.rejectAll(new Error("Onyx Protocol client disposed"));
     for (const disposable of this.disposables) {
       disposable.dispose();
     }
@@ -391,7 +391,7 @@ export class ZCodeProtocolClient implements IDisposable {
 
   private assertNotDisposed(): void {
     if (this.disposed) {
-      throw new Error("ZCode Protocol client is disposed");
+      throw new Error("Onyx Protocol client is disposed");
     }
   }
 }

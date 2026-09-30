@@ -93,7 +93,7 @@ export const ServiceChannels = {
   ZCodeTask: "zcode-task",
   /** 窗口 Host 聚合 workspace/task 投影与列表写路由 */
   WindowController: "window-controller",
-  /** ZCode Protocol agent 服务 */
+  /** Onyx Protocol agent 服务 */
   ZCodeAgent: "zcode-agent",
   /** ZCode session 应用服务 */
   ZCodeSession: "zcode-session",
@@ -161,7 +161,7 @@ export const PlatformChannels = {
   SelectFile: "zcode:select-file",
   /** 打开系统多文件选择框 */
   SelectFiles: "zcode:select-files",
-  /** Renderer → Main：写入宿主 ~/.zcode 临时文本附件 */
+  /** Renderer → Main：写入宿主 ~/.onyx 临时文本附件 */
   CreateTempTextAttachment: "zcode:create-temp-text-attachment",
   /** Renderer → Main：通过原生另存为对话框保存文件 */
   SaveFile: "zcode:save-file",
@@ -260,7 +260,7 @@ export const PlatformChannels = {
   SetResourceUsageSamplingActive: "zcode:set-resource-usage-sampling-active",
   /** 打开资源管理器窗口（其他窗口触发） */
   OpenResourceManager: "zcode:open-resource-manager",
-  /** 资源管理器「存储」tab：开始扫描本机 .zcode 占用（main 持有 StorageService，Worker 线程遍历） */
+  /** 资源管理器「存储」tab：开始扫描本机 .onyx 占用（main 持有 StorageService，Worker 线程遍历） */
   StorageStartScan: "zcode:storage-start-scan",
   /** 资源管理器「存储」tab：取消扫描 */
   StorageCancelScan: "zcode:storage-cancel-scan",
@@ -279,7 +279,7 @@ export const PlatformChannels = {
   OpenInFileManager: "zcode:open-in-file-manager",
   /** Renderer → Main：使用系统默认应用打开本地文件 */
   OpenExternalFile: "zcode:open-external-file",
-  /** Renderer → Main：打开 ZCode Computer Use 权限引导 */
+  /** Renderer → Main：打开 Onyx Computer Use 权限引导 */
   OpenCuaPermissionOnboarding: "zcode:open-cua-permission-onboarding",
   /** Renderer → Main：取消当前 renderer 发起的一次权限引导 participant */
   CancelCuaPermissionOnboarding: "zcode:cancel-cua-permission-onboarding",
@@ -328,7 +328,7 @@ export const PlatformChannels = {
   TaskNotificationSound: "zcode:task-notification-sound",
   /** Main → Preload：用户点击了系统通知，携带 taskId 让 renderer 跳转到对应任务 */
   TaskNotificationClick: "zcode:task-notification-click",
-  /** Renderer → Main：导出日志（打包 ~/.zcode/v2 及外部 agent 日志为 zip 并在 Finder 中显示） */
+  /** Renderer → Main：导出日志（打包 ~/.onyx/v2 及外部 agent 日志为 zip 并在 Finder 中显示） */
   ExportLogs: "zcode:export-logs",
   /** Renderer → Main：截取当前窗口作为反馈附件 */
   CaptureWindowScreenshot: "zcode:capture-window-screenshot",
@@ -485,9 +485,9 @@ export const InternalChannels = {
 } as const;
 
 /** @deprecated `/ws` 已忽略该头；保留常量仅供旧客户端兼容。 */
-export const ZCODE_RPC_CLIENT_MODE_HEADER = "x-zcode-rpc-client-mode";
+export const ONYX_RPC_CLIENT_MODE_HEADER = "x-zcode-rpc-client-mode";
 /** desktop 先经受保护 HTTP endpoint 申请，再在 `/ws/host` 握手时一次性消费。 */
-export const ZCODE_RPC_HOST_CAPABILITY_HEADER = "x-zcode-rpc-host-capability";
+export const ONYX_RPC_HOST_CAPABILITY_HEADER = "x-zcode-rpc-host-capability";
 
 // ============================================================================
 // 进程间消息类型 —— main ↔ host process 之间的 postMessage
@@ -623,7 +623,7 @@ export const HostResponseTypes = {
   BotRemoteWorkspaceRuntimePortRequest: "bot-remote-workspace-runtime-port-request",
   /** host → main：Agent 请求向另一个 session 发送消息 */
   SessionMessageSendRequested: "session-message-send-requested",
-  /** host → main：声明一个 ZCode Agent session 当前归属该 host */
+  /** host → main：声明一个 Onyx Agent session 当前归属该 host */
   SessionRouteAnnounce: "session-route-announce",
   /** host → main：目标 host 完成本地 session message 投递 */
   SessionMessageDeliverResult: "session-message-deliver-result",

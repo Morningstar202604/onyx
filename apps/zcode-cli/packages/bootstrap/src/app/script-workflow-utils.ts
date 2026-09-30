@@ -4,7 +4,7 @@ import type {
   SessionId,
   SessionStorePort,
   WorkflowAgentCallInput,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import { homedir } from "node:os";
 import { isAbsolute, join, relative } from "node:path";
 
@@ -170,8 +170,8 @@ export function inferScriptWorkflowScope(
   scriptPath: string,
   workingDirectory: string,
 ): "explicit" | "project" | "user" {
-  if (isWithin(scriptPath, join(workingDirectory, ".zcode", "workflows"))) return "project";
-  if (isWithin(scriptPath, join(homedir(), ".zcode", "workflows"))) return "user";
+  if (isWithin(scriptPath, join(workingDirectory, ".onyx", "workflows"))) return "project";
+  if (isWithin(scriptPath, join(homedir(), ".onyx", "workflows"))) return "user";
   return "explicit";
 }
 

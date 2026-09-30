@@ -1,5 +1,5 @@
-import type { EffectiveModelSelectionResult } from "@zcode/shared/model-selection";
-export type { EffectiveModelSelectionResult } from "@zcode/shared/model-selection";
+import type { EffectiveModelSelectionResult } from "@onyx/shared/model-selection";
+export type { EffectiveModelSelectionResult } from "@onyx/shared/model-selection";
 import {
   validateModelSelectionOptions,
   type ModelSelection,

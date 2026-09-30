@@ -1,16 +1,16 @@
 import {
   buildZCodeEndpointUrls,
   buildZCodeSourceHeadersFromContext,
-  ZCODE_ENV,
-  ZCODE_DESKTOP_CONTEXT_PROMPT_ENABLED_ENV,
-} from "@zcode/shared";
+  ONYX_ENV,
+  ONYX_DESKTOP_CONTEXT_PROMPT_ENABLED_ENV,
+} from "@onyx/shared";
 import {
   createSingleFeatureRollout,
   type SingleFeatureRollout,
   type SingleFeatureRolloutLogger,
 } from "./singleFeatureRollout.js";
 
-export { ZCODE_DESKTOP_CONTEXT_PROMPT_ENABLED_ENV };
+export { ONYX_DESKTOP_CONTEXT_PROMPT_ENABLED_ENV };
 
 type DesktopContextPromptRolloutLogger = SingleFeatureRolloutLogger;
 export const DESKTOP_CONTEXT_PROMPT_CACHE_TTL_MS = 60 * 60 * 1_000;
@@ -85,6 +85,10 @@ export function createElectronDesktopContextPromptConfigFetcher(options: {
   return async (signal) => {
     const { net } = await import("electron");
     const endpointOrigin = await options.resolveEndpointOrigin();
+    // Onyx 未配置 endpoint：远端灰度配置不可用，返回 null 表示无远端配置。
+    if (!endpointOrigin) {
+      return null;
+    }
     const url = new URL(`${buildZCodeEndpointUrls(endpointOrigin).origin}/api/v1/client/configs`);
     url.searchParams.set("app_version", options.appVersion);
     url.searchParams.set("platform", `${process.platform}-${process.arch}`);
@@ -116,7 +120,7 @@ export function createElectronDesktopContextPromptConfigFetcher(options: {
         deviceMid: options.deviceMid,
         endpointOrigin,
         platform: process.platform,
-        releaseChannel: ZCODE_ENV,
+        releaseChannel: ONYX_ENV,
         sourceTitle: "electron",
       });
       for (const [name, value] of Object.entries(sourceHeaders)) {

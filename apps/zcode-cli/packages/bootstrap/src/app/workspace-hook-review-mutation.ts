@@ -2,17 +2,17 @@ import { basename, resolve } from "node:path";
 import {
   createWorkspaceHookBundleSnapshot,
   type WorkspaceHookBundleSnapshot,
-} from "@zcode/contracts";
-import { digestSummary, workspaceIdentitySummary } from "@zcode/core";
+} from "@onyx/contracts";
+import { digestSummary, workspaceIdentitySummary } from "@onyx/core";
 import {
   buildWorkspaceHookBundleSnapshot,
   readWorkspaceHookProjectSources,
   type WorkspaceHookRuntimeRoot,
-} from "@zcode/shared/workspace-hook-discovery";
+} from "@onyx/shared/workspace-hook-discovery";
 import {
   WorkspaceHookMutationError,
   writeWorkspaceHookConfiguredToggle,
-} from "@zcode/shared/workspace-hook-mutation";
+} from "@onyx/shared/workspace-hook-mutation";
 import type { WorkspaceHookReviewMutationPort } from "./workspace-hook-review-controller.js";
 
 interface WorkspaceHookReviewMutationPortOptions {
@@ -28,7 +28,7 @@ export function createWorkspaceHookReviewMutationPort(
   options: WorkspaceHookReviewMutationPortOptions,
 ): WorkspaceHookReviewMutationPort {
   const workingDirectory = resolve(options.workingDirectory);
-  const editableConfigPath = resolve(workingDirectory, ".zcode", "config.json");
+  const editableConfigPath = resolve(workingDirectory, ".onyx", "config.json");
   const lockKey = editableConfigPath;
 
   return {

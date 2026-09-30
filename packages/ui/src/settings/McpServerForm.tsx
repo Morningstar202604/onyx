@@ -1,6 +1,6 @@
 /* eslint-disable max-lines -- MCP 服务器表单聚合基础字段与高级折叠，结构稳定暂不拆分。 */
 import { useEffect, useRef, useState } from "react";
-import type { McpSource, ZCodeMcpServer } from "@zcode/shared";
+import type { McpSource, ZCodeMcpServer } from "@onyx/shared";
 import { Button } from "@/components/ui/button.js";
 import { Input } from "@/components/ui/input.js";
 import {

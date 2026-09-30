@@ -1,9 +1,9 @@
 import {
   getCapturedZCodeCuaBrokerCredentials,
-  ZCODE_CUA_OFFICIAL_PLUGIN_ID,
-  ZCODE_CUA_PLUGIN_AUTHORITY_ENV_KEY,
-  ZCODE_PLUGIN_ID_ENV_KEY,
-} from "@zcode/shared";
+  ONYX_CUA_OFFICIAL_PLUGIN_ID,
+  ONYX_CUA_PLUGIN_AUTHORITY_ENV_KEY,
+  ONYX_PLUGIN_ID_ENV_KEY,
+} from "@onyx/shared";
 import { registerMcpTools, traceContextToLogContext } from "../deps.js";
 import type { McpConnectionSnapshot, McpServerConfig, TraceContext } from "../deps.js";
 import type { AgentRuntimeInternal } from "../internal.js";
@@ -26,9 +26,9 @@ export function computeOfficialCuaServerNames(
     if (!trustedServerNames.has(name)) continue;
     if (config.type !== "stdio") continue;
     if (
-      config.env?.[ZCODE_PLUGIN_ID_ENV_KEY]?.trim().toLowerCase() !==
-        ZCODE_CUA_OFFICIAL_PLUGIN_ID ||
-      config.env?.[ZCODE_CUA_PLUGIN_AUTHORITY_ENV_KEY]?.trim() !== expectedAuthority
+      config.env?.[ONYX_PLUGIN_ID_ENV_KEY]?.trim().toLowerCase() !==
+        ONYX_CUA_OFFICIAL_PLUGIN_ID ||
+      config.env?.[ONYX_CUA_PLUGIN_AUTHORITY_ENV_KEY]?.trim() !== expectedAuthority
     ) {
       continue;
     }

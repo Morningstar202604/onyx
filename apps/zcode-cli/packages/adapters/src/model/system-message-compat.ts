@@ -1,7 +1,7 @@
 import {
   modelMessageContentToText,
   type ModelInputMessage,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 
 export function normalizeOpenAiCompatibleSystemMessages(
   messages: readonly ModelInputMessage[],

@@ -7,8 +7,8 @@ import type {
   ZCodePluginMarketplaceSummary,
   ZCodePluginScope,
   ZCodePluginsDescribeResult,
-} from "@zcode/shared";
-import type { IPluginManagementService } from "@zcode/services";
+} from "@onyx/shared";
+import type { IPluginManagementService } from "@onyx/services";
 import { logger } from "@/logger.js";
 import { loadInto, runWorkspaceOperation } from "@/store/pluginManagementStoreLoading.js";
 import { setPluginEnabledOptimistically } from "@/store/pluginManagementStoreEnabled.js";

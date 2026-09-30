@@ -5,9 +5,9 @@ import {
   type IPlatformService,
   type ModelSelection,
   type ZCodeAutomation,
-} from "@zcode/shared";
-import type { ProviderSettingsView } from "@zcode/services";
-import { isApiKeyAccess } from "@zcode/provider";
+} from "@onyx/shared";
+import type { ProviderSettingsView } from "@onyx/services";
+import { isApiKeyAccess } from "@onyx/provider";
 import { reportAppTelemetryEvent } from "@/lib/appTelemetry.js";
 import { legacyTelemetryProviderId } from "@/lib/providerTelemetryIdentity.js";
 

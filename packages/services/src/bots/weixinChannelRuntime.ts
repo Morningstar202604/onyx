@@ -2,7 +2,7 @@ import type {
   BotConfig,
   BotProviderCallbackResult,
   BotsConfigFile,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import type { ICredentialService } from "../credential/credential.js";
 import { getWeixinUpdates } from "./providers/weixinProvider.js";
 import {

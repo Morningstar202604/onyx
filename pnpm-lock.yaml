@@ -15,9 +15,6 @@ patchedDependencies:
   '@ai-sdk/openai-compatible@2.0.60':
     hash: 9632fe9d821b3dc20939ae509cc35b968d90d018bbd1d812390718898182a38b
     path: patches/@ai-sdk__openai-compatible@2.0.60.patch
-  '@arms/rum-electron@0.0.3':
-    hash: 36855354851ea495bc47a03340b0484ff62836b739cad56904b8a69f18e2ae97
-    path: patches/@arms__rum-electron@0.0.3.patch
 
 importers:
 
@@ -145,22 +142,22 @@ importers:
       '@modelcontextprotocol/client':
         specifier: 2.0.0
         version: 2.0.0
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@zcode/dynamic-workflow':
+      '@onyx/dynamic-workflow':
         specifier: workspace:*
         version: link:../dynamic-workflow
-      '@zcode/model-option-map':
+      '@onyx/model-option-map':
         specifier: workspace:*
         version: link:../../../../packages/model-option-map
-      '@zcode/provider':
+      '@onyx/provider':
         specifier: workspace:*
         version: link:../../../../packages/provider
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../../../../packages/shared
-      '@zcode/zcode-cua':
+      '@onyx/zcode-cua':
         specifier: workspace:*
         version: link:../../../../packages/zcode-cua
       ai:
@@ -209,34 +206,34 @@ importers:
 
   apps/zcode-cli/packages/bootstrap:
     dependencies:
-      '@zcode/adapters':
+      '@onyx/adapters':
         specifier: workspace:*
         version: link:../adapters
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@zcode/core':
+      '@onyx/core':
         specifier: workspace:*
         version: link:../core
-      '@zcode/dynamic-workflow':
+      '@onyx/dynamic-workflow':
         specifier: workspace:*
         version: link:../dynamic-workflow
-      '@zcode/dynamic-workflow-runtime':
+      '@onyx/dynamic-workflow-runtime':
         specifier: workspace:*
         version: link:../dynamic-workflow-runtime
-      '@zcode/i18n':
+      '@onyx/i18n':
         specifier: workspace:*
         version: link:../i18n
-      '@zcode/provider':
+      '@onyx/provider':
         specifier: workspace:*
         version: link:../../../../packages/provider
-      '@zcode/provider-node':
+      '@onyx/provider-node':
         specifier: workspace:*
         version: link:../../../../packages/provider-node
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../../../../packages/shared
-      '@zcode/telemetry':
+      '@onyx/telemetry':
         specifier: workspace:*
         version: link:../telemetry
       diff:
@@ -252,7 +249,7 @@ importers:
       '@types/yazl':
         specifier: ^3.3.1
         version: 3.3.1
-      '@zcode/formal-proof':
+      '@onyx/formal-proof':
         specifier: workspace:*
         version: link:../../../../packages/formal-proof
       yazl:
@@ -264,16 +261,16 @@ importers:
       '@modelcontextprotocol/server':
         specifier: 2.0.0
         version: 2.0.0
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@zcode/core':
+      '@onyx/core':
         specifier: workspace:*
         version: link:../core
-      '@zcode/node-repl-host':
+      '@onyx/node-repl-host':
         specifier: workspace:*
         version: link:../node-repl-host
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../../../../packages/shared
       zod:
@@ -286,10 +283,10 @@ importers:
       '@types/node':
         specifier: ^24.0.0
         version: 24.12.2
-      '@zcode/adapters':
+      '@onyx/adapters':
         specifier: workspace:*
         version: link:../adapters
-      '@zcode/bootstrap':
+      '@onyx/bootstrap':
         specifier: workspace:*
         version: link:../bootstrap
       esbuild:
@@ -304,34 +301,34 @@ importers:
 
   apps/zcode-cli/packages/cli:
     dependencies:
-      '@zcode/adapters':
+      '@onyx/adapters':
         specifier: workspace:*
         version: link:../adapters
-      '@zcode/bootstrap':
+      '@onyx/bootstrap':
         specifier: workspace:*
         version: link:../bootstrap
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@zcode/core':
+      '@onyx/core':
         specifier: workspace:*
         version: link:../core
-      '@zcode/dynamic-workflow-runtime':
+      '@onyx/dynamic-workflow-runtime':
         specifier: workspace:*
         version: link:../dynamic-workflow-runtime
-      '@zcode/i18n':
+      '@onyx/i18n':
         specifier: workspace:*
         version: link:../i18n
-      '@zcode/provider-node':
+      '@onyx/provider-node':
         specifier: workspace:*
         version: link:../../../../packages/provider-node
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../../../../packages/shared
-      '@zcode/shared-types':
+      '@onyx/shared-types':
         specifier: workspace:*
         version: link:../shared-types
-      '@zcode/tui':
+      '@onyx/tui':
         specifier: workspace:*
         version: link:../tui
       dotenv:
@@ -343,7 +340,7 @@ importers:
 
   apps/zcode-cli/packages/contracts:
     dependencies:
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../../../../packages/shared
       zod:
@@ -359,19 +356,19 @@ importers:
 
   apps/zcode-cli/packages/core:
     dependencies:
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@zcode/dynamic-workflow':
+      '@onyx/dynamic-workflow':
         specifier: workspace:*
         version: link:../dynamic-workflow
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../../../../packages/shared
-      '@zcode/shared-types':
+      '@onyx/shared-types':
         specifier: workspace:*
         version: link:../shared-types
-      '@zcode/zcode-cua':
+      '@onyx/zcode-cua':
         specifier: workspace:*
         version: link:../../../../packages/zcode-cua
       cheerio:
@@ -458,7 +455,7 @@ importers:
 
   apps/zcode-cli/packages/dynamic-workflow-runtime:
     dependencies:
-      '@zcode/dynamic-workflow':
+      '@onyx/dynamic-workflow':
         specifier: workspace:*
         version: link:../dynamic-workflow
     devDependencies:
@@ -468,7 +465,7 @@ importers:
 
   apps/zcode-cli/packages/i18n:
     dependencies:
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
 
@@ -477,16 +474,16 @@ importers:
       '@modelcontextprotocol/server':
         specifier: 2.0.0
         version: 2.0.0
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@zcode/core':
+      '@onyx/core':
         specifier: workspace:*
         version: link:../core
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../../../../packages/shared
-      '@zcode/zcode-cua':
+      '@onyx/zcode-cua':
         specifier: workspace:*
         version: link:../../../../packages/zcode-cua
       zod:
@@ -514,7 +511,7 @@ importers:
 
   apps/zcode-cli/packages/swift-bridge:
     dependencies:
-      '@zcode/shared-types':
+      '@onyx/shared-types':
         specifier: workspace:*
         version: link:../shared-types
 
@@ -544,7 +541,7 @@ importers:
       '@opentelemetry/sdk-trace-base':
         specifier: 2.6.1
         version: 2.6.1(@opentelemetry/api@1.9.1)
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
     devDependencies:
@@ -560,13 +557,13 @@ importers:
       '@mbears/opentui-react':
         specifier: 0.2.15
         version: 0.2.15(react-devtools-core@7.0.1)(react@19.2.7)(typescript@6.0.2)(web-tree-sitter@0.25.10)(ws@8.18.0)
-      '@zcode/contracts':
+      '@onyx/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@zcode/i18n':
+      '@onyx/i18n':
         specifier: workspace:*
         version: link:../i18n
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../../../../packages/shared
       react:
@@ -608,13 +605,13 @@ importers:
 
   packages/client:
     dependencies:
-      '@zcode/rpc':
+      '@onyx/rpc':
         specifier: workspace:*
         version: link:../rpc
-      '@zcode/services':
+      '@onyx/services':
         specifier: workspace:*
         version: link:../services
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../shared
     devDependencies:
@@ -624,9 +621,6 @@ importers:
 
   packages/desktop:
     dependencies:
-      '@arms/rum-electron':
-        specifier: ^0.0.3
-        version: 0.0.3(patch_hash=36855354851ea495bc47a03340b0484ff62836b739cad56904b8a69f18e2ae97)(@babel/runtime@7.29.7)(electron@41.0.3)
       '@babel/runtime':
         specifier: ^7.24.5
         version: 7.29.7
@@ -660,31 +654,31 @@ importers:
       '@opentelemetry/sdk-trace-base':
         specifier: 2.6.1
         version: 2.6.1(@opentelemetry/api@1.9.1)
-      '@zcode/client':
+      '@onyx/client':
         specifier: workspace:*
         version: link:../client
-      '@zcode/provider':
+      '@onyx/provider':
         specifier: workspace:*
         version: link:../provider
-      '@zcode/provider-node':
+      '@onyx/provider-node':
         specifier: workspace:*
         version: link:../provider-node
-      '@zcode/rpc':
+      '@onyx/rpc':
         specifier: workspace:*
         version: link:../rpc
-      '@zcode/server':
+      '@onyx/server':
         specifier: workspace:*
         version: link:../server
-      '@zcode/services':
+      '@onyx/services':
         specifier: workspace:*
         version: link:../services
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../shared
-      '@zcode/ui':
+      '@onyx/ui':
         specifier: workspace:*
         version: link:../ui
-      '@zcode/zcode-cua':
+      '@onyx/zcode-cua':
         specifier: workspace:*
         version: link:../zcode-cua
       electron-updater:
@@ -809,10 +803,10 @@ importers:
 
   packages/provider:
     dependencies:
-      '@zcode/model-option-map':
+      '@onyx/model-option-map':
         specifier: workspace:*
         version: link:../model-option-map
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../shared
       zod:
@@ -825,10 +819,10 @@ importers:
 
   packages/provider-node:
     dependencies:
-      '@zcode/provider':
+      '@onyx/provider':
         specifier: workspace:*
         version: link:../provider
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../shared
       zod:
@@ -838,7 +832,7 @@ importers:
       '@types/node':
         specifier: ^25.5.0
         version: 25.6.0
-      '@zcode/model-option-map':
+      '@onyx/model-option-map':
         specifier: workspace:*
         version: link:../model-option-map
       typescript:
@@ -874,16 +868,16 @@ importers:
       '@lydell/node-pty-linux-x64':
         specifier: 1.2.0-beta.10
         version: 1.2.0-beta.10
-      '@zcode/client':
+      '@onyx/client':
         specifier: workspace:*
         version: link:../client
-      '@zcode/rpc':
+      '@onyx/rpc':
         specifier: workspace:*
         version: link:../rpc
-      '@zcode/services':
+      '@onyx/services':
         specifier: workspace:*
         version: link:../services
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../shared
       axios:
@@ -956,19 +950,19 @@ importers:
       '@larksuiteoapi/node-sdk':
         specifier: 1.64.0
         version: 1.64.0
-      '@zcode/provider':
+      '@onyx/provider':
         specifier: workspace:*
         version: link:../provider
-      '@zcode/provider-node':
+      '@onyx/provider-node':
         specifier: workspace:*
         version: link:../provider-node
-      '@zcode/rpc':
+      '@onyx/rpc':
         specifier: workspace:*
         version: link:../rpc
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../shared
-      '@zcode/zcode-cua':
+      '@onyx/zcode-cua':
         specifier: workspace:*
         version: link:../zcode-cua
       croner:
@@ -1014,7 +1008,7 @@ importers:
 
   packages/shared:
     dependencies:
-      '@zcode/model-option-map':
+      '@onyx/model-option-map':
         specifier: workspace:*
         version: link:../model-option-map
       zod:
@@ -1081,12 +1075,6 @@ importers:
       '@streamdown/mermaid':
         specifier: ^1.0.2
         version: 1.0.2(react@19.2.7)
-      '@stripe/react-stripe-js':
-        specifier: ^6.4.0
-        version: 6.4.0(@stripe/stripe-js@9.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@stripe/stripe-js':
-        specifier: ^9.6.0
-        version: 9.6.0
       '@xterm/addon-clipboard':
         specifier: ^0.2.0
         version: 0.2.0
@@ -1099,16 +1087,16 @@ importers:
       '@xyflow/react':
         specifier: ^12.10.1
         version: 12.10.2(@types/react@19.2.14)(immer@11.1.8)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@zcode/provider':
+      '@onyx/provider':
         specifier: workspace:*
         version: link:../provider
-      '@zcode/rpc':
+      '@onyx/rpc':
         specifier: workspace:*
         version: link:../rpc
-      '@zcode/services':
+      '@onyx/services':
         specifier: workspace:*
         version: link:../services
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../shared
       ai:
@@ -1247,13 +1235,13 @@ importers:
 
   packages/web:
     dependencies:
-      '@zcode/client':
+      '@onyx/client':
         specifier: workspace:*
         version: link:../client
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../shared
-      '@zcode/ui':
+      '@onyx/ui':
         specifier: workspace:*
         version: link:../ui
       react:
@@ -1298,13 +1286,13 @@ importers:
       '@hono/node-ws':
         specifier: ^1.3.0
         version: 1.3.0(@hono/node-server@1.19.14(hono@4.12.12))(hono@4.12.12)
-      '@zcode/rpc':
+      '@onyx/rpc':
         specifier: workspace:*
         version: link:../rpc
-      '@zcode/services':
+      '@onyx/services':
         specifier: workspace:*
         version: link:../services
-      '@zcode/shared':
+      '@onyx/shared':
         specifier: workspace:*
         version: link:../shared
       hono:
@@ -1414,27 +1402,6 @@ packages:
 
   '@antfu/install-pkg@1.1.0':
     resolution: {integrity: sha512-MGQsmw10ZyI+EJo45CdSER4zEb+p31LpDAFp2Z3gkSd1yqVZGi0Ebx++YTEMonJy4oChEMLsxZ64j8FH6sSqtQ==}
-
-  '@arms/rum-browser@0.1.8':
-    resolution: {integrity: sha512-XqGzZB3ziQf8nNVYCf4lDkwonclPCOQYHjk8XBr8U28u/JrTtMSF1hNYZN4JlKqyLypelGb9Nx7T8BtS5bIEhQ==}
-    peerDependencies:
-      '@babel/runtime': ^7.24.5
-
-  '@arms/rum-core@0.1.4':
-    resolution: {integrity: sha512-if7tvpBnKhKddUKk+/u9iXKUVC+/nugiK6FGHTBuqS6LBLL0Fl8xAm4FTN3hGq07DAmP77RmWaG5mb1vmJ73SQ==}
-    peerDependencies:
-      '@babel/runtime': ^7.24.5
-
-  '@arms/rum-electron@0.0.3':
-    resolution: {integrity: sha512-ieiMhVQNpkSEv3tgwfQZqhvy8p9cyhl3B7AS4j+8kikDcriNOA5xE0d8JwpItzfOm7kfeYqGbZYwZMF45EDl4Q==}
-    peerDependencies:
-      '@trpc/server': '*'
-      electron: '>=28.0.0'
-    peerDependenciesMeta:
-      '@trpc/server':
-        optional: true
-      electron:
-        optional: true
 
   '@babel/code-frame@7.29.0':
     resolution: {integrity: sha512-9NhCeYjq9+3uxgdtp20LSiJXJvN0FeCtNGpJxuMFZ1Kv3cWUNb6DOhJwUvcVCzKGR66cw4njwM6hrJLqgOwbcw==}
@@ -4599,12 +4566,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@rrweb/types@2.1.6':
-    resolution: {integrity: sha512-DacFzGpPbQ91q3rRyh/AeZrtFYYonmLT+qgGlmh2iGcW2HPnrABJNgJWhpyzYwp/xed6Fbpi8yMxhRBlrOY0ZA==}
-
-  '@rrweb/utils@2.1.6':
-    resolution: {integrity: sha512-BIRXcxiytJs5Guxw0tzsnVS7ukcMqtnxixjIGvV49VdJeOEG6NJeMU7o8efbHW1D52a12Y8QsgDjgDgblg3org==}
-
   '@sec-ant/readable-stream@0.4.1':
     resolution: {integrity: sha512-831qok9r2t8AlxLko40y2ebgSDhenenCatLVeW/uBtnHPyhHOvG0C7TvfgecV+wHzIm5KUICgzmVpWS+IMEAeg==}
 
@@ -4733,17 +4694,6 @@ packages:
     resolution: {integrity: sha512-Fr/4sBWnAeSnxM3PcrV/+DiZe5oPMq9gOkUIAH7ZauJeuwrZ/DVzD4g0zlav6AH0axh2m/sOfrfLtY5aLT7niw==}
     peerDependencies:
       react: 19.2.7
-
-  '@stripe/react-stripe-js@6.4.0':
-    resolution: {integrity: sha512-5cAf7GAqf8VHPoPLVnJQ2MHtDWLdiEPs5GW/loU7iDEue3xf620v11skrk5HICUraDOhODPYpttgFC5N579NxA==}
-    peerDependencies:
-      '@stripe/stripe-js': '>=9.5.0 <10.0.0'
-      react: 19.2.7
-      react-dom: 19.2.7
-
-  '@stripe/stripe-js@9.6.0':
-    resolution: {integrity: sha512-v5MebYvJbddSRn15fknxTVwypJPzjeIXI1Q2HBxCBrQieWna8PC+RXEVUZ3F4ANAeILEj97HzFlr0r7CXvG7ZA==}
-    engines: {node: '>=12.16'}
 
   '@szmarczak/http-timer@4.0.6':
     resolution: {integrity: sha512-4BAffykYOgO+5nzBWYwE3W90sBgLJoUPRWWcL8wlyiM8IB8ipJz3UMJ9KXQd1RKQXpKp8Tutn80HZtWsu2u76w==}
@@ -4944,9 +4894,6 @@ packages:
 
   '@types/cacheable-request@6.0.3':
     resolution: {integrity: sha512-IQ3EbTzGxIigb1I3qPZc1rWJnH0BmSKv5QYTalEwweFvyBDLSAe24zP0le/hyi7ecGfZVlIVAg4BZqb8WBwKqw==}
-
-  '@types/css-font-loading-module@0.0.7':
-    resolution: {integrity: sha512-nl09VhutdjINdWyXxHWN/w9zlNCfr60JUqJbd24YXUuCwgeL0TpFSdElCwb6cxfB6ybE19Gjj4g0jsgkXxKv1Q==}
 
   '@types/d3-array@3.2.2':
     resolution: {integrity: sha512-hOLWVbm7uRza0BYXpIIW5pxfrKe0W+D5lrFiAEYR+pb6w3N2SwSMaJbXdUfSEv+dT4MfHBLtn5js0LAWaO6otw==}
@@ -5209,9 +5156,6 @@ packages:
     engines: {node: '>=10.0.0'}
     deprecated: this version has critical issues, please update to the latest version
 
-  '@xstate/fsm@1.6.5':
-    resolution: {integrity: sha512-b5o1I6aLNeYlU/3CPlj/Z91ybk1gUsKT+5NAJI+2W4UjvS5KLG28K9v5UvNoFVjHV8PajVZ00RH3vnjyQO7ZAw==}
-
   '@xterm/addon-clipboard@0.2.0':
     resolution: {integrity: sha512-Dl31BCtBhLaUEECUbEiVcCLvLBbaeGYdT7NofB8OJkGTD3MWgBsaLjXvfGAD4tQNHhm6mbKyYkR7XD8kiZsdNg==}
 
@@ -5403,10 +5347,6 @@ packages:
   balanced-match@4.0.4:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
-
-  base64-arraybuffer@1.0.2:
-    resolution: {integrity: sha512-I3yl4r9QB5ZRY3XuJVEPfc2XhZO6YweFPI+UovAzn+8/hb3oJ6lnysaFcjVpkCPfVWFUDvoZ8kmVDP7WyRtYtQ==}
-    engines: {node: '>= 0.6.0'}
 
   base64-js@1.5.1:
     resolution: {integrity: sha512-AKpaYlHn8t4SVbOHCy+b5+KKgvR4vrsD8vbvrbiQJps7fKDTkjkDry6ji0rUJjC0kzbNePLwzxq8iypo41qeWA==}
@@ -7816,9 +7756,6 @@ packages:
     resolution: {integrity: sha512-KZxYo1BUkWD2TVFLr0MQoM8vUUigWD3LlD83a/75BqC+4qE0Hb1Vo5v1FgcfaNXvfXzr+5EhQ6ing/CaBijTlw==}
     engines: {node: '>= 18'}
 
-  mitt@3.0.1:
-    resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
-
   mkdirp@0.5.6:
     resolution: {integrity: sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==}
     hasBin: true
@@ -8375,9 +8312,6 @@ packages:
     resolution: {integrity: sha512-NxNv/kLguCA7p3jE8oL2aEBsrJWgAakBpgmgK6lpPWV+WuOmY6r2/zbAVnP+T8bQlA0nzHXSJSJW0Hq7ylaD2Q==}
     engines: {node: '>= 6'}
 
-  prop-types@15.8.1:
-    resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
-
   propagating-hammerjs@3.0.0:
     resolution: {integrity: sha512-FJTclGll0ysatpF9rKO4jwobyaVDitPb0g/bGlufqqtXPQX8mxf8IXilnIK2iYRMPkVlYeFNhPTrspF9CM1stg==}
     peerDependencies:
@@ -8477,9 +8411,6 @@ packages:
     resolution: {integrity: sha512-BrYwPOdXi5mqkk5lw+Uvt0ThHx32rCt3BkukS4X23A2AIWDPSGX6iaWTc0y9TU/mHDA/6qOSGel+B2ERkOvD1w==}
     peerDependencies:
       react: 19.2.7
-
-  react-is@16.13.1:
-    resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
   react-is@18.3.1:
     resolution: {integrity: sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==}
@@ -8762,15 +8693,6 @@ packages:
   router@2.2.0:
     resolution: {integrity: sha512-nLTrUKm2UyiL7rlhapu/Zl45FwNgkZGaCpZbIHajDYgwlJCOzLSk+cIPAnsEqV955GjILJnKbdQC1nVPz+gAYQ==}
     engines: {node: '>= 18'}
-
-  rrdom@2.1.6:
-    resolution: {integrity: sha512-EMRrTs1GRsmb8bNyAs107wG7eRwVEOvDUBsnCyvQnVV6elrmrua/AeS0tdcA0gLW4eptr4l6bRsS/2QRICvdqQ==}
-
-  rrweb-snapshot@2.1.6:
-    resolution: {integrity: sha512-X03+x3AdWTbpD4Swb54CCJoEauYTv/O2ah0d3ZVv5rgr6bv0Ty5mxNjEyEEfNC1dQ8VdyjKKJgDG3A00FV0lNg==}
-
-  rrweb@2.1.6:
-    resolution: {integrity: sha512-OMdw4lWyfCx2fNhKCv1eZe54oVmD8r4QZsCXKY9fdt+cD/eiiupFgMHoFuwbwvltr4JH3IwWKXoadVjiMNhOZQ==}
 
   run-applescript@7.1.0:
     resolution: {integrity: sha512-DPe5pVFaAsinSaV6QjQ6gdiedWDcRCbUuiQfQa2wmWV7+xC9bGulGI8+TdRmoFkAPaBXk8CrAbnlY2ISniJ47Q==}
@@ -9700,9 +9622,6 @@ packages:
       '@types/emscripten':
         optional: true
 
-  web-vitals@3.5.2:
-    resolution: {integrity: sha512-c0rhqNcHXRkY/ogGDJQxZ9Im9D19hDihbzSQJrsioex+KnFgmMzBiy57Z1EjkhX/+OjyBpclDCzz2ITtjokFmg==}
-
   whatwg-encoding@3.1.1:
     resolution: {integrity: sha512-6qN4hJdMwfYBtE3YBTTHhoeuUrDBPZmbQaxWAqSALV/MeEnR5z1xd8UKud2RAkFoPkmB+hli1TZSnyi84xz1vQ==}
     engines: {node: '>=18'}
@@ -10035,26 +9954,6 @@ snapshots:
     dependencies:
       package-manager-detector: 1.6.0
       tinyexec: 1.1.1
-
-  '@arms/rum-browser@0.1.8(@babel/runtime@7.29.7)':
-    dependencies:
-      '@arms/rum-core': 0.1.4(@babel/runtime@7.29.7)
-      '@babel/runtime': 7.29.7
-      rrweb: 2.1.6
-      web-vitals: 3.5.2
-
-  '@arms/rum-core@0.1.4(@babel/runtime@7.29.7)':
-    dependencies:
-      '@babel/runtime': 7.29.7
-
-  '@arms/rum-electron@0.0.3(patch_hash=36855354851ea495bc47a03340b0484ff62836b739cad56904b8a69f18e2ae97)(@babel/runtime@7.29.7)(electron@41.0.3)':
-    dependencies:
-      '@arms/rum-browser': 0.1.8(@babel/runtime@7.29.7)
-      '@arms/rum-core': 0.1.4(@babel/runtime@7.29.7)
-    optionalDependencies:
-      electron: 41.0.3
-    transitivePeerDependencies:
-      - '@babel/runtime'
 
   '@babel/code-frame@7.29.0':
     dependencies:
@@ -13030,10 +12929,6 @@ snapshots:
   '@rollup/rollup-win32-x64-msvc@4.60.1':
     optional: true
 
-  '@rrweb/types@2.1.6': {}
-
-  '@rrweb/utils@2.1.6': {}
-
   '@sec-ant/readable-stream@0.4.1': {}
 
   '@shikijs/core@3.23.0':
@@ -13196,15 +13091,6 @@ snapshots:
     dependencies:
       mermaid: 11.14.0
       react: 19.2.7
-
-  '@stripe/react-stripe-js@6.4.0(@stripe/stripe-js@9.6.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
-    dependencies:
-      '@stripe/stripe-js': 9.6.0
-      prop-types: 15.8.1
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-
-  '@stripe/stripe-js@9.6.0': {}
 
   '@szmarczak/http-timer@4.0.6':
     dependencies:
@@ -13387,8 +13273,6 @@ snapshots:
       '@types/keyv': 3.1.4
       '@types/node': 25.6.0
       '@types/responselike': 1.0.3
-
-  '@types/css-font-loading-module@0.0.7': {}
 
   '@types/d3-array@3.2.2': {}
 
@@ -13677,8 +13561,6 @@ snapshots:
 
   '@xmldom/xmldom@0.8.12': {}
 
-  '@xstate/fsm@1.6.5': {}
-
   '@xterm/addon-clipboard@0.2.0':
     dependencies:
       js-base64: 3.7.8
@@ -13899,8 +13781,6 @@ snapshots:
   balanced-match@1.0.2: {}
 
   balanced-match@4.0.4: {}
-
-  base64-arraybuffer@1.0.2: {}
 
   base64-js@1.5.1: {}
 
@@ -16172,11 +16052,11 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
+  lodash.pickby@4.6.0: {}
+
   lodash.uniqby@4.7.0: {}
 
   lodash@4.18.1: {}
-
-  lodash.pickby@4.6.0: {}
 
   log-symbols@4.1.0:
     dependencies:
@@ -16811,8 +16691,6 @@ snapshots:
   minizlib@3.1.0:
     dependencies:
       minipass: 7.1.3
-
-  mitt@3.0.1: {}
 
   mkdirp@0.5.6:
     dependencies:
@@ -17494,12 +17372,6 @@ snapshots:
       kleur: 3.0.3
       sisteransi: 1.0.5
 
-  prop-types@15.8.1:
-    dependencies:
-      loose-envify: 1.4.0
-      object-assign: 4.1.1
-      react-is: 16.13.1
-
   propagating-hammerjs@3.0.0(@egjs/hammerjs@2.0.17):
     dependencies:
       '@egjs/hammerjs': 2.0.17
@@ -17680,8 +17552,6 @@ snapshots:
   react-error-boundary@6.1.1(react@19.2.7):
     dependencies:
       react: 19.2.7
-
-  react-is@16.13.1: {}
 
   react-is@18.3.1: {}
 
@@ -18082,25 +17952,6 @@ snapshots:
       path-to-regexp: 8.4.2
     transitivePeerDependencies:
       - supports-color
-
-  rrdom@2.1.6:
-    dependencies:
-      rrweb-snapshot: 2.1.6
-
-  rrweb-snapshot@2.1.6:
-    dependencies:
-      postcss: 8.5.9
-
-  rrweb@2.1.6:
-    dependencies:
-      '@rrweb/types': 2.1.6
-      '@rrweb/utils': 2.1.6
-      '@types/css-font-loading-module': 0.0.7
-      '@xstate/fsm': 1.6.5
-      base64-arraybuffer: 1.0.2
-      mitt: 3.0.1
-      rrdom: 2.1.6
-      rrweb-snapshot: 2.1.6
 
   run-applescript@7.1.0: {}
 
@@ -19051,8 +18902,6 @@ snapshots:
   web-streams-polyfill@3.3.3: {}
 
   web-tree-sitter@0.25.10: {}
-
-  web-vitals@3.5.2: {}
 
   whatwg-encoding@3.1.1:
     dependencies:

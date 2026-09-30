@@ -4,7 +4,7 @@ import {
   type WorkflowGraphNode,
   type WorkflowGraphPlannerNode,
   type WorkflowRunSnapshot,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import {
   collectionFrontier,
   collectionNodeIdsForGraph,

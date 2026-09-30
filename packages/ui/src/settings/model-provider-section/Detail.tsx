@@ -1,13 +1,13 @@
 /* eslint-disable max-lines -- Model Provider 详情页集中编排 API Key 表单与模型编辑；官方套餐/OAuth 区块已移除。 */
 import { useEffect } from "react";
-import type { ModelConnectivityResult } from "@zcode/shared";
-import type { SavePersonalModelDraftInput } from "@zcode/provider";
+import type { ModelConnectivityResult } from "@onyx/shared";
+import type { SavePersonalModelDraftInput } from "@onyx/provider";
 import {
   getProviderFormApiKeyManagementUrl,
   type ProviderSettingsFormProvider,
 } from "@/lib/providerSettingsFormTypes.js";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
-import type { ProviderSettingsView } from "@zcode/services";
+import type { ProviderSettingsView } from "@onyx/services";
 import { useProviderSettingsView } from "@/hooks/useProviderSettingsView.js";
 import type { ModelProviderNavItem } from "./constants.js";
 import { InlineEditableProviderCard } from "./InlineEditableProviderCard.js";

@@ -1,16 +1,16 @@
 /* oxlint-disable eslint(max-lines) -- telemetry state lock、deviceMid 编排和上报路径共享同一状态文件，拆分会增加锁语义漂移风险。 */
 import {
   createUuid,
-  ZCODE_VERSION,
-  ZCODE_ENV,
-  ZCODE_TELEMETRY_ENABLED,
-  ZCODE_TELEMETRY_REPORT_ENDPOINT,
+  ONYX_VERSION,
+  ONYX_ENV,
+  ONYX_TELEMETRY_ENABLED,
+  ONYX_TELEMETRY_REPORT_ENDPOINT,
   buildZCodeSourceHeadersFromContext,
   rewriteZCodeEndpointUrl,
   sanitizeTelemetryEventDetail,
   type TelemetryEventPayload,
   type TelemetryRendererContext,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import {
   ensureDeviceMid,
   ensureDeviceMidInLockedState,
@@ -126,14 +126,14 @@ function toLocalDateKey(timestamp: number, timeZone: string): string {
 
 function resolveTelemetryStateFile(homeDir?: string): string {
   if (homeDir) {
-    return join(homeDir, ".zcode", "v2", "telemetry-state.json");
+    return join(homeDir, ".onyx", "v2", "telemetry-state.json");
   }
   return join(getAppConfigDir(), "telemetry-state.json");
 }
 
 function resolveTelemetryLockFile(homeDir?: string): string {
   if (homeDir) {
-    return join(homeDir, ".zcode", "v2", "telemetry-state.lock");
+    return join(homeDir, ".onyx", "v2", "telemetry-state.lock");
   }
   return join(getAppConfigDir(), "telemetry-state.lock");
 }
@@ -290,7 +290,7 @@ export function createTelemetryCore(dependencies: TelemetryCoreDependencies = {}
   let didWarnMarketingParamsLoadFailure = false;
   const randomUUID = dependencies.randomUUID ?? (() => createUuid());
   const now = dependencies.now ?? Date.now;
-  const appVersion = dependencies.appVersion ?? ZCODE_VERSION;
+  const appVersion = dependencies.appVersion ?? ONYX_VERSION;
   const platform = dependencies.platform ?? process.platform;
   const osVersion = dependencies.osVersion ?? version();
   const requestTimeoutMs = dependencies.requestTimeoutMs ?? REPORT_REQUEST_TIMEOUT_MS;
@@ -364,7 +364,7 @@ export function createTelemetryCore(dependencies: TelemetryCoreDependencies = {}
     deviceMid: string,
   ): Promise<void> {
     // 总开关关闭或上报端点未配置时，事件到此终止。
-    if (!ZCODE_TELEMETRY_ENABLED || !ZCODE_TELEMETRY_REPORT_ENDPOINT) {
+    if (!ONYX_TELEMETRY_ENABLED || !ONYX_TELEMETRY_REPORT_ENDPOINT) {
       return;
     }
     let marketingParams: { source?: string } | null = null;
@@ -406,8 +406,8 @@ export function createTelemetryCore(dependencies: TelemetryCoreDependencies = {}
 
     const endpoint = String(
       rewriteZCodeEndpointUrl(
-        ZCODE_TELEMETRY_REPORT_ENDPOINT,
-        (await dependencies.resolveZCodeEndpointOrigin?.()) ?? ZCODE_TELEMETRY_REPORT_ENDPOINT,
+        ONYX_TELEMETRY_REPORT_ENDPOINT,
+        (await dependencies.resolveZCodeEndpointOrigin?.()) ?? ONYX_TELEMETRY_REPORT_ENDPOINT,
       ),
     );
 
@@ -416,7 +416,7 @@ export function createTelemetryCore(dependencies: TelemetryCoreDependencies = {}
       platform,
       arch: dependencies.arch ?? process.arch,
       osVersion,
-      releaseChannel: dependencies.releaseChannel ?? ZCODE_ENV,
+      releaseChannel: dependencies.releaseChannel ?? ONYX_ENV,
       clientLanguage: context.clientLanguage,
       clientTimezone: context.clientTimezone,
       deviceMid,

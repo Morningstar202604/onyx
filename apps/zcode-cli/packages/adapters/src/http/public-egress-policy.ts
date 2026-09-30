@@ -5,7 +5,7 @@ import {
   getIpAddressVersion,
   getPublicEgressIpBlockReason,
   normalizeIpAddressLiteral,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 
 export type DnsLookupAddress = { address: string; family: number };
 export type DnsLookup = (

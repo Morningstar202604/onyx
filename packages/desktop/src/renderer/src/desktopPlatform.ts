@@ -1,5 +1,5 @@
-import { recordArmsCustomEventForE2E } from "@zcode/ui";
-import { DesktopCommandIds, buildLocalMediaPreviewUrl, type IPlatformService } from "@zcode/shared";
+import { recordArmsCustomEventForE2E } from "@onyx/ui";
+import { DesktopCommandIds, buildLocalMediaPreviewUrl, type IPlatformService } from "@onyx/shared";
 
 import { desktopBrowserPlatformBridge } from "./desktopBrowserPlatformBridge.js";
 
@@ -161,6 +161,6 @@ export function createDesktopPlatform(options: {
       Promise.resolve(navigator.language.toLowerCase().startsWith("zh") ? "zh-CN" : "en-US"),
     setTitleBarTheme: (theme) => window.zcode.setTitleBarTheme(theme),
     getDeviceId: () =>
-      (window as Window & { __ZCODE_DEVICE_ID__?: string }).__ZCODE_DEVICE_ID__ ?? "",
+      (window as Window & { __ONYX_DEVICE_ID__?: string }).__ONYX_DEVICE_ID__ ?? "",
   };
 }

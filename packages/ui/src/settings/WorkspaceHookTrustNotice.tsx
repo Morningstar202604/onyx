@@ -1,4 +1,4 @@
-import type { Hook } from "@zcode/shared";
+import type { Hook } from "@onyx/shared";
 import { CircleAlert } from "lucide-react";
 import { useZCodeIntl } from "@/i18n/IntlProvider.js";
 

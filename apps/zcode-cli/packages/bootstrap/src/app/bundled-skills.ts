@@ -1,8 +1,8 @@
 import { createHash, randomUUID } from "node:crypto";
 import { access, mkdir, readdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
-import type { Logger, SkillRoot } from "@zcode/contracts";
-import { DYNAMIC_WORKFLOW_SKILL_NAME } from "@zcode/contracts";
+import type { Logger, SkillRoot } from "@onyx/contracts";
+import { DYNAMIC_WORKFLOW_SKILL_NAME } from "@onyx/contracts";
 import { candidateBaseDirs } from "./bundled-plugins.js";
 
 /**
@@ -40,7 +40,7 @@ const BUNDLED_SKILL_PACK_ROOT_CANDIDATES = [
 
 export const SEA_BUNDLED_SKILL_ASSET_PREFIX = "zcode-bundled-skills/";
 const SEA_BUNDLED_SKILL_MANIFEST_ASSET_KEY = `${SEA_BUNDLED_SKILL_ASSET_PREFIX}manifest.json`;
-const SEED_MARKER_FILE = ".zcode-bundled-skills-seed.json";
+const SEED_MARKER_FILE = ".onyx-bundled-skills-seed.json";
 
 /**
  * 排在所有插件根之后（adapters 的插件根从 FIRST_PLUGIN_PRIORITY 起步进）：同名技能按发现顺序取先者，

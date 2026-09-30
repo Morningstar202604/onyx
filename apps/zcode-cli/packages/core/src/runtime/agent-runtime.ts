@@ -1,5 +1,5 @@
-import { DEFAULT_ZCODE_MODEL_CONTEXT_BUDGET_STRATEGY, resolveExecutionState } from "@zcode/shared";
-import type { BackgroundBashOutputResult } from "@zcode/shared";
+import { DEFAULT_ONYX_MODEL_CONTEXT_BUDGET_STRATEGY, resolveExecutionState } from "@onyx/shared";
+import type { BackgroundBashOutputResult } from "@onyx/shared";
 import {
   createDenyPermissionBroker,
   createRootTraceContext,
@@ -232,7 +232,7 @@ export class AgentRuntime {
     // 3.12.2：兼容旧 Host/内部调用传入 legacy，但本版本 Runtime、日志和子 Agent 只使用 preflight。
     this.config = projectPersistentAgentMemoryTools({
       ...config,
-      modelContextBudgetStrategy: DEFAULT_ZCODE_MODEL_CONTEXT_BUDGET_STRATEGY,
+      modelContextBudgetStrategy: DEFAULT_ONYX_MODEL_CONTEXT_BUDGET_STRATEGY,
     });
     Object.assign(this.config, resolveExecutionState(config));
     this.agentTelemetry = new RuntimeTelemetryFacade({

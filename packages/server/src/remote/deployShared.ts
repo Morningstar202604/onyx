@@ -1,10 +1,10 @@
 import { join } from "node:path";
 import { access } from "node:fs/promises";
-import type { StdioStream } from "@zcode/server/remote/backend.js";
-import { quotePosixPathArg } from "@zcode/server/remote/posixShell.js";
-import type { RemoteAssetNetworkPort } from "@zcode/server/remote/remoteAssetNetwork.js";
+import type { StdioStream } from "@onyx/server/remote/backend.js";
+import { quotePosixPathArg } from "@onyx/server/remote/posixShell.js";
+import type { RemoteAssetNetworkPort } from "@onyx/server/remote/remoteAssetNetwork.js";
 
-export const REMOTE_BASE = "~/.zcode/server";
+export const REMOTE_BASE = "~/.onyx/server";
 
 export interface RemoteAssetDeployOptions {
   /** 取消当前连接初始化；共享 cache 仍可独立完成，但不得继续写入远端 staging。 */

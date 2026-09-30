@@ -1,38 +1,38 @@
 import {
-  ZCODE_AGENT_RUNTIME,
-  ZCODE_AGENT_PROVIDER,
+  ONYX_AGENT_RUNTIME,
+  ONYX_AGENT_PROVIDER,
   type RemoteResourcePackageId,
-} from "@zcode/shared";
-import type { IRemoteBackend, RemoteEnvironment } from "@zcode/server/remote/backend.js";
+} from "@onyx/shared";
+import type { IRemoteBackend, RemoteEnvironment } from "@onyx/server/remote/backend.js";
 import {
   REMOTE_BASE,
   type DeployLoggers,
   type RemoteAssetDeployOptions,
   waitForClose,
-} from "@zcode/server/remote/deployShared.js";
-import type { RemoteAssetInstaller } from "@zcode/server/remote/remoteAssetInstaller.js";
-import { buildWriteLiteralFileCommand } from "@zcode/server/remote/posixShell.js";
-import { deployDevelopmentZCodeAgentRuntime } from "@zcode/server/remote/zcodeAgentDevDeploy.js";
+} from "@onyx/server/remote/deployShared.js";
+import type { RemoteAssetInstaller } from "@onyx/server/remote/remoteAssetInstaller.js";
+import { buildWriteLiteralFileCommand } from "@onyx/server/remote/posixShell.js";
+import { deployDevelopmentZCodeAgentRuntime } from "@onyx/server/remote/zcodeAgentDevDeploy.js";
 import {
   buildRemoteAgentBundleWrapper,
   isRemoteAgentBundleWrapperCurrent,
   REMOTE_AGENT_BUNDLE_NAME,
-} from "@zcode/server/remote/zcodeAgentBundleWrapper.js";
+} from "@onyx/server/remote/zcodeAgentBundleWrapper.js";
 import {
   deployRemoteAgentWrapper,
   isWslBackend,
-} from "@zcode/server/remote/zcodeAgentWrapperDeploy.js";
+} from "@onyx/server/remote/zcodeAgentWrapperDeploy.js";
 import {
   buildRemoteAgentOfficialPluginDir,
   buildRemoteAgentOfficialPluginRequiredPaths,
   buildRemoteAgentOfficialPluginSourceRelativePath,
   REMOTE_AGENT_OFFICIAL_PLUGIN_REQUIRED_RELATIVE_PATHS,
-} from "@zcode/server/remote/zcodeAgentOfficialPluginAssets.js";
-import { repairLegacyRemoteOfficialPluginDirectoryPermissions } from "@zcode/server/remote/zcodeAgentOfficialPluginPermissionRepair.js";
+} from "@onyx/server/remote/zcodeAgentOfficialPluginAssets.js";
+import { repairLegacyRemoteOfficialPluginDirectoryPermissions } from "@onyx/server/remote/zcodeAgentOfficialPluginPermissionRepair.js";
 import {
   checkRemoteAssetComponentIdentity,
   writeRemoteAssetComponentMeta,
-} from "@zcode/server/remote/remoteAssetLiveIdentity.js";
+} from "@onyx/server/remote/remoteAssetLiveIdentity.js";
 
 const REMOTE_AGENT_RUNTIME_BASE = `${REMOTE_BASE}/agents`;
 
@@ -126,7 +126,7 @@ async function shouldSkipZCodeAgentDeploy(params: {
   }
 
   params.loggers.log(
-    `[zcode-agent-deploy] ${ZCODE_AGENT_PROVIDER}: 制品 SHA ${params.expectedArtifactSha256} 已部署，跳过`,
+    `[zcode-agent-deploy] ${ONYX_AGENT_PROVIDER}: 制品 SHA ${params.expectedArtifactSha256} 已部署，跳过`,
   );
   return true;
 }
@@ -145,7 +145,7 @@ async function findMissingRemoteOfficialPluginAssetPaths(
 }
 
 /**
- * 部署 ZCode Agent runtime 到远程机器。
+ * 部署 Onyx Agent runtime 到远程机器。
  *
  * 生产态只用 manifest SHA 判断制品是否变化；语义版本不参与跳过决策。
  */
@@ -155,8 +155,8 @@ export async function deployZCodeAgentRuntime(
   options: DeployZCodeAgentRuntimeOptions,
   loggers: DeployLoggers,
 ): Promise<void> {
-  const provider = ZCODE_AGENT_PROVIDER;
-  const runtime = ZCODE_AGENT_RUNTIME;
+  const provider = ONYX_AGENT_PROVIDER;
+  const runtime = ONYX_AGENT_RUNTIME;
   const componentId = provider;
   if (!isSelectedZCodeAgentComponent(componentId, options.selectedResourcePackageIds)) {
     loggers.log(`[zcode-agent-deploy] ${provider}: 未选择资源包 ${componentId}，跳过检查和部署`);

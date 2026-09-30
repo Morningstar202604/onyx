@@ -1,5 +1,5 @@
-import type { IServiceAccessor } from "@zcode/services";
-import { Event, ProxyChannel, type IChannel } from "@zcode/rpc";
+import type { IServiceAccessor } from "@onyx/services";
+import { Event, ProxyChannel, type IChannel } from "@onyx/rpc";
 import { useMemo } from "react";
 import { useOptionalServices, useServices } from "@/hooks/useServices.js";
 import {

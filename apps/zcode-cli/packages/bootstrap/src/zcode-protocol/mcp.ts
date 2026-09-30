@@ -1,10 +1,10 @@
-import { createConfig, resolvePath } from "@zcode/adapters/config";
-import type { Logger, McpConnectionSnapshot, McpPort, McpServerStatus } from "@zcode/contracts";
+import { createConfig, resolvePath } from "@onyx/adapters/config";
+import type { Logger, McpConnectionSnapshot, McpPort, McpServerStatus } from "@onyx/contracts";
 import {
   zcodeMcpListParamsSchema,
   zcodeMcpListResultSchema,
   type ZCodeMcpListResult,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import {
   listMcpServerStatuses,
   omitMcpServers,
@@ -60,7 +60,7 @@ export async function listMcpServers(
   const explicitRuntimeMcp = protocolMcpServersToRuntimeMcpConfig(params.mcpServers);
   const configuredMcpServers = {
     ...pluginOutcome.mcpServers,
-    // 设置页的本地 MCP 列表由 desktop main 解析 `.zcode` / `.agents` fallback，
+    // 设置页的本地 MCP 列表由 desktop main 解析 `.onyx` / `.agents` fallback，
     // session runtime 也使用这批 params.mcpServers。mcp/list 不能再只靠 agent createConfig，
     // 否则 `.agents` fallback 行会缺少 status snapshot 并被 UI 误标红。
     ...(explicitMcpServersProvided

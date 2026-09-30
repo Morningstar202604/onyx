@@ -1,4 +1,4 @@
-import { decodeCustomModelValue, encodeCustomModelValue } from "@zcode/shared";
+import { decodeCustomModelValue, encodeCustomModelValue } from "@onyx/shared";
 
 // Provider 重构拆分了执行身份，但旧报表仍按原桶统计；只在事件构造处使用，禁止回流业务配置。
 // 官方账号体系（Z.ai/BigModel 账号、Coding Plan、Start Plan、闲时套餐）已整体移除，

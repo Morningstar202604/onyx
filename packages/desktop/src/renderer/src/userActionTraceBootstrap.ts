@@ -1,12 +1,12 @@
 import {
   DISABLED_RENDERER_ACTION_TRACE_CONFIG,
   RENDERER_ACTION_TRACE_SERVICE_NAME,
-  ZCODE_ENV,
-  ZCODE_VERSION,
+  ONYX_ENV,
+  ONYX_VERSION,
   type IPlatformService,
   type RendererActionTraceConfigV1,
-} from "@zcode/shared";
-import { RendererUserActionTelemetry, setUserActionTelemetry } from "@zcode/ui";
+} from "@onyx/shared";
+import { RendererUserActionTelemetry, setUserActionTelemetry } from "@onyx/ui";
 
 export function initializeDesktopUserActionTrace(options: {
   platform: IPlatformService;
@@ -24,8 +24,8 @@ export function initializeDesktopUserActionTrace(options: {
     config: DISABLED_RENDERER_ACTION_TRACE_CONFIG,
     resource: {
       serviceName: RENDERER_ACTION_TRACE_SERVICE_NAME,
-      serviceVersion: ZCODE_VERSION || "unknown",
-      deploymentEnvironment: options.isLocalDevelopmentRuntime ? "development" : ZCODE_ENV,
+      serviceVersion: ONYX_VERSION || "unknown",
+      deploymentEnvironment: options.isLocalDevelopmentRuntime ? "development" : ONYX_ENV,
       rendererInstanceId,
     },
     sendBatch: (batch) => sendBatch(batch),

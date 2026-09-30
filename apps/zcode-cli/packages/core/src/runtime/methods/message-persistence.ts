@@ -1,5 +1,5 @@
-import type { RuntimeInputPresentation } from "@zcode/contracts";
-import { createModelId, createModelProviderId } from "@zcode/contracts";
+import type { RuntimeInputPresentation } from "@onyx/contracts";
+import { createModelId, createModelProviderId } from "@onyx/contracts";
 import { SessionEventType, createPartId, traceContextToLogContext } from "../deps.js";
 import type {
   EnvInfo,

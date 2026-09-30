@@ -1,9 +1,9 @@
 import { extractDisallowedToolsArgs, parseGlobalArgs } from "./arguments.js";
-import { createNodeLoggerFactory } from "@zcode/adapters";
-import { getRuntimeInfo, type PresentationSurface } from "@zcode/core";
-import { color, formatJson, supportsColor } from "@zcode/core";
-import { getZCodeCopy, isUiLocale, type UiLocale } from "@zcode/i18n";
-import type { RunContext, GlobalOptions, GlobalOutputFormat } from "@zcode/shared-types";
+import { createNodeLoggerFactory } from "@onyx/adapters";
+import { getRuntimeInfo, type PresentationSurface } from "@onyx/core";
+import { color, formatJson, supportsColor } from "@onyx/core";
+import { getZCodeCopy, isUiLocale, type UiLocale } from "@onyx/i18n";
+import type { RunContext, GlobalOptions, GlobalOutputFormat } from "@onyx/shared-types";
 import {
   applyCliRuntimeEnvSanitization,
   loadCliDotenv,
@@ -244,7 +244,7 @@ const runZCodeProtocolCommand = async (
     const workingDirectory = (deps.cwd ?? process.cwd)();
     // 打包态 app-server 是 desktop host 的内部协议子进程。
     // 如果这里继续从 workspace 向上读取用户 .env，读文件失败或环境污染会在协议建立前
-    // 直接退出，外层只能看到 ZCode agent transport closed。
+    // 直接退出，外层只能看到 Onyx agent transport closed。
     const dotenvResult = shouldLoadCliDotenvForProtocolServer(env)
       ? (deps.loadDotenv ?? loadCliDotenv)({
           cwd: workingDirectory,

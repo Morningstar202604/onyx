@@ -8,13 +8,13 @@
 // 各查一次，不再定时轮询；状态存在共享缓存里，与输入框常驻入口读同一份。
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { useSettings } from "@/hooks/useSettingService.js";
-import type { CuaOsSupport, CuaPermissionKind, RemoteTarget } from "@zcode/shared";
+import type { CuaOsSupport, CuaPermissionKind, RemoteTarget } from "@onyx/shared";
 import {
   DesktopCommandIds,
   isRemoteWorkspaceIdentity,
-  ZCODE_CUA_OFFICIAL_PLUGIN_ID,
-} from "@zcode/shared";
-import { isCuaPermissionStatusAvailable, type CuaPermissionRestartOptions } from "@zcode/services";
+  ONYX_CUA_OFFICIAL_PLUGIN_ID,
+} from "@onyx/shared";
+import { isCuaPermissionStatusAvailable, type CuaPermissionRestartOptions } from "@onyx/services";
 import { Button } from "@/components/ui/button.js";
 import { toast } from "@/components/ui/toast.js";
 import { Switch } from "@/components/ui/switch.js";
@@ -127,9 +127,9 @@ export function ComputerUseSection({
   const setPluginEnabled = usePluginManagementStore((state) => state.setEnabled);
   const initializePlugins = usePluginManagementStore((state) => state.initialize);
   const togglingPluginId = usePluginManagementStore((state) => state.togglingPluginId);
-  const cuaPlugin = plugins.find((plugin) => plugin.id === ZCODE_CUA_OFFICIAL_PLUGIN_ID);
+  const cuaPlugin = plugins.find((plugin) => plugin.id === ONYX_CUA_OFFICIAL_PLUGIN_ID);
   const cuaEnabled = cuaPlugin?.enabled ?? false;
-  const cuaToggling = togglingPluginId === ZCODE_CUA_OFFICIAL_PLUGIN_ID;
+  const cuaToggling = togglingPluginId === ONYX_CUA_OFFICIAL_PLUGIN_ID;
 
   const initRef = useRef(false);
   useEffect(() => {
@@ -331,7 +331,7 @@ export function ComputerUseSection({
       const operationContextKey = pluginToggleContextKey;
       // 切换 zcode-cua 插件 = 同步其 MCP server + skill 一起启用/禁用。
       const completed = await runAfterSuccessfulPluginEnabledChange({
-        submit: () => setPluginEnabled(ZCODE_CUA_OFFICIAL_PLUGIN_ID, next, pluginManagementService),
+        submit: () => setPluginEnabled(ONYX_CUA_OFFICIAL_PLUGIN_ID, next, pluginManagementService),
         isCurrent: () =>
           mountedRef.current &&
           pluginToggleGenerationRef.current === operationGeneration &&

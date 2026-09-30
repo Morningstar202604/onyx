@@ -9,9 +9,9 @@ import {
   type MouseEvent,
 } from "react";
 import { ArrowUpRightIcon, MoonIcon, SunIcon } from "lucide-react";
-import type { ConversationSharePreview } from "@zcode/shared";
-import { ConversationShareReadonlyTimeline } from "@zcode/ui/conversation-share-readonly";
-import { applyTheme, resolveTheme, type Theme } from "@zcode/ui/useTheme";
+import type { ConversationSharePreview } from "@onyx/shared";
+import { ConversationShareReadonlyTimeline } from "@onyx/ui/conversation-share-readonly";
+import { applyTheme, resolveTheme, type Theme } from "@onyx/ui/useTheme";
 import "./conversationShareLandingPage.css";
 import {
   buildShareImportDeepLink,
@@ -75,7 +75,8 @@ interface Copy {
 }
 
 // 站点首页本身就是下载入口，没有 /download 这个 path（单独的下载链接会 404）。
-const ZCODE_DOWNLOAD_URL = "https://zcode.z.ai";
+// Onyx 无官方下载站：置空，分享落地页不再展示下载入口链接。
+const ONYX_DOWNLOAD_URL = "";
 
 const COPY: Record<ConversationShareLandingLocale, Copy> = {
   "zh-CN": {
@@ -517,7 +518,7 @@ export function ConversationShareLandingPage({
               >
                 {copy.retryOpen}
               </a>
-              <a className="text-brand underline underline-offset-2" href={ZCODE_DOWNLOAD_URL}>
+              <a className="text-brand underline underline-offset-2" href={ONYX_DOWNLOAD_URL}>
                 {copy.downloadZCode}
               </a>
             </div>
@@ -624,7 +625,7 @@ export function ConversationShareLandingStatus({
             {isNotFound ? (
               <a
                 className="rounded-md bg-primary px-4 py-2 text-ui-base text-primary-foreground"
-                href={ZCODE_DOWNLOAD_URL}
+                href={ONYX_DOWNLOAD_URL}
               >
                 {copy.backToHome}
               </a>

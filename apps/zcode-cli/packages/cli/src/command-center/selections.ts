@@ -1,4 +1,4 @@
-import type { TuiSelection, TuiSelectionItem } from "@zcode/tui";
+import type { TuiSelection, TuiSelectionItem } from "@onyx/tui";
 import type {
   CommandCenterCheckpoint,
   CommandCenterSession,

@@ -8,9 +8,9 @@ import {
   playTaskNotificationSound,
   setStreamClientId,
   type Theme,
-} from "@zcode/ui";
-import "@zcode/ui/styles.css";
-import { connectViaWebSocket } from "@zcode/client";
+} from "@onyx/ui";
+import "@onyx/ui/styles.css";
+import { connectViaWebSocket } from "@onyx/client";
 import { resolveWebCommunityUrl, resolveWebHelpConfig } from "./communityUrl.js";
 import {
   ConversationShareLandingLoader,
@@ -24,7 +24,7 @@ import {
   isConversationSharePath,
   resolveConversationShareCodeFromPath,
 } from "./share/conversationShareRoute.js";
-import type { IPlatformService, RemoteTarget, ServerRemoteInfo } from "@zcode/shared";
+import type { IPlatformService, RemoteTarget, ServerRemoteInfo } from "@onyx/shared";
 import { WEB_DEFAULT_THEME, resolveWebInitialTheme } from "./webThemeSeed.js";
 
 function resolveWebThemePreference(defaultTheme: Theme = WEB_DEFAULT_THEME): Theme {
@@ -102,7 +102,7 @@ async function renderConversationSharePage(): Promise<void> {
   }
 
   const endpointOrigin =
-    import.meta.env.VITE_ZCODE_BASE_URL?.trim().replace(/\/+$/u, "") || window.location.origin;
+    import.meta.env.VITE_ONYX_BASE_URL?.trim().replace(/\/+$/u, "") || window.location.origin;
   const mockMode =
     import.meta.env.DEV && import.meta.env.VITE_CONVERSATION_SHARE_PREVIEW_MOCK === "true";
   // Share 加载失败不能只有通用 network 文案：需要区分 mock、endpoint 配置或跨域 fetch。

@@ -78,9 +78,9 @@ Useful environment variables:
 
 | Variable | Purpose |
 | --- | --- |
-| `ZCODE_DATA_BASE_DIR` | App data base directory (writes into `.zcode/` under it) |
-| `ZCODE_SERVER_WORKSPACE` | Web backend workspace path |
-| `ZCODE_BUILTIN_PROVIDER_CONFIG_FILE` | Local model-provider config file |
+| `ONYX_DATA_BASE_DIR` | App data base directory (writes into `.onyx/` under it) |
+| `ONYX_SERVER_WORKSPACE` | Web backend workspace path |
+| `ONYX_BUILTIN_PROVIDER_CONFIG_FILE` | Local model-provider config file |
 
 ## Known limitations
 

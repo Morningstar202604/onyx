@@ -1,5 +1,5 @@
 /* oxlint-disable eslint(max-lines) -- footer 聚合账户、主题、模式和快捷键菜单。 */
-import type { Locale } from "@zcode/shared";
+import type { Locale } from "@onyx/shared";
 import type { UserInfo } from "@/lib/userInfo.js";
 import { memo, useCallback, useEffect, useState } from "react";
 import {
@@ -7,7 +7,7 @@ import {
   TID_LOGIN_TRIGGER,
   TID_LOGOUT_BUTTON,
   TID_TASK_SETTINGS_BUTTON,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { ControlHintTooltip } from "@/ControlHintTooltip.js";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar.js";
 import { cn } from "@/components/lib/utils.js";

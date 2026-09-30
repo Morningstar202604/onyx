@@ -8,7 +8,7 @@ export const CREDENTIAL_DECRYPT_ERROR_CODE = "zcode:credential-decrypt" as const
 const CREDENTIAL_CIPHER_ALGORITHM = "aes-256-gcm";
 const CREDENTIAL_CIPHER_IV_BYTES = 12;
 const CREDENTIAL_CIPHER_AUTH_TAG_BYTES = 16;
-const CREDENTIAL_SECRET_ENV_KEY = "ZCODE_CREDENTIAL_SECRET";
+const CREDENTIAL_SECRET_ENV_KEY = "ONYX_CREDENTIAL_SECRET";
 
 export interface CredentialCipherProvider {
   encrypt(value: string): string;

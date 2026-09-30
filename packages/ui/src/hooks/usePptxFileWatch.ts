@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import type { IDisposable } from "@zcode/rpc";
-import type { IFileWatcherService } from "@zcode/services";
-import type { FileWatchEvent } from "@zcode/shared";
+import type { IDisposable } from "@onyx/rpc";
+import type { IFileWatcherService } from "@onyx/services";
+import type { FileWatchEvent } from "@onyx/shared";
 import { logger } from "@/logger.js";
 import { getContainingDirectoryPath } from "@/lib/path.js";
 

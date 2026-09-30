@@ -1,4 +1,4 @@
-import type { SessionId, TurnId } from "@zcode/contracts";
+import type { SessionId, TurnId } from "@onyx/contracts";
 
 interface BrowserTurnScreenshotCandidate {
   browserGeneration: number;

@@ -1,18 +1,10 @@
-import {
-  isBuiltinModelProviderId,
-  resolveRuntimeZCodeEndpointOrigin,
-  ZCODE_VERSION,
-} from "@zcode/shared";
-import { dirname, join } from "node:path";
+import { isBuiltinModelProviderId } from "@onyx/shared";
 import {
   NodeModelSelectionConfigRepository,
   NodeProviderRegistryRuntime,
   resolveNodeProviderRuntimePaths,
-  downloadZCodeBuiltinRelease,
-  resolveZCodeBuiltinClientPlatform,
-  ZCODE_BUILTIN_PROVIDER_BUNDLED_CONFIG_FILE_ENV,
-  type ZCodeBuiltinRefreshEvent,
-} from "@zcode/provider-node";
+  ONYX_BUILTIN_PROVIDER_BUNDLED_CONFIG_FILE_ENV,
+} from "@onyx/provider-node";
 import { readLegacyCliPersonalProviderConfig } from "./legacy-cli-personal-provider-config-importer.js";
 
 export interface ProcessProviderRegistryRuntimeOptions {
@@ -21,7 +13,6 @@ export interface ProcessProviderRegistryRuntimeOptions {
     readonly legacyCliUserConfigFilePath?: string;
     readonly request?: typeof fetch;
     readonly onBuiltinRefreshError?: (error: unknown) => void;
-    readonly onBuiltinRefreshResult?: (event: ZCodeBuiltinRefreshEvent) => void;
   };
 }
 
@@ -35,30 +26,15 @@ export async function startProcessProviderRegistryRuntime(
   }
 
   const bundledFile = options.standalone
-    ? env[ZCODE_BUILTIN_PROVIDER_BUNDLED_CONFIG_FILE_ENV]?.trim()
+    ? env[ONYX_BUILTIN_PROVIDER_BUNDLED_CONFIG_FILE_ENV]?.trim()
     : undefined;
+  // Onyx 内置供应商配置随包静态分发：不启用任何远端同步/下载链路。
   const runtime = new NodeProviderRegistryRuntime({
     ...paths,
     ...(bundledFile
       ? {
           zcodeBuiltinFilePath: bundledFile,
           zcodeBuiltinActiveFilePath: paths.zcodeBuiltinFilePath,
-          zcodeBuiltinRemote: {
-            controlFilePath: join(
-              dirname(paths.zcodeBuiltinFilePath),
-              "zcode-builtin-refresh.json",
-            ),
-            resolveEndpointKey: () => resolveRuntimeZCodeEndpointOrigin(env),
-            fetchRelease: (endpointOrigin, signal) =>
-              downloadZCodeBuiltinRelease({
-                endpointOrigin,
-                signal,
-                appVersion: ZCODE_VERSION,
-                platform: resolveZCodeBuiltinClientPlatform(),
-                request: options.standalone?.request ?? globalThis.fetch,
-              }),
-            onRefreshResult: options.standalone?.onBuiltinRefreshResult,
-          },
         }
       : {}),
     onZCodeBuiltinRefreshError: options.standalone?.onBuiltinRefreshError,

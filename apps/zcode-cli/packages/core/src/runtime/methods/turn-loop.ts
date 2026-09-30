@@ -1,4 +1,4 @@
-import { beginLocalTurnPreparation } from "@zcode/contracts";
+import { beginLocalTurnPreparation } from "@onyx/contracts";
 import {
   CompactPhase,
   CompactReason,

@@ -7,7 +7,7 @@ import {
   type ExecutionRequest,
   type ExecutionShellDialect,
   windowsPathToGitBashPath,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 
 interface CwdCapturePlan {
   command: ExecutionCommand;

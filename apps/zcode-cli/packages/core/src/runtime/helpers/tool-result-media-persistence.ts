@@ -1,4 +1,4 @@
-import type { FilePart } from "@zcode/contracts";
+import type { FilePart } from "@onyx/contracts";
 import { createPartId } from "../deps.js";
 import type {
   MessageId,
@@ -46,7 +46,7 @@ export async function persistToolResultMediaAttachments(input: {
 
   const attachments: FilePart[] = [];
   for (const [index, block] of projection.mediaBlocks.entries()) {
-    const existingArtifactUri = block.source?.uri?.startsWith("zcode-artifact://")
+    const existingArtifactUri = block.source?.uri?.startsWith("onyx-artifact://")
       ? block.source.uri
       : undefined;
     const artifactUri =

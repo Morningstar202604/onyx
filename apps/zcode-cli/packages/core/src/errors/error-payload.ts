@@ -2,7 +2,7 @@ import type {
   ErrorAttribution,
   ModelApiErrorPhase,
   ModelFailureExceptionKind,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 
 interface ExecutionErrorPayloadProjection {
   attribution?: ErrorAttribution;

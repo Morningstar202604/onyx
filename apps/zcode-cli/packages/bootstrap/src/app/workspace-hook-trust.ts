@@ -1,4 +1,4 @@
-import { createDefaultFileWorkspaceHookTrustStore } from "@zcode/adapters/storage";
+import { createDefaultFileWorkspaceHookTrustStore } from "@onyx/adapters/storage";
 import {
   InMemoryWorkspaceHookPolicyProvider,
   WorkspaceHookTrustCoordinator,
@@ -8,21 +8,21 @@ import {
   type WorkspaceHookReviewTarget,
   type WorkspaceHookRuntimeAdmissionPort,
   type WorkspaceHookPolicyProvider,
-} from "@zcode/core";
-import { SessionEventType } from "@zcode/contracts";
+} from "@onyx/core";
+import { SessionEventType } from "@onyx/contracts";
 import type {
   Logger,
   SessionId,
   WorkspaceHookBundleSnapshot,
   WorkspaceHookPolicy,
   WorkspaceHookAdmissionUpdatedPayload,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import type {
   WorkspaceHookReviewDecision,
   WorkspaceHookReviewRequestPayload,
   WorkspaceHookTrustRevokeTarget,
-} from "@zcode/shared/zcode-protocol-v4";
-import type { WorkspaceHookRuntimeRoot } from "@zcode/shared/workspace-hook-discovery";
+} from "@onyx/shared/zcode-protocol-v4";
+import type { WorkspaceHookRuntimeRoot } from "@onyx/shared/workspace-hook-discovery";
 import {
   WorkspaceHookReviewController,
   type WorkspaceHookReviewCommandResult,
@@ -87,7 +87,7 @@ export function createWorkspaceHookRuntimeSecurity(input: {
   snapshot?: WorkspaceHookBundleSnapshot;
   userConfigPath: string;
   workingDirectory: string;
-  /** 测试注入临时 HOME；生产不传，Trust store 落在真实 ~/.zcode/security。 */
+  /** 测试注入临时 HOME；生产不传，Trust store 落在真实 ~/.onyx/security。 */
   homeDir?: string;
 }): WorkspaceHookRuntimeSecurity | undefined {
   if (!input.snapshot) return undefined;

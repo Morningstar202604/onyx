@@ -14,8 +14,8 @@ import {
   parseRemoteWorkspaceIdentity,
   type ZCodeSessionContextUsage,
   type ZCodeWorkspaceRef,
-} from "@zcode/shared";
-import { createExternalTurnFaultError } from "@zcode/core";
+} from "@onyx/shared";
+import { createExternalTurnFaultError } from "@onyx/core";
 import {
   V4_NOTIFICATIONS,
   conversationInputIntentSchema,
@@ -25,7 +25,7 @@ import {
   type V4ConversationFileChangesResult,
   type V4ConversationFileRewindPreviewResult,
   type SessionSummary,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@onyx/shared/zcode-protocol-v4";
 import { V4CommandExecutor } from "../zcode-protocol-v4/commands/executor.js";
 import { V4QueuePromotionLeaseUnavailableError } from "../zcode-protocol-v4/commands/handlers/queue.js";
 import { V4CapabilityUnsupportedError } from "../zcode-protocol-v4/commands/handlers/interaction-background.js";
@@ -65,7 +65,7 @@ import {
   SessionEventType,
   createEventId,
   createSessionId,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import type {
   CollaborationMode,
   DynamicWorkflowRunProgressPayload,
@@ -80,7 +80,7 @@ import type {
   TraceId,
   TurnId,
   WorkspaceId,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import { HYDRATION_TRACE_ID } from "../zcode-protocol-v4/projection-state.js";
 import { resolveWorkspaceRefFromId } from "./mapper.js";
 import { buildLiveWorkspaceConfigStateV4 } from "./v4-workspace-config.js";
@@ -1453,7 +1453,7 @@ export function createConversationV4Gateway(
     ) => {
       const persisted = await context.deps.sessionStore?.getSession(sessionId as SessionId);
       if (!persisted) {
-        context.logger?.warn("ZCode Protocol v4 cold resume has no persisted session", {
+        context.logger?.warn("Onyx Protocol v4 cold resume has no persisted session", {
           activeSessionCount: context.sessions.size,
           event: "zcode_protocol.v4.resume_persisted_missing",
           module: "bootstrap.zcode_protocol",
@@ -1771,7 +1771,7 @@ export function createConversationV4Gateway(
       if (!record) {
         // 诊断：hydrate 预期在 runtime 已由 cold-resume 激活后执行；连父 record 兜底
         // 都落空时，返回空事件会把真实的生命周期竞态伪装成“历史为空”，必须留下明确现场。
-        context.logger?.warn("ZCode Protocol v4 hydrate has no active runtime", {
+        context.logger?.warn("Onyx Protocol v4 hydrate has no active runtime", {
           activeSessionCount: context.sessions.size,
           event: "zcode_protocol.v4.hydrate_runtime_missing",
           module: "bootstrap.zcode_protocol",
@@ -1901,7 +1901,7 @@ export function createConversationV4Gateway(
       };
     },
     onError: (scope, error, errorContext) =>
-      context.logger?.warn("ZCode Protocol v4 gateway error", {
+      context.logger?.warn("Onyx Protocol v4 gateway error", {
         ...errorContext,
         error: error instanceof Error ? error.message : String(error),
         event: "zcode_protocol.v4.gateway_error",

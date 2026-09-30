@@ -18,8 +18,8 @@ import type {
   ModelSelection,
   TurnFileChangeSummary,
   TurnInputIntentMetadata,
-} from "@zcode/contracts";
-import type { EventId, SessionEvent, SessionId, TraceId, TurnId } from "@zcode/contracts";
+} from "@onyx/contracts";
+import type { EventId, SessionEvent, SessionId, TraceId, TurnId } from "@onyx/contracts";
 import {
   CompactTimelineStatus,
   CompactTrigger,
@@ -29,12 +29,12 @@ import {
   parseCompletedToolPartMetadata,
   SessionEventType,
   STREAM_RECOVERY_DISCARDED_ERROR_NAME,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import {
   getConversationModelOnlyTurnTriggerSource,
   getConversationMessageProjectionPolicy,
   isConversationRealUserTurnStarter,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import {
   conversationInputIntentSchema,
   errorAttributionSchema,
@@ -42,13 +42,13 @@ import {
   workflowNotificationMetaSchema,
   type ErrorAttribution,
   type WorkflowLaunchMeta,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@onyx/shared/zcode-protocol-v4";
 import { shouldHideInvalidToolCallFromProduct } from "../tool-call-product-visibility.js";
 import { HYDRATION_TRACE_ID } from "./projection-state.js";
 
 const SUBAGENT_TOOL_NAMES = new Set(["Agent", "Task", "subagent"]);
 const LEGACY_MODEL_REQUEST_CANCELLED_MESSAGE = "Model request was cancelled.";
-const LEGACY_PROTOCOL_SESSION_STOPPED_MESSAGE = "ZCode Protocol session stopped";
+const LEGACY_PROTOCOL_SESSION_STOPPED_MESSAGE = "Onyx Protocol session stopped";
 const PERSISTED_CANCELLATION_CODES = new Set<string>([
   CoreErrorType.TurnCancelled,
   ModelErrorCode.ModelRequestCancelled,

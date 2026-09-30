@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { UserInfo } from "@/lib/userInfo.js";
-import type { ModelSelectionView } from "@zcode/services";
+import type { ModelSelectionView } from "@onyx/services";
 import { resolveProviderAvailabilityState } from "@/lib/modelProviderAvailability.js";
 import { logger } from "@/logger.js";
 

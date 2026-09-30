@@ -1,4 +1,4 @@
-import { ModelErrorCode } from "@zcode/contracts";
+import { ModelErrorCode } from "@onyx/contracts";
 import { AiSdkModelAdapterError } from "./errors.js";
 
 export function normalizeModelToolName(

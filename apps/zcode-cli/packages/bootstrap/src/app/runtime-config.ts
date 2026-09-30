@@ -1,7 +1,7 @@
-import type { ConfigResult } from "@zcode/adapters/config";
-import { resolveInitialModelSelection, type ModelSelectionOptions } from "@zcode/provider";
-import { resolveBashTimeoutPolicy, type AgentProfile, type AgentRuntimeConfig } from "@zcode/core";
-import { type BuiltInSubagentModelSelectionOverrides } from "@zcode/shared";
+import type { ConfigResult } from "@onyx/adapters/config";
+import { resolveInitialModelSelection, type ModelSelectionOptions } from "@onyx/provider";
+import { resolveBashTimeoutPolicy, type AgentProfile, type AgentRuntimeConfig } from "@onyx/core";
+import { type BuiltInSubagentModelSelectionOverrides } from "@onyx/shared";
 import {
   type CollaborationMode,
   type HookConfigSource,
@@ -9,7 +9,7 @@ import {
   type HookMatcherConfig,
   type HooksRuntimeConfig,
   type McpServerConfig,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import { omitMcpServers, resolveTrustedOfficialCuaServerNames } from "../mcp-config.js";
 import { resolveDefaultEmbeddedSearchBackend } from "./embedded-search-backend.js";
 import { getProjectMemoryRoot } from "./paths.js";
@@ -122,7 +122,7 @@ export function resolveAppRuntimeConfig(input: {
       resolveBashTimeoutPolicy(options.env ?? process.env),
     mode: options.runtimeConfig?.mode ?? persistedMode ?? configResult.config.permission.mode,
     modelSelection: initialModelSelection,
-    // 仅接受显式传入的会话级工具面（ZCode Protocol session/create 或 CLI
+    // 仅接受显式传入的会话级工具面（Onyx Protocol session/create 或 CLI
     // --allowed-tools/--disallowed-tools）。不要从 config.permission.allowedTools
     // 回落：那个键的既有语义是“免审批清单”，把它投影到注册面会让老配置里
     // 只写了几个 allowedTools 的用户突然丢失其余全部工具。

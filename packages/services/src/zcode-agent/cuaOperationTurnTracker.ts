@@ -1,5 +1,5 @@
-import { resolveWorkspaceKey, type ZCodeComputerUseOperationEvent } from "@zcode/shared";
-import type { PipSessionEvent } from "@zcode/zcode-cua/pip-session";
+import { resolveWorkspaceKey, type ZCodeComputerUseOperationEvent } from "@onyx/shared";
+import type { PipSessionEvent } from "@onyx/zcode-cua/pip-session";
 
 export interface CuaOperationWorkspaceTarget {
   workspacePath: string;

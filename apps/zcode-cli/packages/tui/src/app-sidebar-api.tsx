@@ -1,5 +1,5 @@
-import type { ModelUsageSummary } from "@zcode/contracts";
-import type { TuiCopy } from "@zcode/i18n";
+import type { ModelUsageSummary } from "@onyx/contracts";
+import type { TuiCopy } from "@onyx/i18n";
 import React from "react";
 import type { NetworkRequest } from "./app-model.js";
 import { palette } from "./app-model.js";

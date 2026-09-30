@@ -3,7 +3,7 @@ import {
   type FileSystemPort,
   type Logger,
   type TraceContext,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 
 export async function ensureMemoryDirectoryExists(
   fileSystemPort: FileSystemPort,

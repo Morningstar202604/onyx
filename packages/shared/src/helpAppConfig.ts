@@ -24,7 +24,10 @@ export function buildHelpAppConfigUrl(
   version: string,
   platform?: string,
 ): string {
-  const url = new URL("/api/v1/client/configs", buildZCodeEndpointUrls(endpoint).origin);
+  const origin = buildZCodeEndpointUrls(endpoint).origin;
+  // Onyx 未配置 endpoint：远端帮助配置不可用，调用方应回退到内置配置。
+  if (!origin) return "";
+  const url = new URL("/api/v1/client/configs", origin);
   url.searchParams.set("app_version", version);
   if (platform) url.searchParams.set("platform", platform);
   return url.toString();

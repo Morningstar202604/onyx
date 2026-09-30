@@ -4,7 +4,7 @@ import {
   parseClientConfigSnapshot,
   type ApiClient,
   type ClientConfigSnapshot,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import type { IClientConfigService } from "./clientConfig.js";
 
 const CACHE_TTL_MS = 60 * 60 * 1000;
@@ -66,6 +66,10 @@ export function createClientConfigService(dependencies: {
     async getSnapshot(options = {}) {
       const { forceRefresh } = clientConfigReadOptionsSchema.parse(options);
       const context = await dependencies.resolveRequestContext();
+      // Onyx 未配置 endpoint：跳过远端 client config 请求，返回空快照（远端灰度/商店排序不可用）。
+      if (!context.endpointOrigin) {
+        return { pluginStoreOrder: null };
+      }
       const url = new URL(
         "/api/v1/client/configs",
         buildZCodeEndpointUrls(context.endpointOrigin).origin,

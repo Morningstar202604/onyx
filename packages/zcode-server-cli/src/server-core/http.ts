@@ -12,19 +12,19 @@ import {
   ChannelServer,
   LoggingChannelServer,
   type ISocket,
-} from "@zcode/rpc";
+} from "@onyx/rpc";
 import {
   createZCodeAgentConnectionScope,
   IZCodeAgentService,
   ServiceCollection,
-} from "@zcode/services";
-import { createServiceLogger } from "@zcode/services/node";
+} from "@onyx/services";
+import { createServiceLogger } from "@onyx/services/node";
 import {
   SERVER_REMOTE_PROTOCOL_VERSION,
-  ZCODE_RPC_HOST_CAPABILITY_HEADER,
-  ZCODE_VERSION,
+  ONYX_RPC_HOST_CAPABILITY_HEADER,
+  ONYX_VERSION,
   type ServerRemoteInfo,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { createHostCapabilityStore, type HostCapabilityStore } from "./hostCapability.js";
 
 interface CoreHttpServer {
@@ -132,7 +132,7 @@ export async function createCoreHttpServer(
   }
   const info: ServerRemoteInfo = {
     serverId: options.serverId ?? hostname() ?? "zcode-server",
-    version: ZCODE_VERSION,
+    version: ONYX_VERSION,
     protocolVersion: SERVER_REMOTE_PROTOCOL_VERSION,
     authRequired: false,
     workspaces: [],
@@ -155,7 +155,7 @@ export async function createCoreHttpServer(
     })),
   );
   app.use("/ws/host", async (context, next) => {
-    const capability = context.req.header(ZCODE_RPC_HOST_CAPABILITY_HEADER);
+    const capability = context.req.header(ONYX_RPC_HOST_CAPABILITY_HEADER);
     if (!capabilities.consume(capability)) {
       return context.json({ error: "Invalid or expired host capability" }, 401);
     }

@@ -1,10 +1,10 @@
-import { isApiKeyAccess } from "@zcode/provider";
+import { isApiKeyAccess } from "@onyx/provider";
 import type {
   ConfigValidationIssue,
   ModelConfigObject,
   ProviderConfigObject,
   ProviderSettingsProviderView,
-} from "@zcode/provider";
+} from "@onyx/provider";
 
 /** 官方 Account Provider 状态已移除；保留最小契约供设置页判定凭据可用性。 */
 export interface AccountProviderState {

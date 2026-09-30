@@ -1,5 +1,5 @@
-import type { PermissionOptionsPolicy, PermissionUpdate } from "@zcode/contracts";
-import { OFFICIAL_CUA_PERMISSION_RULE_TOOL_NAME, type ZCodePermissionOption } from "@zcode/shared";
+import type { PermissionOptionsPolicy, PermissionUpdate } from "@onyx/contracts";
+import { OFFICIAL_CUA_PERMISSION_RULE_TOOL_NAME, type ZCodePermissionOption } from "@onyx/shared";
 
 const PROJECT_RULE_INPUT_KEYS = ["command", "url", "file_path", "path", "pattern"] as const;
 

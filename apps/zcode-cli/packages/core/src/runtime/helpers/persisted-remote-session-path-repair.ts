@@ -5,8 +5,8 @@ import {
   type RepairRemoteSessionPathsInput,
   type SessionInfo,
   type SessionStorePort,
-} from "@zcode/contracts";
-import { parseRemoteWorkspaceIdentity } from "@zcode/shared";
+} from "@onyx/contracts";
+import { parseRemoteWorkspaceIdentity } from "@onyx/shared";
 
 const REMOTE_SESSION_PATH_CORRUPTION_REASON = "remote_session_workspace_path_corrupted";
 

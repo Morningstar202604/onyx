@@ -3,28 +3,28 @@ import {
   localTtftFactsSchema,
   sessionDebugSnapshotSchema,
   type LocalTtftFacts,
-} from "@zcode/shared";
-/* oxlint-disable eslint(max-lines) -- ZCode Protocol transport、通知 wiring 和 app-facing session 方法必须共享同一个 client/emitter 上下文。 */
+} from "@onyx/shared";
+/* oxlint-disable eslint(max-lines) -- Onyx Protocol transport、通知 wiring 和 app-facing session 方法必须共享同一个 client/emitter 上下文。 */
 import { randomUUID } from "node:crypto";
 import { ensureIndependentPlanSupport } from "./independentPlanSupport.js";
 import { mkdirSync } from "node:fs";
 import { join } from "node:path";
-import { Emitter } from "@zcode/rpc";
-import type { IDisposable } from "@zcode/rpc";
-import type { ModelSelectionView } from "@zcode/provider";
-import { completeNewModelSelection } from "@zcode/provider";
+import { Emitter } from "@onyx/rpc";
+import type { IDisposable } from "@onyx/rpc";
+import type { ModelSelectionView } from "@onyx/provider";
+import { completeNewModelSelection } from "@onyx/provider";
 import {
-  ZCODE_SESSION_RUNTIME_PREFERENCES_REQUEST_TIMEOUT_MS,
+  ONYX_SESSION_RUNTIME_PREFERENCES_REQUEST_TIMEOUT_MS,
   formatLogPrefix,
   resolveWorkspaceKey,
   type TraceId,
-  ZCODE_AGENT_PROVIDER,
-  ZCODE_AGENT_PROVIDER_NOT_READY_CODE,
-  ZCODE_AGENT_PROVIDER_NOT_READY_REASON,
-  ZCODE_MODEL_REASONING_SEPARATOR,
+  ONYX_AGENT_PROVIDER,
+  ONYX_AGENT_PROVIDER_NOT_READY_CODE,
+  ONYX_AGENT_PROVIDER_NOT_READY_REASON,
+  ONYX_MODEL_REASONING_SEPARATOR,
   isRemoteWorkspaceIdentity,
-  ZCODE_PROTOCOL_NAME,
-  ZCODE_PROTOCOL_VERSION,
+  ONYX_PROTOCOL_NAME,
+  ONYX_PROTOCOL_VERSION,
   zcodeMcpListResultSchema,
   zcodePermissionRequestParamsSchema,
   zcodeBrowserListParamsSchema,
@@ -104,7 +104,7 @@ import {
   type ZCodeToolExecResource,
   type ZCodePluginOperationProgressNotification,
   type ZCodeTaskMode,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import { createServiceLogger } from "#src/logger/serviceLogger.js";
 
 /** 闲时任务客户端灰度配置（官方订阅链路已去除，类型保留供本地协议使用）。 */
@@ -122,7 +122,7 @@ import {
   mergeAutomationMutationToolDenylist,
   mergeOffPeakMutationToolDenylist,
 } from "#src/zcode-agent/automationToolPolicy.js";
-import { ZCODE_AGENT_RUNTIME_UNAVAILABLE_CODE } from "./zcodeAgent.js";
+import { ONYX_AGENT_RUNTIME_UNAVAILABLE_CODE } from "./zcodeAgent.js";
 import type {
   ZCodeProtocolRequestId,
   ModelSelection,
@@ -134,7 +134,7 @@ import type {
   ZCodeWorkspacePresentation,
   ZCodeWorkspaceRef,
   ZCodeSessionRuntimePreferencesResult,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import type {
   IZCodeAgentService,
   ZCodeAgentBackgroundBashOutputParams,
@@ -276,7 +276,7 @@ import {
   workspaceConfigTopic,
   workspaceConfigTopicWireCandidateSchema,
   utf8JsonByteLength,
-  ZCODE_ATTACHMENT_FAULT_CODES,
+  ONYX_ATTACHMENT_FAULT_CODES,
   ZCodeAttachmentFaultError,
   type CommandAck,
   type ConversationTopicWireCandidate,
@@ -284,7 +284,7 @@ import {
   type SessionsIndexTopicWireCandidate,
   type WorkspaceConfigTopicWireCandidate,
   type CommandEnvelope,
-} from "@zcode/shared/zcode-protocol-v4";
+} from "@onyx/shared/zcode-protocol-v4";
 import {
   readTrustedZCodeAgentV4Connection,
   readTrustedZCodeAgentV4UnsubscribeRoute,
@@ -312,7 +312,7 @@ import {
   type CuaOperationWorkspaceTarget,
   type CuaOperationStateReporter,
 } from "./cuaOperationTurnTracker.js";
-import type { PipSessionEvent } from "@zcode/zcode-cua/pip-session";
+import type { PipSessionEvent } from "@onyx/zcode-cua/pip-session";
 import { registerMemoryDiagnosticsProvider } from "#src/memoryDiagnostics.js";
 
 const logger = createServiceLogger("zcode-agent-service");
@@ -418,7 +418,7 @@ function supportsLegacyRemoteTaskAllowlist(workspaceIdentity: string | undefined
 }
 
 function isClosedStdioTransportError(error: unknown): boolean {
-  return error instanceof Error && error.message === "ZCode agent stdio transport is closed";
+  return error instanceof Error && error.message === "Onyx agent stdio transport is closed";
 }
 
 interface SessionEventSequenceState {
@@ -464,16 +464,16 @@ function savedWorkflowScopeParam(params: ZCodeAgentSavedWorkflowTarget): {
 }
 
 function ensurePluginManagementWorkspacePath(): string {
-  const workspacePath = join(getDataBaseDir(), ".zcode", PLUGIN_MANAGEMENT_WORKSPACE_DIR_NAME);
+  const workspacePath = join(getDataBaseDir(), ".onyx", PLUGIN_MANAGEMENT_WORKSPACE_DIR_NAME);
   // 插件管理是控制面能力，不能复用可能因真实 workspace 被删而 EPIPE 的会话进程。
   // 这里给它固定一个内部 cwd；真实 workspace 仍通过协议参数传给 CLI 做 workspace-scope 判定。
   mkdirSync(workspacePath, { recursive: true });
   return workspacePath;
 }
 
-// NOTE: this counts ONLY the per-session MCP servers passed through the ZCode Protocol
+// NOTE: this counts ONLY the per-session MCP servers passed through the Onyx Protocol
 // session/create params (the app→protocol channel). It is deliberately independent of the
-// CLI/bootstrap MCP servers configured in ~/.zcode/cli/config.json (mcp.servers), which the agent
+// CLI/bootstrap MCP servers configured in ~/.onyx/cli/config.json (mcp.servers), which the agent
 // runtime connects separately and reports via the `mcp.server.connected`/toolCount events. So a
 // createSession log line with mcpServerCount:0 is EXPECTED when zcode-cua is a CLI-config MCP server
 // (e.g. the product Helper broker path injected through the gated bootstrap env): the model still receives those
@@ -597,7 +597,7 @@ function isProtocolRequestTimeout(error: unknown, method: string): boolean {
   if (error instanceof ZCodeProtocolRequestTimeoutError) {
     return error.method === method;
   }
-  return error instanceof Error && error.message === `ZCode Protocol request timed out: ${method}`;
+  return error instanceof Error && error.message === `Onyx Protocol request timed out: ${method}`;
 }
 
 function assertV4AttachmentNdjsonEnvelope(method: string, params: unknown): void {
@@ -747,7 +747,7 @@ function formatModelSelectionForLog(ref: ModelSelection | undefined): string | n
 
   const base = `${ref.providerId}/${ref.modelId}`;
   const reasoningLevel = ref.options?.reasoningLevel;
-  return reasoningLevel ? `${base}${ZCODE_MODEL_REASONING_SEPARATOR}${reasoningLevel}` : base;
+  return reasoningLevel ? `${base}${ONYX_MODEL_REASONING_SEPARATOR}${reasoningLevel}` : base;
 }
 
 function sessionEventKey(params: ZCodeAgentSessionTarget): string {
@@ -845,14 +845,14 @@ interface ActiveWorkspaceClient {
 }
 
 function createRuntimeUnavailableError(params: ZCodeAgentWorkspaceTarget): Error & {
-  code: typeof ZCODE_AGENT_RUNTIME_UNAVAILABLE_CODE;
+  code: typeof ONYX_AGENT_RUNTIME_UNAVAILABLE_CODE;
   workspaceKey: string;
 } {
-  const error = new Error("ZCode Agent runtime is not running.") as Error & {
-    code: typeof ZCODE_AGENT_RUNTIME_UNAVAILABLE_CODE;
+  const error = new Error("Onyx Agent runtime is not running.") as Error & {
+    code: typeof ONYX_AGENT_RUNTIME_UNAVAILABLE_CODE;
     workspaceKey: string;
   };
-  error.code = ZCODE_AGENT_RUNTIME_UNAVAILABLE_CODE;
+  error.code = ONYX_AGENT_RUNTIME_UNAVAILABLE_CODE;
   error.workspaceKey = resolveWorkspaceKey(params);
   return error;
 }
@@ -1236,7 +1236,7 @@ export function createZCodeAgentService(
       requestId,
       scope: pending.request.scope,
       sessionId: pending.request.sessionId,
-      timeoutMs: ZCODE_SESSION_RUNTIME_PREFERENCES_REQUEST_TIMEOUT_MS,
+      timeoutMs: ONYX_SESSION_RUNTIME_PREFERENCES_REQUEST_TIMEOUT_MS,
       workspaceKey: pending.workspaceKey,
     });
     void pending.client
@@ -1244,7 +1244,7 @@ export function createZCodeAgentService(
         code: -32022,
         message: "Session runtime preferences request timed out",
         data: {
-          timeoutMs: ZCODE_SESSION_RUNTIME_PREFERENCES_REQUEST_TIMEOUT_MS,
+          timeoutMs: ONYX_SESSION_RUNTIME_PREFERENCES_REQUEST_TIMEOUT_MS,
         },
       })
       .catch((error: unknown) => {
@@ -1343,7 +1343,7 @@ export function createZCodeAgentService(
             reason: `startup_ready:${event.reason}`,
             workspace,
           });
-          logger.info(undefined, "provider/model 就绪后已启动等待中的 ZCode agent", {
+          logger.info(undefined, "provider/model 就绪后已启动等待中的 Onyx agent", {
             providerCount: event.snapshot.providerCount,
             reason: event.reason,
             revision: event.snapshot.revision,
@@ -1753,7 +1753,7 @@ export function createZCodeAgentService(
           if (parsed.success) {
             pluginOperationProgressEmitters.get(parsed.data.operationId)?.fire(parsed.data);
           } else {
-            logger.warn(undefined, "丢弃无效 ZCode Protocol 插件操作进度", {
+            logger.warn(undefined, "丢弃无效 Onyx Protocol 插件操作进度", {
               issues: parsed.error.issues.map((issue) => ({
                 code: issue.code,
                 message: issue.message,
@@ -1771,7 +1771,7 @@ export function createZCodeAgentService(
             // 避免把两条独立事件流的 sequenceNumber/seq 混为同一顺序域。
             cuaOperationTurnTracker?.accept(workspace, parsed.data);
           } else {
-            logger.warn(undefined, "丢弃无效 ZCode Protocol Computer Use operation event", {
+            logger.warn(undefined, "丢弃无效 Onyx Protocol Computer Use operation event", {
               issues: parsed.error.issues.map((issue) => ({
                 code: issue.code,
                 message: issue.message,
@@ -1794,7 +1794,7 @@ export function createZCodeAgentService(
                 : {};
             logger.warn(
               typeof rawParams.traceId === "string" ? rawParams.traceId : undefined,
-              "丢弃无效 ZCode Protocol session event",
+              "丢弃无效 Onyx Protocol session event",
               {
                 eventId: rawParams.eventId,
                 issues: parsed.error.issues.map((issue) => ({
@@ -1984,7 +1984,7 @@ export function createZCodeAgentService(
             request: dynamicRequest,
             timeout: setTimeout(
               () => expireSessionRuntimePreferencesRequest(requestId),
-              ZCODE_SESSION_RUNTIME_PREFERENCES_REQUEST_TIMEOUT_MS,
+              ONYX_SESSION_RUNTIME_PREFERENCES_REQUEST_TIMEOUT_MS,
             ),
             workspaceKey: resolveWorkspaceKey(workspace),
           });
@@ -2518,7 +2518,7 @@ export function createZCodeAgentService(
 
         void client.respondError(request.id, {
           code: -32601,
-          message: `Unsupported ZCode Protocol request: ${request.method}`,
+          message: `Unsupported Onyx Protocol request: ${request.method}`,
         });
       }),
       client.onClose(() => {
@@ -2547,10 +2547,10 @@ export function createZCodeAgentService(
     snapshot?: ZCodeAgentProviderReadinessSnapshot;
     workspace: ZCodeAgentWorkspaceTarget;
   }): Error & {
-    code: typeof ZCODE_AGENT_PROVIDER_NOT_READY_CODE;
+    code: typeof ONYX_AGENT_PROVIDER_NOT_READY_CODE;
     data: {
       providerCount: number;
-      reason: typeof ZCODE_AGENT_PROVIDER_NOT_READY_REASON;
+      reason: typeof ONYX_AGENT_PROVIDER_NOT_READY_REASON;
       revision: string | null;
       workspaceKey: string;
       workspacePath: string;
@@ -2558,19 +2558,19 @@ export function createZCodeAgentService(
   } {
     const workspaceKey = resolveWorkspaceKey(params.workspace);
     const error = new Error("当前没有可用的模型供应商和模型，请先登录或配置 API Key。") as Error & {
-      code: typeof ZCODE_AGENT_PROVIDER_NOT_READY_CODE;
+      code: typeof ONYX_AGENT_PROVIDER_NOT_READY_CODE;
       data: {
         providerCount: number;
-        reason: typeof ZCODE_AGENT_PROVIDER_NOT_READY_REASON;
+        reason: typeof ONYX_AGENT_PROVIDER_NOT_READY_REASON;
         revision: string | null;
         workspaceKey: string;
         workspacePath: string;
       };
     };
-    error.code = ZCODE_AGENT_PROVIDER_NOT_READY_CODE;
+    error.code = ONYX_AGENT_PROVIDER_NOT_READY_CODE;
     error.data = {
       providerCount: params.snapshot?.providerCount ?? 0,
-      reason: ZCODE_AGENT_PROVIDER_NOT_READY_REASON,
+      reason: ONYX_AGENT_PROVIDER_NOT_READY_REASON,
       revision: params.snapshot?.revision ?? null,
       workspaceKey,
       workspacePath: params.workspace.workspacePath,
@@ -2580,10 +2580,10 @@ export function createZCodeAgentService(
 
   function isProviderNotReadyError(
     error: unknown,
-  ): error is Error & { code: typeof ZCODE_AGENT_PROVIDER_NOT_READY_CODE } {
+  ): error is Error & { code: typeof ONYX_AGENT_PROVIDER_NOT_READY_CODE } {
     return (
       error instanceof Error &&
-      (error as { code?: unknown }).code === ZCODE_AGENT_PROVIDER_NOT_READY_CODE
+      (error as { code?: unknown }).code === ONYX_AGENT_PROVIDER_NOT_READY_CODE
     );
   }
 
@@ -2617,7 +2617,7 @@ export function createZCodeAgentService(
     const workspaceKey = resolveWorkspaceKey(params);
     activeClientsByWorkspaceKey.delete(workspaceKey);
     interactionPreferenceSyncByWorkspaceKey.delete(workspaceKey);
-    logger.warn(undefined, "复用的 ZCode Protocol client 已 disposed，清理 stale entry", {
+    logger.warn(undefined, "复用的 Onyx Protocol client 已 disposed，清理 stale entry", {
       workspaceKey,
       workspacePath: params.workspacePath,
     });
@@ -2727,7 +2727,7 @@ export function createZCodeAgentService(
     } finally {
       delete entry.interactionPreferencesReady;
     }
-    logger.info(undefined, "为只读会话控制面启动 ZCode agent", {
+    logger.info(undefined, "为只读会话控制面启动 Onyx agent", {
       workspaceKey,
       workspacePath: params.workspacePath,
     });
@@ -2763,8 +2763,8 @@ export function createZCodeAgentService(
         logger.info(
           undefined,
           active
-            ? "provider/model 尚未就绪，ZCode agent 保持只读"
-            : "provider/model 尚未就绪，ZCode agent 保持未启动",
+            ? "provider/model 尚未就绪，Onyx agent 保持只读"
+            : "provider/model 尚未就绪，Onyx agent 保持未启动",
           {
             providerCount: readinessSnapshot?.providerCount ?? 0,
             revision: readinessSnapshot?.revision ?? null,
@@ -2784,7 +2784,7 @@ export function createZCodeAgentService(
     processManager.markReady(params, entry.client);
     entry.workspace = params;
     waitingWorkspaceStartups.delete(workspaceKey);
-    logger.info(undefined, "provider/model 就绪，允许 ZCode agent 模型执行", {
+    logger.info(undefined, "provider/model 就绪，允许 Onyx agent 模型执行", {
       modelId: readiness.modelId,
       providerId: readiness.providerId,
       revision: readinessSnapshot.revision,
@@ -2839,7 +2839,7 @@ export function createZCodeAgentService(
   // 就绪的 workspace 级方法，管理面进程正是为这种「不寄居真实项目」的控制面能力准备的，且不会因
   // 真实 workspace 生命周期被 watchdog 回收；getOrStartReadOnlyClient 反而会把这个合成 workspace
   // 塞进 activeClientsByWorkspaceKey 并跑一遍交互偏好同步，污染会话 client map。两条路径都在本机，
-  // homedir() 即用户家目录，全局根 `~/.zcode/workflows/` 因此解析到真实目录。
+  // homedir() 即用户家目录，全局根 `~/.onyx/workflows/` 因此解析到真实目录。
   // 远程 runtime（SSH/WSL identity 或带 remoteSessionId）的 home 不是本机，绝不选它当载体。
   function isLocalActiveWorkspaceClient(workspace: ZCodeAgentWorkspaceTarget): boolean {
     return (
@@ -3057,13 +3057,13 @@ async function ensureAccountProviderConfigSynced(_params: {
     async initialize(params: ZCodeAgentWorkspaceTarget): Promise<ZCodeAgentInitializeResult> {
       const workspaceKey = resolveWorkspaceKey(params);
       const startedAt = Date.now();
-      logger.info(undefined, "开始初始化 ZCode agent", {
+      logger.info(undefined, "开始初始化 Onyx agent", {
         workspaceKey,
         workspacePath: params.workspacePath,
       });
       try {
         const client = await getClient(params);
-        logger.info(undefined, "ZCode agent 初始化完成", {
+        logger.info(undefined, "Onyx agent 初始化完成", {
           durationMs: Date.now() - startedAt,
           transportKind: client.transportKind === "websocket" ? "websocket" : "stdio",
           workspaceKey,
@@ -3072,15 +3072,15 @@ async function ensureAccountProviderConfigSynced(_params: {
         return {
           available: true,
           workspaceKey,
-          protocolName: ZCODE_PROTOCOL_NAME,
-          protocolVersion: ZCODE_PROTOCOL_VERSION,
+          protocolName: ONYX_PROTOCOL_NAME,
+          protocolVersion: ONYX_PROTOCOL_VERSION,
           transportKind: client.transportKind === "websocket" ? "websocket" : "stdio",
         };
       } catch (error) {
         const providerNotReady = isProviderNotReadyError(error);
         logger[providerNotReady ? "info" : "warn"](
           undefined,
-          providerNotReady ? "ZCode agent 等待 provider/model 就绪" : "ZCode agent 初始化失败",
+          providerNotReady ? "Onyx agent 等待 provider/model 就绪" : "Onyx agent 初始化失败",
           {
             durationMs: Date.now() - startedAt,
             message: error instanceof Error ? error.message : String(error),
@@ -3093,10 +3093,10 @@ async function ensureAccountProviderConfigSynced(_params: {
         return {
           available: false,
           workspaceKey,
-          protocolName: ZCODE_PROTOCOL_NAME,
-          protocolVersion: ZCODE_PROTOCOL_VERSION,
+          protocolName: ONYX_PROTOCOL_NAME,
+          protocolVersion: ONYX_PROTOCOL_VERSION,
           reason: error instanceof Error ? error.message : String(error),
-          ...(providerNotReady ? { reasonCode: ZCODE_AGENT_PROVIDER_NOT_READY_REASON } : {}),
+          ...(providerNotReady ? { reasonCode: ONYX_AGENT_PROVIDER_NOT_READY_REASON } : {}),
         };
       }
     },
@@ -3134,7 +3134,7 @@ async function ensureAccountProviderConfigSynced(_params: {
         workspace: params,
       });
       const sessionTraceId = params.sessionTraceId;
-      logger.info(sessionTraceId, "开始请求 ZCode Protocol session/create", {
+      logger.info(sessionTraceId, "开始请求 Onyx Protocol session/create", {
         hasInitialModel: params.model !== undefined,
         hasInitialThoughtLevel: params.thoughtLevel !== undefined,
         initialModel: formatModelSelectionForLog(params.model),
@@ -3155,7 +3155,7 @@ async function ensureAccountProviderConfigSynced(_params: {
           sessionTraceId ? { trace: { traceId: sessionTraceId } } : undefined,
         );
         rememberSessionTrace({ ...params, sessionId: snapshot.session.sessionId }, snapshot);
-        logger.info(sessionTraceId, "ZCode Protocol session/create 完成", {
+        logger.info(sessionTraceId, "Onyx Protocol session/create 完成", {
           durationMs: Date.now() - startedAt,
           messageCount: snapshot.messages.length,
           modelCurrent: formatModelSelectionForLog(snapshot.settings.model.current),
@@ -3170,7 +3170,7 @@ async function ensureAccountProviderConfigSynced(_params: {
       } catch (error) {
         const compatFields = getSessionCreateCompatFields(error);
         if (compatFields.length === 0) {
-          logger.warn(sessionTraceId, "ZCode Protocol session/create 失败", {
+          logger.warn(sessionTraceId, "Onyx Protocol session/create 失败", {
             durationMs: Date.now() - startedAt,
             message: error instanceof Error ? error.message : String(error),
             persistence: params.persistence,
@@ -3179,7 +3179,7 @@ async function ensureAccountProviderConfigSynced(_params: {
           });
           throw error;
         }
-        logger.warn(sessionTraceId, "ZCode Protocol session/create 命中新旧协议兼容重试", {
+        logger.warn(sessionTraceId, "Onyx Protocol session/create 命中新旧协议兼容重试", {
           compatFields,
           durationMs: Date.now() - startedAt,
           workspaceKey: resolveWorkspaceKey(params),
@@ -3199,7 +3199,7 @@ async function ensureAccountProviderConfigSynced(_params: {
         );
         rememberSessionTrace({ ...params, sessionId: snapshot.session.sessionId }, snapshot);
         if (!compatFields.includes("thoughtLevel") || !params.thoughtLevel) {
-          logger.info(sessionTraceId, "ZCode Protocol session/create 兼容重试完成", {
+          logger.info(sessionTraceId, "Onyx Protocol session/create 兼容重试完成", {
             durationMs: Date.now() - startedAt,
             sessionId: snapshot.session.sessionId,
             snapshotTraceId: snapshot.session.traceId ?? null,
@@ -3226,7 +3226,7 @@ async function ensureAccountProviderConfigSynced(_params: {
         );
         logger.info(
           sessionTraceId,
-          "ZCode Protocol session/create 兼容重试后设置 thoughtLevel 完成",
+          "Onyx Protocol session/create 兼容重试后设置 thoughtLevel 完成",
           {
             durationMs: Date.now() - startedAt,
             sessionId: snapshot.session.sessionId,
@@ -3251,7 +3251,7 @@ async function ensureAccountProviderConfigSynced(_params: {
       const offPeakToolEnabled = isOffPeakToolSupported(params);
       // 冷恢复同样按 Host 的灰度判定下发，否则恢复出来的会话会丢掉工作流工具簇。
       const dynamicWorkflowEnabled = await resolveDynamicWorkflowGate();
-      logger.info(cachedTraceId, "开始请求 ZCode Protocol session/resume", {
+      logger.info(cachedTraceId, "开始请求 Onyx Protocol session/resume", {
         mcpServerCount: getMcpServerCount(params),
         mcpServerNames: getMcpServerNames(params),
         modelHint: params.model ?? null,
@@ -3266,7 +3266,7 @@ async function ensureAccountProviderConfigSynced(_params: {
           zcodeSessionStateSnapshotSchema,
         );
         const sessionTraceId = rememberSessionTrace(params, snapshot) ?? cachedTraceId;
-        logger.info(sessionTraceId, "ZCode Protocol session/resume 完成", {
+        logger.info(sessionTraceId, "Onyx Protocol session/resume 完成", {
           durationMs: Date.now() - startedAt,
           messageCount: snapshot.messages.length,
           modelCurrent: formatModelSelectionForLog(snapshot.settings.model.current),
@@ -3280,7 +3280,7 @@ async function ensureAccountProviderConfigSynced(_params: {
       } catch (error) {
         const compatFields = getSessionResumeCompatFields(error);
         if (compatFields.length === 0) {
-          logger.warn(cachedTraceId, "ZCode Protocol session/resume 失败", {
+          logger.warn(cachedTraceId, "Onyx Protocol session/resume 失败", {
             durationMs: Date.now() - startedAt,
             message: error instanceof Error ? error.message : String(error),
             sessionId: params.sessionId,
@@ -3289,7 +3289,7 @@ async function ensureAccountProviderConfigSynced(_params: {
           });
           throw error;
         }
-        logger.warn(cachedTraceId, "ZCode Protocol session/resume 命中新旧协议兼容重试", {
+        logger.warn(cachedTraceId, "Onyx Protocol session/resume 命中新旧协议兼容重试", {
           compatFields,
           durationMs: Date.now() - startedAt,
           sessionId: params.sessionId,
@@ -3305,7 +3305,7 @@ async function ensureAccountProviderConfigSynced(_params: {
           zcodeSessionStateSnapshotSchema,
         );
         const sessionTraceId = rememberSessionTrace(params, snapshot) ?? cachedTraceId;
-        logger.info(sessionTraceId, "ZCode Protocol session/resume 兼容重试完成", {
+        logger.info(sessionTraceId, "Onyx Protocol session/resume 兼容重试完成", {
           durationMs: Date.now() - startedAt,
           sessionId: params.sessionId,
           snapshotTraceId: snapshot.session.traceId ?? null,
@@ -3443,7 +3443,7 @@ async function ensureAccountProviderConfigSynced(_params: {
 
     async readWorkspacePresentation(params: ZCodeAgentReadWorkspacePresentationParams) {
       const startedAt = Date.now();
-      logger.info(undefined, "开始请求 ZCode Protocol workspace/readPresentation", {
+      logger.info(undefined, "开始请求 Onyx Protocol workspace/readPresentation", {
         workspaceKey: resolveWorkspaceKey(params),
         workspacePath: params.workspacePath,
       });
@@ -3487,9 +3487,9 @@ async function ensureAccountProviderConfigSynced(_params: {
           }
         }
         if (!presentation) {
-          throw new Error("ZCode Protocol workspace/readPresentation did not return a result");
+          throw new Error("Onyx Protocol workspace/readPresentation did not return a result");
         }
-        logger.info(undefined, "ZCode Protocol workspace/readPresentation 完成", {
+        logger.info(undefined, "Onyx Protocol workspace/readPresentation 完成", {
           durationMs: Date.now() - startedAt,
           slashCommandCount: presentation.slashCommands.length,
           workspaceKey: resolveWorkspaceKey(params),
@@ -3497,7 +3497,7 @@ async function ensureAccountProviderConfigSynced(_params: {
         });
         return presentation;
       } catch (error) {
-        logger.warn(undefined, "ZCode Protocol workspace/readPresentation 失败", {
+        logger.warn(undefined, "Onyx Protocol workspace/readPresentation 失败", {
           durationMs: Date.now() - startedAt,
           message: error instanceof Error ? error.message : String(error),
           workspaceKey: resolveWorkspaceKey(params),
@@ -3744,7 +3744,7 @@ async function ensureAccountProviderConfigSynced(_params: {
           }
           return {
             pid: runtime.pid,
-            provider: ZCODE_AGENT_PROVIDER,
+            provider: ONYX_AGENT_PROVIDER,
             workspacePath: runtime.workspacePath,
             ...(runtime.lane ? { lane: runtime.lane } : {}),
             children,
@@ -4150,7 +4150,7 @@ async function ensureAccountProviderConfigSynced(_params: {
         ...params,
         ...(browserAmbientContext ? { browserAmbientContext } : {}),
       };
-      logger.info(logTraceId, "ZCode Agent session/send 开始", {
+      logger.info(logTraceId, "Onyx Agent session/send 开始", {
         attachmentCount: params.attachments?.length ?? 0,
         hasBrowserAmbientContext: browserAmbientContext !== undefined,
         inputId: params.inputId,
@@ -4167,7 +4167,7 @@ async function ensureAccountProviderConfigSynced(_params: {
           buildSessionSendParams(protocolParams),
           zcodeSessionSendResultSchema,
         );
-        logger.info(logTraceId, "ZCode Agent session/send ACK", {
+        logger.info(logTraceId, "Onyx Agent session/send ACK", {
           durationMs: Date.now() - startedAt,
           inputId: params.inputId,
           queryId: params.queryId ?? null,
@@ -4180,7 +4180,7 @@ async function ensureAccountProviderConfigSynced(_params: {
       } catch (error) {
         const compatFields = getSessionSendCompatFields(error);
         if (compatFields.length > 0) {
-          logger.warn(logTraceId, "ZCode Agent session/send 命中新旧协议兼容重试", {
+          logger.warn(logTraceId, "Onyx Agent session/send 命中新旧协议兼容重试", {
             compatFields,
             durationMs: Date.now() - startedAt,
             sessionId: params.sessionId,
@@ -4194,7 +4194,7 @@ async function ensureAccountProviderConfigSynced(_params: {
           );
           return result;
         }
-        logger.warn(logTraceId, "ZCode Agent session/send 失败", {
+        logger.warn(logTraceId, "Onyx Agent session/send 失败", {
           durationMs: Date.now() - startedAt,
           error: error instanceof Error ? error.message : String(error),
           inputId: params.inputId,
@@ -4212,7 +4212,7 @@ async function ensureAccountProviderConfigSynced(_params: {
       const startedAt = Date.now();
       const client = await getClient(params);
       const sessionTraceId = getSessionTraceId(params);
-      logger.info(sessionTraceId ?? params.inputId, "ZCode Protocol session/compact 开始", {
+      logger.info(sessionTraceId ?? params.inputId, "Onyx Protocol session/compact 开始", {
         inputId: params.inputId,
         sessionId: params.sessionId,
         workspaceKey: resolveWorkspaceKey(params),
@@ -4229,7 +4229,7 @@ async function ensureAccountProviderConfigSynced(_params: {
             timeoutMs: SESSION_COMPACT_REQUEST_TIMEOUT_MS,
           },
         );
-        logger.info(sessionTraceId ?? params.inputId, "ZCode Protocol session/compact ACK", {
+        logger.info(sessionTraceId ?? params.inputId, "Onyx Protocol session/compact ACK", {
           durationMs: Date.now() - startedAt,
           inputId: params.inputId,
           sessionId: params.sessionId,
@@ -4238,7 +4238,7 @@ async function ensureAccountProviderConfigSynced(_params: {
         });
         return result;
       } catch (error) {
-        logger.warn(sessionTraceId ?? params.inputId, "ZCode Protocol session/compact 失败", {
+        logger.warn(sessionTraceId ?? params.inputId, "Onyx Protocol session/compact 失败", {
           durationMs: Date.now() - startedAt,
           error: error instanceof Error ? error.message : String(error),
           inputId: params.inputId,
@@ -4253,7 +4253,7 @@ async function ensureAccountProviderConfigSynced(_params: {
     async goalSession(params: ZCodeAgentGoalParams) {
       const startedAt = Date.now();
       const client = await getClient(params);
-      logger.info(params.inputId, "开始请求 ZCode Protocol session/goal", {
+      logger.info(params.inputId, "开始请求 Onyx Protocol session/goal", {
         action: params.action,
         hasObjective: Boolean(params.objective?.trim()),
         sessionId: params.sessionId,
@@ -4272,7 +4272,7 @@ async function ensureAccountProviderConfigSynced(_params: {
           },
           zcodeSessionGoalResultSchema,
         );
-        logger.info(params.inputId, "ZCode Protocol session/goal 完成", {
+        logger.info(params.inputId, "Onyx Protocol session/goal 完成", {
           action: params.action,
           durationMs: Date.now() - startedAt,
           messageCount: result.snapshot.messages.length,
@@ -4285,7 +4285,7 @@ async function ensureAccountProviderConfigSynced(_params: {
         });
         return result;
       } catch (error) {
-        logger.warn(params.inputId, "ZCode Protocol session/goal 失败", {
+        logger.warn(params.inputId, "Onyx Protocol session/goal 失败", {
           action: params.action,
           durationMs: Date.now() - startedAt,
           message: error instanceof Error ? error.message : String(error),
@@ -4320,7 +4320,7 @@ async function ensureAccountProviderConfigSynced(_params: {
     async setModel(params: ZCodeAgentSetModelParams) {
       const startedAt = Date.now();
       const client = await getClient(params);
-      logger.info(undefined, "开始请求 ZCode Protocol session/setModel", {
+      logger.info(undefined, "开始请求 Onyx Protocol session/setModel", {
         expectedRevision: params.expectedRevision ?? null,
         persistAsWorkspaceLastUsed: params.persistAsWorkspaceLastUsed ?? null,
         requestedModel: formatModelSelectionForLog(params.model),
@@ -4339,7 +4339,7 @@ async function ensureAccountProviderConfigSynced(_params: {
           },
           zcodeSessionStateSnapshotSchema,
         );
-        logger.info(undefined, "ZCode Protocol session/setModel 完成", {
+        logger.info(undefined, "Onyx Protocol session/setModel 完成", {
           durationMs: Date.now() - startedAt,
           requestedModel: formatModelSelectionForLog(params.model),
           sessionId: params.sessionId,
@@ -4349,7 +4349,7 @@ async function ensureAccountProviderConfigSynced(_params: {
         });
         return snapshot;
       } catch (error) {
-        logger.warn(undefined, "ZCode Protocol session/setModel 失败", {
+        logger.warn(undefined, "Onyx Protocol session/setModel 失败", {
           durationMs: Date.now() - startedAt,
           message: error instanceof Error ? error.message : String(error),
           requestedModel: formatModelSelectionForLog(params.model),
@@ -4909,7 +4909,7 @@ async function ensureAccountProviderConfigSynced(_params: {
     async conversationAttachmentReadV4(params: ZCodeAgentConversationAttachmentReadParams) {
       if (!readTrustedZCodeAgentV4Connection(params)) {
         throw new ZCodeAttachmentFaultError(
-          ZCODE_ATTACHMENT_FAULT_CODES.shareReadConnectionUntrusted,
+          ONYX_ATTACHMENT_FAULT_CODES.shareReadConnectionUntrusted,
         );
       }
       const wireParams = v4ConversationAttachmentReadParamsSchema.parse({
@@ -4931,7 +4931,7 @@ async function ensureAccountProviderConfigSynced(_params: {
     async conversationAttachmentStatV4(params: ZCodeAgentConversationAttachmentStatParams) {
       if (!readTrustedZCodeAgentV4Connection(params)) {
         throw new ZCodeAttachmentFaultError(
-          ZCODE_ATTACHMENT_FAULT_CODES.shareStatConnectionUntrusted,
+          ONYX_ATTACHMENT_FAULT_CODES.shareStatConnectionUntrusted,
         );
       }
       const wireParams = v4ConversationAttachmentStatParamsSchema.parse({
@@ -5139,7 +5139,7 @@ async function ensureAccountProviderConfigSynced(_params: {
         if (
           error instanceof Error &&
           "code" in error &&
-          error.code === ZCODE_AGENT_RUNTIME_UNAVAILABLE_CODE
+          error.code === ONYX_AGENT_RUNTIME_UNAVAILABLE_CODE
         ) {
           return { kind: "unavailable", workId: params.workId };
         }

@@ -4,7 +4,7 @@ import {
   PERSONAL_PROVIDER_CONFIG_FILE_NAME,
   type PersonalProviderConfigRecoveryEvent,
   type NodeProviderConfigRuntimeOptions,
-} from "@zcode/provider-node";
+} from "@onyx/provider-node";
 import type { ModelProviderConfig } from "./legacyModelProviderSerialized.js";
 import { getAppConfigDir } from "../paths.js";
 import { importLegacyPersonalProviderConfig } from "./legacyPersonalProviderConfigImporter.js";
@@ -12,7 +12,6 @@ import { importLegacyPersonalProviderConfig } from "./legacyPersonalProviderConf
 export interface ProviderConfigRuntimeOptions {
   readonly zcodeBuiltinFilePath: string;
   readonly zcodeBuiltinActiveFilePath?: string;
-  readonly zcodeBuiltinRemote?: NodeProviderConfigRuntimeOptions["zcodeBuiltinRemote"];
   readonly onZCodeBuiltinRefreshError?: (error: unknown) => void;
   readonly onPersonalConfigRecovery?: (event: PersonalProviderConfigRecoveryEvent) => void;
   readonly onPersonalConfigPollingError?: (error: unknown) => void;
@@ -24,7 +23,7 @@ export interface ProviderConfigRuntimeOptions {
 
 /**
  * Services 装配层：提供 App 配置目录和已发布旧配置的一次性迁移入口。
- * 配置迁移保留 ZCode 用户的供应商数据，文件运行时由 @zcode/provider-node 唯一实现。
+ * 配置迁移保留 ZCode 用户的供应商数据，文件运行时由 @onyx/provider-node 唯一实现。
  */
 export class ProviderConfigRuntime {
   readonly configService: NodeProviderConfigRuntime["configService"];
@@ -34,7 +33,6 @@ export class ProviderConfigRuntime {
     const runtimeOptions: NodeProviderConfigRuntimeOptions = {
       zcodeBuiltinFilePath: options.zcodeBuiltinFilePath,
       zcodeBuiltinActiveFilePath: options.zcodeBuiltinActiveFilePath,
-      zcodeBuiltinRemote: options.zcodeBuiltinRemote,
       onZCodeBuiltinRefreshError: options.onZCodeBuiltinRefreshError,
       onPersonalConfigRecovery: options.onPersonalConfigRecovery,
       onPersonalConfigPollingError: options.onPersonalConfigPollingError,
@@ -65,10 +63,6 @@ export class ProviderConfigRuntime {
 
   resolveZCodeBuiltinActiveFilePath(): Promise<string> {
     return this.#runtime.resolveZCodeBuiltinActiveFilePath();
-  }
-
-  refreshZCodeBuiltin(options?: { readonly force?: boolean }) {
-    return this.#runtime.refreshZCodeBuiltin(options);
   }
 
   onDidCheckZCodeBuiltin(listener: () => Promise<void>): () => void {

@@ -19,7 +19,7 @@ import {
   type ModelMessageContent,
   type ResolveWorkflowQuestionInput,
   type ResolveWorkflowQuestionOutput,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import type {
   ToolEntry,
   ToolExecutionContext,

@@ -1,4 +1,4 @@
-import type { CuaAppIdentity } from "@zcode/shared/zcode-protocol-v4";
+import type { CuaAppIdentity } from "@onyx/shared/zcode-protocol-v4";
 
 const OFFICIAL_CUA_PREFIXES = [
   "mcp__computer-use__",

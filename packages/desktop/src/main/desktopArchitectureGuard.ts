@@ -1,5 +1,5 @@
 import type { BrowserWindow, NativeImage } from "electron";
-import { DEFAULT_ZCODE_ENDPOINT_ORIGIN, buildZCodeEndpointUrls, type Locale } from "@zcode/shared";
+import { DEFAULT_ONYX_ENDPOINT_ORIGIN, buildZCodeEndpointUrls, type Locale } from "@onyx/shared";
 
 interface ArchitectureMismatch {
   /** 当前运行的二进制架构，例如 x64。 */
@@ -46,10 +46,12 @@ function detectArchitectureMismatch(
 
 function resolveArchitectureDownloadUrl(
   locale: Locale,
-  endpointOrigin = DEFAULT_ZCODE_ENDPOINT_ORIGIN,
+  endpointOrigin = DEFAULT_ONYX_ENDPOINT_ORIGIN,
 ): string {
   // 与 changelog 等外链保持一致，按应用语言分流到官网下载页。
   const origin = buildZCodeEndpointUrls(endpointOrigin).origin;
+  // Onyx 未配置 endpoint：无官网下载页，返回空串由调用方跳过外跳。
+  if (!origin) return "";
   return locale === "zh-CN" ? `${origin}/cn` : `${origin}/en`;
 }
 
@@ -138,6 +140,11 @@ export async function maybeWarnArchitectureMismatch(options: {
 
   if (response === 0) {
     const url = resolveArchitectureDownloadUrl(options.locale);
+    // Onyx 未配置 endpoint：没有官网下载页可跳，仅提示用户手动到自有渠道下载。
+    if (!url) {
+      options.logger.warn("[architecture] 未配置 endpoint，无下载地址可打开");
+      return;
+    }
     options.logger.info(`[architecture] 用户选择前往下载：${url}`);
     await shell.openExternal(url);
   }

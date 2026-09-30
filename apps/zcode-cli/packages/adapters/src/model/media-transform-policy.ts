@@ -3,7 +3,7 @@ import {
   getUnsupportedModelInputMediaKind,
   type ModelInputFormat,
   type ModelMessageContentBlock,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 
 export function unsupportedInputMediaText(
   block: ModelMessageContentBlock,

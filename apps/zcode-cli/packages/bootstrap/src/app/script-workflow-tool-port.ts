@@ -16,7 +16,7 @@ import {
   type WorkflowStartRequest,
   type WorkflowTaskSnapshot,
   type WorkflowTaskStatus,
-} from "@zcode/contracts";
+} from "@onyx/contracts";
 import { readWorkflowScriptDocument } from "./script-workflow-meta.js";
 import type { ScriptWorkflowRuntime } from "./script-workflow-runtime.js";
 import { isScriptWorkflowStore } from "./script-workflow-utils.js";
@@ -314,8 +314,8 @@ async function resolveNamedWorkflowPath(
 ): Promise<string> {
   const fileName = workflowFileName(name);
   const candidates = [
-    join(deps.workingDirectory, ".zcode", "workflows", fileName),
-    join(homedir(), ".zcode", "workflows", fileName),
+    join(deps.workingDirectory, ".onyx", "workflows", fileName),
+    join(homedir(), ".onyx", "workflows", fileName),
   ];
   const builtIn = BUILTIN_WORKFLOW_ALLOWLIST.get(name);
   if (builtIn) candidates.push(builtIn);

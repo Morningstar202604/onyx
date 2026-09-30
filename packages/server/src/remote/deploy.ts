@@ -1,13 +1,13 @@
 /* eslint-disable max-lines -- 远端部署入口集中编排 server/node/agent/tool 资源，拆分需单独整理边界。 */
 import { join } from "node:path";
 import {
-  ZCODE_VERSION,
+  ONYX_VERSION,
   formatLogPrefix,
   normalizeRemoteResourcePackageSelection,
   type RemoteAssetInstallMode,
   type RemoteResourcePackageId,
   type RemoteResourcePackageSelection,
-} from "@zcode/shared";
+} from "@onyx/shared";
 import type { IRemoteBackend, RemoteEnvironment } from "./backend.js";
 import { deployZCodeAgentRuntime } from "./zcodeAgentDeploy.js";
 import {
@@ -15,7 +15,7 @@ import {
   deployNodeRuntime,
   createRemoteComponentVersionResolver,
   logDeployRequired,
-} from "@zcode/server/remote/remoteAssetDeployDecision.js";
+} from "@onyx/server/remote/remoteAssetDeployDecision.js";
 import {
   REMOTE_BASE,
   fileExists,
@@ -23,34 +23,34 @@ import {
   formatOptionalValues,
   type DeployLoggers,
   type RemoteAssetDeployOptions,
-} from "@zcode/server/remote/deployShared.js";
-import { quotePosixPathArg } from "@zcode/server/remote/posixShell.js";
-import { checkServerBundleRequiredMarkers } from "@zcode/server/remote/serverBundleDeployCheck.js";
-import { deployRuntimeTools } from "@zcode/server/remote/runtimeToolDeploy.js";
-import { REMOTE_AGENT_OFFICIAL_PLUGIN_REQUIRED_RELATIVE_PATHS } from "@zcode/server/remote/zcodeAgentOfficialPluginAssets.js";
+} from "@onyx/server/remote/deployShared.js";
+import { quotePosixPathArg } from "@onyx/server/remote/posixShell.js";
+import { checkServerBundleRequiredMarkers } from "@onyx/server/remote/serverBundleDeployCheck.js";
+import { deployRuntimeTools } from "@onyx/server/remote/runtimeToolDeploy.js";
+import { REMOTE_AGENT_OFFICIAL_PLUGIN_REQUIRED_RELATIVE_PATHS } from "@onyx/server/remote/zcodeAgentOfficialPluginAssets.js";
 import {
   ensureRemoteReleaseDirFromCdn,
   selectRemoteAssetManifestComponents,
   type RemoteAssetManifestRef,
-} from "@zcode/server/remote/remoteAssetCache.js";
+} from "@onyx/server/remote/remoteAssetCache.js";
 import {
   fetchRemoteDownloadManifest,
   LocalUploadAssetInstaller,
   RemoteDownloadAssetInstaller,
   type RemoteAssetInstaller,
   type RemoteManifestRef,
-} from "@zcode/server/remote/remoteAssetInstaller.js";
+} from "@onyx/server/remote/remoteAssetInstaller.js";
 import {
   checkRemoteAssetComponentIdentity,
   createFreshRemoteAssetManifestRefResolver,
   hasRemoteAssetComponentRefreshPending,
   markRemoteAssetComponentRefreshPending,
   writeRemoteAssetComponentMeta,
-} from "@zcode/server/remote/remoteAssetLiveIdentity.js";
-import { detectRemoteAssetTools } from "@zcode/server/remote/remoteAssetPreflight.js";
-import { assertSupportedRemoteEnvironment } from "@zcode/server/remote/remotePlatformSupport.js";
-import { acquireRemoteDeployLock } from "@zcode/server/remote/remoteDeployLock.js";
-import type { RemoteAssetNetworkPort } from "@zcode/server/remote/remoteAssetNetwork.js";
+} from "@onyx/server/remote/remoteAssetLiveIdentity.js";
+import { detectRemoteAssetTools } from "@onyx/server/remote/remoteAssetPreflight.js";
+import { assertSupportedRemoteEnvironment } from "@onyx/server/remote/remotePlatformSupport.js";
+import { acquireRemoteDeployLock } from "@onyx/server/remote/remoteDeployLock.js";
+import type { RemoteAssetNetworkPort } from "@onyx/server/remote/remoteAssetNetwork.js";
 
 const log = (...args: unknown[]) => console.log(formatLogPrefix("deploy", process.pid), ...args);
 const logWarn = (...args: unknown[]) =>
@@ -127,7 +127,7 @@ export async function deployServer(
   const getRemoteManifestRef = (): Promise<RemoteManifestRef> => {
     remoteManifestPromise ??= fetchRemoteDownloadManifest(
       {
-        version: ZCODE_VERSION,
+        version: ONYX_VERSION,
         platformArch,
         remoteCdnBaseUrl: options?.remoteCdnBaseUrl,
         remoteCdnBaseUrls: options?.remoteCdnBaseUrls,
@@ -221,7 +221,7 @@ export async function deployServer(
     {
       ...assetDeployOptions,
       platformArch,
-      version: ZCODE_VERSION,
+      version: ONYX_VERSION,
       assetInstallMode: options?.assetInstallMode,
     },
     { log, logWarn },
@@ -267,7 +267,7 @@ export async function deployServer(
       await markRemoteAssetComponentRefreshPending(backend, {
         componentId: "glm",
         platformArch,
-        appVersion: ZCODE_VERSION,
+        appVersion: ONYX_VERSION,
       });
     }
 
@@ -370,7 +370,7 @@ export async function deployServer(
 
     log("all uploads complete");
 
-    // 部署 ZCode Agent runtime 到远程，历史资源包选择已在入口统一忽略。
+    // 部署 Onyx Agent runtime 到远程，历史资源包选择已在入口统一忽略。
     await deployZCodeAgentRuntime(
       backend,
       env,
@@ -513,11 +513,11 @@ async function checkServerDeployDecision(
       `${quotePosixPathArg(nodePath)} ${quotePosixPathArg(serverPath)} --version`,
     );
     const version = (await collectStdout(stream)).trim();
-    log("remote version:", JSON.stringify(version), "local:", ZCODE_VERSION);
-    if (version !== ZCODE_VERSION) {
+    log("remote version:", JSON.stringify(version), "local:", ONYX_VERSION);
+    if (version !== ONYX_VERSION) {
       return {
         shouldDeploy: true,
-        reason: `remote server version mismatch remote=${version} expected=${ZCODE_VERSION}`,
+        reason: `remote server version mismatch remote=${version} expected=${ONYX_VERSION}`,
         appVersionChanged: true,
       };
     }
@@ -620,7 +620,7 @@ function resolveMockCdnReleaseDir(mockCdnDir?: string): string | null {
     return null;
   }
 
-  return join(mockCdnDir, "releases", ZCODE_VERSION);
+  return join(mockCdnDir, "releases", ONYX_VERSION);
 }
 
 async function resolveReleaseDir(
@@ -669,7 +669,7 @@ async function resolveReleaseDir(
       remoteCdnBaseUrl: options?.remoteCdnBaseUrl,
       remoteCdnBaseUrls: options?.remoteCdnBaseUrls,
       remoteCacheDir: options?.remoteCacheDir,
-      version: ZCODE_VERSION,
+      version: ONYX_VERSION,
       platformArch,
       componentIds,
       manifestRef,

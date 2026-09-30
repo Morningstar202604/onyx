@@ -1,7 +1,8 @@
-import { ZCODE_VERSION, type ZCodeEnv } from "@zcode/shared";
+import { ONYX_VERSION, type ZCodeEnv } from "@onyx/shared";
 
-declare const __ZCODE_CDN_BASE_URL__: string | undefined;
-const DEFAULT_CDN_BASE_URL = "https://cdn-zcode.z.ai";
+declare const __ONYX_CDN_BASE_URL__: string | undefined;
+// Onyx 无官方 CDN：默认不配置远程资源下载源，由调用方回退到本地 bundled 资源。
+const DEFAULT_CDN_BASE_URL = "";
 
 export interface ResolveRemoteCdnOptions {
   env?: ZCodeEnv;
@@ -23,10 +24,12 @@ export function resolveRemoteCdnBaseUrls(options: ResolveRemoteCdnOptions = {}):
   const override = options.overrideBaseUrl?.trim();
   if (override) return [normalizeBaseUrl(override)];
   const baseUrl =
-    process.env.ZCODE_CDN_BASE_URL?.trim() ||
-    (typeof __ZCODE_CDN_BASE_URL__ === "undefined" ? "" : __ZCODE_CDN_BASE_URL__) ||
+    process.env.ONYX_CDN_BASE_URL?.trim() ||
+    (typeof __ONYX_CDN_BASE_URL__ === "undefined" ? "" : __ONYX_CDN_BASE_URL__) ||
     DEFAULT_CDN_BASE_URL;
+  // Onyx 未配置 CDN：返回空列表，调用方应跳过远程资源下载，回退本地 bundled 资源。
+  if (!baseUrl) return [];
   return [
-    `${normalizeBaseUrl(baseUrl)}/zcode/electron/releases/${options.version ?? ZCODE_VERSION}`,
+    `${normalizeBaseUrl(baseUrl)}/zcode/electron/releases/${options.version ?? ONYX_VERSION}`,
   ];
 }
