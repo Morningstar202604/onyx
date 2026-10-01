@@ -1,0 +1,6 @@
+# Onyx — robots.txt
+# 允许所有爬虫抓取（官网随仓库发布，README/文档为主要索引入口）
+User-agent: *
+Allow: /
+
+# 仓库镜像（GitHub 已自带索引，这里仅声明；如未来独立托管官网请在此更新 Sitemap）

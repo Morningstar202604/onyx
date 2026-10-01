@@ -1,20 +1,51 @@
 # Changelog
 
+All notable changes to Onyx are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+
+## [1.2.0] - 2026-10-01
+
+### ✨ P2 深度开发（路线图 §10）
+
+- **离线降级（已覆盖）**：OpenAI 兼容协议接受任意 baseURL——Ollama / llama.cpp / 任意本地 `/v1` 端点即插即用，能力协商保守默认；本地端点冒烟验证通过
+- **远端资源监控 UI 全链路**：连接建立即启动机器级采样（backend.exec 探测，3s 周期 + 手动刷新，断连/平台不支持静默跳过），main 归并 + IPC 查询 + 窗口推送，资源管理器新增远端资源卡片（目标/CPU 核数/内存/磁盘）
+- **技能/插件本地市场统一**：技能发现覆盖插件市场全部已安装记录，本地市场安装的插件自动贡献技能，无需额外导入（指南 §6.6）
+- **跨工作区全局运行监控**：单库聚合 `automation_runs`（workspace_key 列），自动化页新增「运行监控」视图（触发时间/来源/状态/工作区）
+
+### 🔧 收尾
+
+- 删除 5 个含密钥的排障脚本（本地磁盘 0 密钥残留）
+- README 新增「接入本地/自建模型端点（离线可用）」引导
+- 品牌残留修复：WebFetch UA、遥测属性/serviceName 全面 Onyx 化（apps 层上游域名 0 残留）
+- 路线图 §11 最终收尾记档；验证矩阵全绿（typecheck 0 / lint 0 / 全包构建 0 / 冒烟 17 项全绿）
+
+## [1.1.0] - 2026-09-30
+
+### ✨ P0 + P1 深度开发（路线图 §8-§9）
+
+- **协议层**：多网关 failover（主坏备好自动切换 / 主好备坏不误伤）、统一重试、能力协商保守默认、并发门（默认 8）、推理正文恒空自动回退（国产模型适配）
+- **云知声真实 API 端到端实测 7/7 全绿**：挖出并修复 failover 主网关不切换、请求体重放、端口残留、Headers 展开、并发门未上电等真实缺陷
+- **自动化**：cron 定时任务 UI + 运行日志 + 通知中心；文件变更 / Webhook / Git 事件触发；闲时调度
+- **远程工作区**：断线自动重连 + 连接诊断；增量同步
+- **记忆**：分层记忆 UI + 技能管理；全文关键词检索；冲突合并；技能自动触发
+- **插件生态**：SDK + 市场页 + 权限；本地市场索引（file / directory / git / url 源）；远端资源采样模块
+
+### 🔧 质量
+
+- typecheck 0 / lint 0（2477 文件 0 warnings 0 errors）/ desktop main tsc 105=105 基线零新增
+
 ## [1.0.0] - 2026-09-28
 
 ### 🎉 Onyx 首发版
 
-Onyx（黑曜石）—— 属于自己的 AI 编程工作台。基于 ZCode 深度定制，彻底移除官方账号、套餐、订阅与遥测体系，打开即是工作台，配一个 API Key 就能开始干活。
+Onyx —— 属于自己的 AI 编程工作台。基于上游深度定制，彻底移除官方账号、套餐、订阅与遥测体系，打开即是工作台，配一个 API Key 就能开始干活。
 
 ### ✨ 新增（相对上游定制）
 
 - **纯 API Key 直连**：移除官方账号/OAuth/套餐体系，任意 OpenAI 兼容网关即插即用
 - **去官方化**：清除官方界面、登录墙、套餐入口、遥测上报，打开直进主界面
-- **官方链路深度清理**：删除官方登录命令（`login`/`logout`）、官方账号 Provider Registry、
-  账号配置协议（providerUpdateAccountConfig）、RemoteUsage 遥测上报——全库构建修复
+- **官方链路深度清理**：删除官方登录命令、官方账号 Provider Registry、账号配置协议、RemoteUsage 遥测上报——全库构建修复
 - **品牌全面 Onyx 化**：产品名、CLI 命令（`onyx`）、窗口/标签标题、错误提示、文档与截图全部统一
 - **设置页简单优先**：常用项直接展示，复杂配置（钩子/规则）收进高级折叠，默认简单定义
-- **12 个 Agnes 模型预配置**：flash/pro/image/video 系列开箱即用
 
 ### 🚀 核心能力
 
@@ -26,7 +57,7 @@ Onyx（黑曜石）—— 属于自己的 AI 编程工作台。基于 ZCode 深�
 ### 🔧 质量
 
 - lint 0 errors / typecheck 全绿
-- **全量构建通过**（shared/provider/services/web/desktop/zcode-cli 全包）
+- 全量构建通过（shared/provider/services/web/desktop/cli 全包）
 - 端到端会话链路验证跑通（completedSuccess + 完整回复）
 
 ### ⚠️ 已知限制
