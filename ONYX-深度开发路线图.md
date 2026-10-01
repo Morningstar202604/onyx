@@ -254,3 +254,31 @@
 - **P2 按原则收敛**：已具备 3 项（智能路由基础/模板库/运行回放）、已覆盖 2 项（离线队列/个性化工作流）、砍 3 项（跨端插件/社区市场/跨设备同步——需服务器或平台）、暂缓 6 项（工程量高或依赖未稳协议面）。
 - 剩余暂缓项均不影响"无官方服务器、国内轻量、自托管优先"产品主线。
 
+
+## 9. 端到端实测与全量查漏补缺记录（2026-10-01 追加）
+
+### 云知声真实 API 端到端实测（用户提供 u2-flash 凭证）
+
+- **探活**：`https://maas-api.unisound.com/v1` 200，响应含非标准 `reasoning_content` 字段（推理模型）。
+- **E2E 7/7 全绿**（产品全链路：`AiSdkModelAdapter.createModel` → runner → 并发门 → failover → openai-compatible）：
+  1. 非流式正文（reasoning 回退生效） 2. 流式正文（EOF 补发 reasoning） 3. 10 并发排队全成功
+  4. failover 主坏备好自动切换 5. failover 主好备坏不误伤 6. 能力协商保守默认 7. 坏 key 401 正确分类
+
+### 实测挖出并修复的真实缺陷（提交 `3517ac0`）
+
+| 缺陷 | 根因 | 修复 |
+| --- | --- | --- |
+| 并发门未上电 | P0 只交付模块与网关可选字段，未接真实调用点 | `model-execution.ts` 装配 `createProviderConcurrencyGate`（默认 8），先 acquire 再进 failover、finally release |
+| failover A：主网关从不切换 | `allGateways` 只取备用列表，主网关从未进入切换序列 | 前置 `[{ baseUrl: options.baseURL }, ...fallbackGateways]` |
+| failover B：备用无法重放请求体 | 主网关网络失败后 `Request.bodyUsed=true`，重放被跳过 | `toReplayableRequest` 循环前预读 body 为 ArrayBuffer |
+| failover C：备用端口残留 | `URL.host` setter 保留旧端口 | 显式 `hostname + port` 重写 |
+| failover D：Headers 展开不安全 | Headers 实例 Object spread 丢失/重复键 | `headerEntriesToObject` 转 plain object |
+| 推理模型正文恒空 | u2-flash content 恒 null，输出全在 `reasoning_content`，用户拿到空回复 | 非流式 text 空用 reasoning 回退；流式 EOF 零正文补发 reasoning 为 text_start/delta/end（国产模型适配） |
+
+- 验证：typecheck 0 / lint 0（全仓 0 warnings 0 errors）/ adapters build 通过 / main tsc 105=105 基线零新增 / 本地 echo server 验证 failover 全链路 200 / E2E 7/7。
+
+### #33 全量查漏补缺结论
+
+- typecheck 0、lint 0（2473 文件 0 warnings 0 errors）、desktop main tsc 105=105 零新增、@onyx/adapters 构建产物含全部修复。
+- failover 接口对调用方（createFactory）兼容性核验通过；正文回退对非推理模型零影响（text 非空不触发）。
+- 路线图 5 方向（协议/远程/插件/自动化/记忆）P0+P1 全部收敛并实测验证；P2 判定不变。
