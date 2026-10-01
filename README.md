@@ -81,6 +81,16 @@ pnpm typecheck       # 全量类型检查
 | `ONYX_SERVER_WORKSPACE` | Web 后端工作区路径 |
 | `ONYX_BUILTIN_PROVIDER_CONFIG_FILE` | 本地模型供应商配置路径 |
 
+## 接入本地 / 自建模型端点（离线可用）
+
+Onyx 只认 OpenAI 兼容协议，**不内置任何厂商地址与密钥**——服务商地址和密钥都由你自行填写。这意味着本地推理服务也可以即插即用：
+
+- **Ollama**：`http://localhost:11434/v1`（key 任意非空值），模型如 `qwen2.5:7b`；
+- **llama.cpp 自建**：`http://localhost:8080/v1` 及任何 OpenAI 兼容 `/v1` 端点；
+- **云服务商自定义入口**：同样填其兼容地址 + 密钥即可（协议层接受任意 baseURL，无厂商白名单校验）。
+
+填写位置：设置 → 模型 / 供应商配置；也可用 `ONYX_BUILTIN_PROVIDER_CONFIG_FILE` 指定本地供应商配置文件。能力协商对未知 provider 保守默认（如不承诺工具调用），推理模型正文恒空时自动回退到推理内容。
+
 ## 已知限制
 
 - **会话内容不持久化**：会话数据存于运行内存，关闭页面或重启服务后，历史会话只剩标题。后续版本将补持久化。
