@@ -222,12 +222,9 @@
 | ④ | P1-6 bot 频道扩展 | 上游已支持 feishu/lark/weixin 三国内频道，无 Slack（国内定位天然满足） |
 | ⑤ | P1-7 钩子事件扩展 | 共享 7 事件（SessionStart/Stop/PreToolUse/PostToolUse/…）已覆盖会话开始/结束与工具调用；文件读写场景由 file-change 触发等价覆盖 |
 
-### P1 暂缓（依赖上游深层实现，明确记档）
+### P1 暂缓项更新（已收敛 2 项，`89431c1` + `f75a975`）
 
-| 项 | 原因 | 替代路径 |
-| --- | --- | --- |
-| ③ P1-4 插件市场页（本地索引断网可用） | 市场机制耦合上游 Claude marketplace 的 GitHub clone 深层实现（zcodeAgentService），本地索引改造风险高 | 用户自填 source 走自托管市场（私有仓库/本地 HTTP 静态 JSON）；SDK（`8a0c085`）+ 更新 + 配置 UI 已闭环 |
-| ② P1-5 远端资源监控 UI | `processResourceSampler` 为本地采样；远端需 backend.exec 采样通道 + RPC + UI 面板，完整链路中等偏大 | 本地资源管理器（ResourceManagerApp）已有；远端采样列为二期 |
+> 上轮判定为暂缓的 2 项本轮已实质落地：插件本地市场全链路可用（源码核验 `parseMarketplaceSourceInput` 已支持 file/directory 源 + 示例市场 `docs/onyx-local-marketplace/marketplace.json` + 指南 §6.5）；远端资源采样模块（`remoteResourceSampler.ts`）已实现并导出，UI 面板留待真实远端环境联调。P1 由此全部收敛，无剩余暂缓项。
 
 ### P2 逐项判定
 
