@@ -7,6 +7,12 @@ export type {
 } from "./backend.js";
 export { createRemoteBackend } from "./create-backend.js";
 export {
+  buildRemoteResourceProbeCommand,
+  createRemoteResourceSampler,
+  parseRemoteResourceProbeOutput,
+  type RemoteResourceSnapshot,
+} from "./remoteResourceSampler.js";
+export {
   diagnoseRemoteConnection,
   type RemoteDiagnosticResult,
   type RemoteDiagnosticStep,
