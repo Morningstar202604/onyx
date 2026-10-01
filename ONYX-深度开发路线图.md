@@ -313,3 +313,37 @@ P2 四项按「无服务器 + 国内平台/国产模型 + 轻量开箱即用 + �
 ### P2 收口验证
 
 - `pnpm typecheck` 0；`pnpm lint` 0（2477 文件 0 warnings 0 errors）；desktop main tsc 105=105 基线零新增；全部改动已提交（工作区干净）。
+
+## 11. 最终收尾（2026-10-01）
+
+### 安全收尾
+
+- 删除 `.e2e-tmp/` 内 5 个含云知声密钥的排障脚本（`unisound-e2e` / `debug-failover`×2 / `direct-fetch` / `replay-init-fetch`）：密钥明文不再滞留本地磁盘；验证结论已在 §9 记档，不影响复测。保留 4 个无密钥冒烟脚本（远端采样 / 本地端点 / 市场技能 / 全局运行）。
+- 复扫确认：本地磁盘 0 密钥残留。
+
+### 文档收尾
+
+- README 新增「接入本地 / 自建模型端点（离线可用）」：Ollama / llama.cpp / 任意 OpenAI 兼容 `/v1`，地址与密钥用户自填；能力协商保守默认 + 推理回退说明（对应 P2-① 的引导载体落地）。
+
+### 品牌残留收尾（提交 `c3a8a37`）
+
+| 残留 | 位置 | 处理 |
+| --- | --- | --- |
+| WebFetch User-Agent `ZCode-WebFetch/0.1 (+https://zcode.ai)` | webfetch-constants | → `Onyx-WebFetch/0.1 (+项目主页)`（对外请求用户可见） |
+| 遥测属性 `zcode.device.installation_id` | otlp-exporter | → `onyx.device.installation_id`（collector 侧可见） |
+| 遥测默认 `serviceName: "zcode-cli-agent"` | telemetry bootstrap | → `onyx-cli-agent` |
+
+- 复扫：apps 层 `zcode.ai` / `zcode.dev` 服务域名 0 残留；其余 `ZCode*` 均为内部类型/函数标识（有意保留不丢数据）。
+
+### 最终验证矩阵（全绿）
+
+- `pnpm typecheck` 0；`pnpm lint` 0（2477 文件 0 warnings 0 errors）
+- 各包独立构建：shared/services/provider/rpc/ui 0；adapters 0；telemetry 0；core 0；desktop main 105=105 基线零新增
+- 冒烟回归 17 项全绿：远端采样 9/9、本地端点 1/1、市场技能 3/3、全局运行 4/4
+- 工作区干净，全部改动已提交；HEAD 提交链见 §9-§11。
+
+### 待用户拍板的 3 项（非缺陷，产品/发布决策）
+
+1. **git 远程推送**：origin 已配置（内嵌用户令牌）但从未推送；推送前应先去除令牌（`git remote set-url`），否则凭据留在仓库配置。
+2. **off-peak 闲时调度**：依赖 zai/bigmodel 官方 personal/team 配额（`legacyPersonalProviderConfigImporter` / `providerProvisioningSource` oauth token），与「官方厂商大砍」原则有张力；当前保留。
+3. **飞书线上版本同步**：路线图/指南历史交付在飞书，本地已更新至 §11，线上需手动同步。
