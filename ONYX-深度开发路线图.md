@@ -279,3 +279,37 @@
 - typecheck 0、lint 0（2473 文件 0 warnings 0 errors）、desktop main tsc 105=105 零新增、@onyx/adapters 构建产物含全部修复。
 - failover 接口对调用方（createFactory）兼容性核验通过；正文回退对非推理模型零影响（text 非空不触发）。
 - 路线图 5 方向（协议/远程/插件/自动化/记忆）P0+P1 全部收敛并实测验证；P2 判定不变。
+
+## 10. P2 深度开发交付（2026-10-01）
+
+P2 四项按「无服务器 + 国内平台/国产模型 + 轻量开箱即用 + 彻底摆脱上游」原则全部交付并实测：
+
+### P2-① 离线降级：改判「已覆盖」（提交 `85c429d`）
+
+- 结论：OpenAI 兼容协议接受任意 baseURL——本地推理服务（Ollama / llama.cpp 等 `/v1` 兼容端点）由用户自填地址即可接入，无需专门本地运行时集成。
+- 验证：本地 OpenAI 兼容端点冒烟 1/1（`127.0.0.1` 自建 chat/completions 服务即插即用，`generateText` 返回正文）；能力协商对未知 provider 保守默认。
+
+### P2-② 远端资源监控 UI 全链路（提交 `7623d90`）
+
+- host：连接建立即启动机器级采样（`createRemoteResourceSampling`：backend.exec 探测 nproc / /proc/meminfo / df，3s 周期 + 手动刷新，断连/平台不支持静默跳过，dispose 收口），样本经 parentPort 上报 main。
+- shared：`HostResponseTypes.RemoteResourceSample` + `remoteResourceSnapshotDataSchema`（main 白名单解析同一契约）。
+- main：`remoteResourceMonitor` 按 target 归并最新样本 + IPC 查询 + 向资源管理器窗口推送增量。
+- renderer：preload 桥 `getRemoteSnapshot` / `onRemoteResourceSample`；资源管理器新增远端资源卡片（远端目标/CPU 核数/内存/磁盘），推送优先 + 初值兜底。
+- 验证：冒烟 9/9（解析/上报结构/shared schema 校验/断连防御/dispose 停止/平台不支持）；typecheck 0 / lint 0 / main tsc 105=105 零新增。
+
+### P2-③ 技能/插件本地市场统一（提交 `0623ad6`）
+
+- 结论：技能发现（`resolvePluginSkillRootDescriptors`）已覆盖插件市场全部已安装记录（inline + 官方 cache + `installed_plugins.json`），**本地市场安装的插件自动贡献技能**，无需额外导入。
+- 文档：插件开发指南 §6.6「技能随本地市场分发」。
+- 验证：冒烟 3/3（本地市场安装记录进入技能候选 / rootPath 指向插件目录 / 技能根目录存在）。
+
+### P2-④ 跨工作区全局运行监控（提交 `d13079c`）
+
+- repo：`listAllRuns` 单库聚合 `automation_runs`（workspace_key 列），倒序 + outcome 过滤 + limit 上限 200。
+- 服务：`automationService.listAllWorkspaceRuns` / `zcodeAgent.listAllAutomationRuns`（缺省即全局，不依赖当前 workspace）。
+- UI：自动化页新增「运行监控」视图（触发时间/来源/状态/工作区列），store `globalRuns` + `loadGlobalRuns`，空态与列表态均有入口。
+- 验证：冒烟 4/4（跨 workspace 聚合 / outcome 过滤 / limit / per-workspace 视图不被全局查询污染）；typecheck 0 / lint 0。
+
+### P2 收口验证
+
+- `pnpm typecheck` 0；`pnpm lint` 0（2477 文件 0 warnings 0 errors）；desktop main tsc 105=105 基线零新增；全部改动已提交（工作区干净）。
