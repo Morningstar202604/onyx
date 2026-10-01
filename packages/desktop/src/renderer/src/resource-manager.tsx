@@ -8,11 +8,16 @@ import {
   loadUiFontSizePx,
   subscribeToUiFontSizeStorageChanges,
 } from "@onyx/ui";
+import type { RemoteResourceSnapshot } from "@onyx/ui";
 
 declare global {
   interface Window {
     resourceManager?: {
       getSnapshot: () => Promise<ResourceUsageSnapshot>;
+      getRemoteSnapshot: () => Promise<RemoteResourceSnapshot | null>;
+      onRemoteResourceSample: (
+        listener: (snapshot: RemoteResourceSnapshot | null) => void,
+      ) => () => void;
       setSamplingActive: (active: boolean) => void;
       storage?: StorageManagementBridge;
     };
@@ -54,16 +59,32 @@ subscribeToUiFontSizeStorageChanges();
 
 const root = document.getElementById("root");
 if (root) {
-  createRoot(root).render(
-    // 语言沿用主窗口写入 localStorage 的偏好；不接 settingService，避免独立窗口再起一份 RPC。
-    <ZCodeIntlProvider>
-      <ResourceManagerApp
-        setSamplingActive={window.resourceManager?.setSamplingActive}
-        getSnapshot={
-          window.resourceManager ? () => window.resourceManager!.getSnapshot() : undefined
-        }
-        storage={window.resourceManager?.storage}
-      />
-    </ZCodeIntlProvider>,
-  );
+  const rm = window.resourceManager;
+  const rootElement = createRoot(root);
+  let currentRemote: RemoteResourceSnapshot | null = null;
+  const render = () => {
+    rootElement.render(
+      // 语言沿用主窗口写入 localStorage 的偏好；不接 settingService，避免独立窗口再起一份 RPC。
+      <ZCodeIntlProvider>
+        <ResourceManagerApp
+          setSamplingActive={rm?.setSamplingActive}
+          getSnapshot={rm ? () => rm.getSnapshot() : undefined}
+          remoteSnapshot={currentRemote}
+          remoteTargetLabel={currentRemote ? "remote" : undefined}
+          storage={rm?.storage}
+        />
+      </ZCodeIntlProvider>,
+    );
+  };
+  // 推送优先（main 每轮样本即推），轮询兜底由 main IPC 查询承担。
+  const unsubscribe = rm?.onRemoteResourceSample((snapshot) => {
+    currentRemote = snapshot;
+    render();
+  });
+  window.addEventListener("beforeunload", () => unsubscribe?.(), { once: true });
+  void rm?.getRemoteSnapshot().then((snapshot) => {
+    currentRemote = snapshot;
+    render();
+  });
+  render();
 }

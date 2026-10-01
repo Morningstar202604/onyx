@@ -32,6 +32,7 @@ import {
   setResourceUsageSamplingActive,
 } from "./resourceManagerWindow.js";
 import { registerResourceManagerStorageIpc } from "./resourceManagerStorage.js";
+import { getRemoteResourceSnapshot, registerRemoteResourceIpc } from "./remoteResourceMonitor.js";
 import { applyWindowsTitleBarTheme, getWindowOverlayTheme } from "./desktopWindowChrome.js";
 import { syncWindowControlsOverlayForZoomLevel } from "./desktopWindowButtonPosition.js";
 import { resolveDesktopZoomLevelFromFactor } from "./desktopZoom.js";
@@ -175,10 +176,14 @@ export function registerPlatformIpcHandlers(options: {
   ipcMain.handle(PlatformChannels.GetResourceUsageSnapshot, (event) =>
     getResourceUsageSnapshot(event.sender.id),
   );
+  ipcMain.handle(PlatformChannels.GetRemoteResourceSnapshot, (_event, targetLabel?: unknown) =>
+    getRemoteResourceSnapshot(typeof targetLabel === "string" ? targetLabel : undefined),
+  );
   ipcMain.on(PlatformChannels.SetResourceUsageSamplingActive, (event, active: unknown) => {
     if (typeof active === "boolean") setResourceUsageSamplingActive(event.sender.id, active);
   });
   registerResourceManagerStorageIpc();
+  registerRemoteResourceIpc();
   ipcMain.handle(PlatformChannels.GetZCodeStdioTapDevState, () => readZCodeStdioTapDevState());
   ipcMain.on(PlatformChannels.OpenResourceManager, () => {
     openResourceManager();

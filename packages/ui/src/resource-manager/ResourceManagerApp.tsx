@@ -6,6 +6,7 @@ import {
   type ResourceUsageSnapshot,
   type StorageManagementBridge,
 } from "@onyx/shared";
+import type { RemoteResourceSnapshot } from "./remoteResourceTypes.js";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs.js";
 import { useZCodeIntl } from "@/i18n/index.js";
 import { StorageSection } from "./storage/StorageSection.js";
@@ -27,6 +28,10 @@ export interface ResourceManagerAppProps {
   refreshIntervalMs?: number;
   /** 初始 tab，默认 CPU */
   initialTab?: ResourceManagerTab;
+  /** 远端机器整体资源样本（backend.exec 探测）；缺省表示无远端连接或不可用 */
+  remoteSnapshot?: RemoteResourceSnapshot | null;
+  /** 远端目标标识（脱敏） */
+  remoteTargetLabel?: string;
 }
 
 export type ResourceManagerTab = "cpu" | "memory" | "storage";
@@ -54,6 +59,8 @@ export function ResourceManagerApp({
   storage,
   refreshIntervalMs = DEFAULT_REFRESH_INTERVAL_MS,
   initialTab = "cpu",
+  remoteSnapshot,
+  remoteTargetLabel,
 }: ResourceManagerAppProps) {
   const { intl } = useZCodeIntl();
   const [tab, setTab] = useState<ResourceManagerTab>(initialTab);
@@ -145,6 +152,46 @@ export function ResourceManagerApp({
           </TabsList>
         </Tabs>
       </header>
+
+      {remoteSnapshot ? (
+        <section
+          className="shrink-0 border-b border-border bg-background-alt px-4 py-3"
+          data-testid="remote-resource-card"
+        >
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-ui-sm">
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-foreground-subtle">
+                {intl.formatMessage({ id: "resourceManager.remoteTarget" })}
+              </span>
+              <span className="font-mono">{remoteTargetLabel ?? "remote"}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-foreground-subtle">
+                {intl.formatMessage({ id: "resourceManager.remoteCpu" })}
+              </span>
+              <span>{remoteSnapshot.cpuCores}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-foreground-subtle">
+                {intl.formatMessage({ id: "resourceManager.remoteMemory" })}
+              </span>
+              <span>
+                {formatBytes(remoteSnapshot.memUsedMb * 1024 * 1024)} /{" "}
+                {formatBytes(remoteSnapshot.memTotalMb * 1024 * 1024)}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-foreground-subtle">
+                {intl.formatMessage({ id: "resourceManager.remoteDisk" })}
+              </span>
+              <span>
+                {formatBytes(remoteSnapshot.diskUsedBytes)} /{" "}
+                {formatBytes(remoteSnapshot.diskTotalBytes)}
+              </span>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <div className="min-h-0 flex-1 overflow-auto bg-background-alt p-4">
         {tab === "storage" ? (

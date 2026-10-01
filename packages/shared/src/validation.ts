@@ -942,6 +942,31 @@ export const networkObservationSchema = z.object({
   downloadMs: z.number().optional(),
 });
 
+/** 远端机器整体资源样本（host → main，target 为脱敏后的远程目标标识）。 */
+export const remoteResourceSnapshotDataSchema = z
+  .object({
+    os: z.string(),
+    arch: z.string(),
+    cpuCores: z.number().int().positive(),
+    memTotalMb: z.number().int().nonnegative(),
+    memAvailableMb: z.number().int().nonnegative(),
+    memUsedMb: z.number().int().nonnegative(),
+    diskTotalBytes: z.number().int().nonnegative(),
+    diskAvailableBytes: z.number().int().nonnegative(),
+    diskUsedBytes: z.number().int().nonnegative(),
+  })
+  .strict();
+
+export type RemoteResourceSnapshotData = z.infer<typeof remoteResourceSnapshotDataSchema>;
+
+export const hostRemoteResourceSampleResponseSchema = z
+  .object({
+    type: z.literal("remote-resource-sample"),
+    targetLabel: z.string().min(1),
+    snapshot: remoteResourceSnapshotDataSchema,
+  })
+  .strict();
+
 export const hostNetworkTelemetryBatchResponseSchema = z.object({
   type: z.literal("network-telemetry-batch"),
   observations: z.array(networkObservationSchema).max(500),
@@ -1032,6 +1057,7 @@ export const hostResponseMessageSchema = z.discriminatedUnion("type", [
   hostBrowserExecuteRequestResponseSchema,
   hostLocalMediaPreviewPathAuthorizeRequestResponseSchema,
   hostNetworkTelemetryBatchResponseSchema,
+  hostRemoteResourceSampleResponseSchema,
   hostProviderProvisioningSourceChangedResponseSchema,
   hostProviderProvisioningExecutionResultResponseSchema,
   hostCronRunResultResponseSchema,

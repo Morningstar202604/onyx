@@ -260,6 +260,8 @@ export const PlatformChannels = {
   WindowControlsOverlayReady: "zcode:window-controls-overlay-ready",
   /** 获取资源管理器快照（CPU / 内存，按基础服务、内置插件、社区插件归类） */
   GetResourceUsageSnapshot: "zcode:get-resource-usage-snapshot",
+  GetRemoteResourceSnapshot: "zcode:get-remote-resource-snapshot",
+  RemoteResourceSamplePushed: "zcode:remote-resource-sample-pushed",
   SetResourceUsageSamplingActive: "zcode:set-resource-usage-sampling-active",
   /** 打开资源管理器窗口（其他窗口触发） */
   OpenResourceManager: "zcode:open-resource-manager",
@@ -577,6 +579,8 @@ export const HostResponseTypes = {
   RemoteWorkspaceReconnected: "remote-workspace-reconnected",
   /** window Host → main：远程连接诊断结果 */
   RemoteWorkspaceDiagnoseResult: "remote-workspace-diagnose-result",
+  /** host → main：远端机器整体资源样本（backend.exec 探测，按 target 归并） */
+  RemoteResourceSample: "remote-resource-sample",
   /** host 进程日志上报 */
   Log: "log",
   /** host 内拉起新的 agent 子进程 */

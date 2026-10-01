@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
+import type { RemoteResourceSnapshotData } from "@onyx/shared";
 import { PlatformChannels, formatZCodeRendererProcessName } from "@onyx/shared";
 import type {
   ResourceUsageSnapshot,
@@ -38,5 +39,18 @@ contextBridge.exposeInMainWorld("resourceManager", {
     ipcRenderer.send(PlatformChannels.SetResourceUsageSamplingActive, active),
   getSnapshot: (): Promise<ResourceUsageSnapshot> =>
     ipcRenderer.invoke(PlatformChannels.GetResourceUsageSnapshot),
+  getRemoteSnapshot: (): Promise<RemoteResourceSnapshotData | null> =>
+    ipcRenderer.invoke(PlatformChannels.GetRemoteResourceSnapshot).then(
+      (entry: { snapshot: RemoteResourceSnapshotData } | null) => entry?.snapshot ?? null,
+    ),
+  onRemoteResourceSample: (listener: (snapshot: RemoteResourceSnapshotData | null) => void): (() => void) => {
+    const handler = (_event: unknown, message: { targetLabel: string; snapshot: RemoteResourceSnapshotData }): void => {
+      listener(message.snapshot);
+    };
+    ipcRenderer.on(PlatformChannels.RemoteResourceSamplePushed, handler);
+    return () => {
+      ipcRenderer.removeListener(PlatformChannels.RemoteResourceSamplePushed, handler);
+    };
+  },
   storage,
 });

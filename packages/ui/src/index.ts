@@ -66,6 +66,7 @@ export {
 
 export { ZCodeIntlProvider, useZCodeIntl, LocaleSwitcher } from "./i18n/index.js";
 export { ResourceManagerApp } from "./resource-manager/ResourceManagerApp.js";
+export type { RemoteResourceSnapshot } from "./resource-manager/remoteResourceTypes.js";
 export type {
   ResourceManagerAppProps,
   ResourceManagerTab,

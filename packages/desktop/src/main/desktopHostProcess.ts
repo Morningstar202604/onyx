@@ -50,6 +50,7 @@ import {
   resolveBundledGlmBinaryPath,
 } from "./desktopRuntimeEnv.js";
 import { ingestHostNetworkObservations } from "./desktopNetworkTelemetry.js";
+import { ingestRemoteResourceSample } from "./remoteResourceMonitor.js";
 import { ingestCliResourceSample } from "./processResourceCliSource.js";
 import { ingestHostSelfResourceSample } from "./processResourceSelfHeapSource.js";
 import { createFeedbackLogArchiveFromExportLogs } from "./exportLogs.js";
@@ -355,6 +356,16 @@ export function spawnHostProcess(
         result.data.runtimeSurface,
         result.data.environmentKey,
       );
+      return;
+    }
+
+    // 远端机器整体资源样本：按 target 归并并推送资源管理器窗口。
+    if (result.data.type === HostResponseTypes.RemoteResourceSample) {
+      ingestRemoteResourceSample({
+        type: result.data.type,
+        targetLabel: result.data.targetLabel,
+        snapshot: result.data.snapshot,
+      });
       return;
     }
 

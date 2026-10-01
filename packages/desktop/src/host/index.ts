@@ -25,6 +25,7 @@ import {
 } from "@onyx/rpc";
 import { registerHostNetworkTelemetry, stopHostNetworkTelemetry } from "./hostNetworkTelemetry.js";
 import { registerHostServiceResourceTelemetry } from "./hostServiceResourceTelemetry.js";
+import { createRemoteResourceSampling } from "./remoteResourceSampling.js";
 import { resolveResourceTelemetryEnvironmentKey } from "./hostResourceTelemetryEnvironment.js";
 import { reportHostSessionCreate } from "./hostSessionCreateTelemetry.js";
 import { createBrowserControlMainBridge } from "./browserControlMainBridge.js";
@@ -1717,6 +1718,16 @@ async function createWindowRemoteConnectionHandle(params: {
     environmentKey: resolveResourceTelemetryEnvironmentKey(params.target),
     onError: (error) => logger.warn("remote resource telemetry subscription failed", error),
   });
+  // 远端机器整体资源采样（机器级 CPU/内存/磁盘）：连接建立即启动，断开即收口。
+  // 样本经 parentPort 上报 main，main 按 targetLabel 归并并转发资源管理器窗口。
+  const remoteResourceSampling =
+    "backend" in connection
+      ? createRemoteResourceSampling({
+          backend: connection.backend,
+          targetLabel: resolveResourceTelemetryEnvironmentKey(params.target) || "remote",
+          postMessage: (message) => parentPort?.postMessage(message),
+        })
+      : undefined;
   const remoteMediaPreviewFactory = !remoteMediaRangePreviewEnabled
     ? undefined
     : (scope: Extract<WindowHostAttachmentScope, { kind: "remote" }>) =>
@@ -1750,6 +1761,7 @@ async function createWindowRemoteConnectionHandle(params: {
       }
       disposed = true;
       closeListeners.clear();
+      remoteResourceSampling?.dispose();
       resourceTelemetry.dispose();
       await disposeServiceResourcesAndWait(services);
       await disposeHostRemoteConnection(connection);
