@@ -83,6 +83,16 @@ description: "<触发条件描述：何时、对什么任务使用本技能。�
 - 仓库已附带示例：`docs/onyx-local-marketplace/marketplace.json`（manifest 格式：顶层 `name`/`description`/`plugins[]`，每条含 `name`/`description`/`version`/`source`/`tags`）。
 - 分发插件时把插件目录与 `marketplace.json` 一起打包/拷贝即可（`source.type: "directory"` 指向相对路径）；远端分发可选 GitHub/Git/HTTP JSON 源（`source: "github" | "git" | "url"`），与本地源同一套安装链路。
 
+### 6.6 技能随本地市场一起分发（技能/插件市场统一）
+
+技能发现（`skillsService`）会扫描插件市场的**全部已安装记录**（`installed_plugins.json`），
+与来源无关——**本地市场安装的插件同样自动贡献技能**：
+
+- 插件目录放 `skills/<name>/SKILL.md` 或 plugin.json 声明 `skills: ["./skills"]`，
+  本地市场安装后技能自动出现在「技能管理」页，无需额外导入。
+- 一个本地市场可以同时分发"纯技能插件"与"带运行时插件"两类条目；安装/更新走同一链路。
+- 验证：本地市场安装记录进入技能候选（`readInstalledPluginRoots` → `resolvePluginSkillRoots`），冒烟 4/4 通过。
+
 ## 7. 边界与已知限制
 
 - **无远端市场**：Onyx 无服务器架构，插件全部本地分发/安装；`source` 为空的市场不会发起远端请求。本地文件/目录市场源完整可用（见 §6.5）。
