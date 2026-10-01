@@ -245,7 +245,7 @@ function telemetryResourceAttributes(
     "service.name": resource.serviceName,
     "service.version": resource.cliVersion,
     "zcode.build.commit_id": resource.buildCommitId,
-    "zcode.device.installation_id": options.includeInstallationId
+    "onyx.device.installation_id": options.includeInstallationId
       ? resource.installationId
       : undefined,
     "zcode.product.version": resource.productVersion,
