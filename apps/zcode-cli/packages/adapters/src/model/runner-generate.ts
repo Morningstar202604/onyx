@@ -219,10 +219,16 @@ export async function runGenerateText(input: {
       const toolCalls = normalizeToolCalls(result, input.logger);
       const toolResults = normalizeToolResults(result, toolCalls);
       const sources = normalizeSources(result);
+      const reasoning = normalizeReasoning(result.reasoning);
+      // 推理模型（如 u2-flash）content 恒空、输出全在 reasoning_content：
+      // 正文为空时用思考内容回退，避免调用结果对用户不可见（国产模型适配）。
+      const reasoningFallbackText =
+        reasoning?.map((block) => block.text).join("\n") ?? "";
       const text = input.request.responseJsonSchema
         ? serializeStructuredOutput(result)
-        : result.text;
-      const reasoning = normalizeReasoning(result.reasoning);
+        : result.text.trim().length > 0
+          ? result.text
+          : reasoningFallbackText;
       const reasoningLength = (reasoning ?? []).reduce(
         (total, block) => total + block.text.length,
         0,

@@ -75,3 +75,4 @@ packages/desktop/src/scheduler/schedulerProtocol.d.ts
 packages/desktop/src/scheduler/schedulerProtocol.d.ts.map
 packages/desktop/src/scheduler/schedulerProtocol.js
 packages/desktop/src/scheduler/schedulerProtocol.js.map
+.e2e-tmp/

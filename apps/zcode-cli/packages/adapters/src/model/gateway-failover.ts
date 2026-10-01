@@ -33,9 +33,13 @@ export function createGatewayFailoverFetch(options: GatewayFailoverOptions): Pro
     return options.fetch;
   }
 
-  // gateways[0] 与主 baseURL 同源时无需额外校验；若配置了与主地址同源的网关，
-  // 视为重复配置，运行时切换无效但不破坏请求。
-  const allGateways = fallbackGateways;
+  // 主网关不在 fallbackGateways 列表中：构造 [主网关, ...备用] 完整切换序列。
+  // 循环 currentIndex=0 为主（透传原 URL），1..n 为备用（重写 URL 与鉴权）。
+  // 若备用与主地址同源视为重复配置，运行时切换无效但不破坏请求。
+  const allGateways = [
+    { baseUrl: options.baseURL },
+    ...fallbackGateways,
+  ] satisfies readonly ProviderFallbackGateway[];
 
   return async (input, init) => {
     const release =
@@ -48,87 +52,30 @@ export function createGatewayFailoverFetch(options: GatewayFailoverOptions): Pro
   };
 }
 
-async function runFailover(
+interface ReplayableRequest {
+  input: string | URL;
+  init: RequestInit;
+}
+
+/**
+ * 把输入规范化成可重放请求：Request 实例在进入切换循环前读一次 body
+ * （ArrayBuffer），避免主网关网络失败后 Request.bodyUsed 变为 true 导致
+ * 备用网关无法重放请求体。读取失败/已消费时返回 undefined（原样透传）。
+ */
+async function toReplayableRequest(
   input: Parameters<ProviderFetch>[0],
   init: Parameters<ProviderFetch>[1] | undefined,
-  fetchImpl: ProviderFetch,
-  allGateways: readonly ProviderFallbackGateway[],
-): Promise<Response> {
-    let currentIndex = 0;
-    // 记录每次尝试的失败：最后一次响应/错误在全部网关失败后抛出，
-    // 保持与单网关一致的错误语义（调用方依赖分类器识别）。
-    let lastResponse: Response | undefined;
-    let lastError: unknown;
-
-    for (;;) {
-      const gateway = allGateways[currentIndex];
-      const isPrimaryAttempt = currentIndex === 0;
-      const rewritten = isPrimaryAttempt
-        ? { input, init }
-        : rewriteRequest(input, init, gateway);
-      if (!rewritten) {
-        // 请求体已消费（Request.bodyUsed），无法重放：直接透传原始失败。
-        if (lastError !== undefined) throw lastError;
-        if (lastResponse !== undefined) return lastResponse;
-        return fetchImpl(input, init);
-      }
-
-      try {
-        const response = await fetchImpl(rewritten.input, rewritten.init);
-        if (response.ok || !isSwitchableHttpStatus(response.status)) {
-          return response;
-        }
-        lastResponse = response;
-        await consumeBodyBestEffort(response);
-      } catch (error) {
-        if (!isSwitchableNetworkError(error)) {
-          throw error;
-        }
-        lastError = error;
-      }
-
-      const nextIndex = currentIndex + 1;
-      if (nextIndex >= allGateways.length) {
-        if (lastError !== undefined) throw lastError;
-        if (lastResponse !== undefined) return lastResponse;
-        return fetchImpl(input, init);
-      }
-      currentIndex = nextIndex;
-    }
-  }
-
-function rewriteRequest(
-  input: RequestInfo | URL,
-  init: RequestInit | undefined,
-  gateway: ProviderFallbackGateway,
-): { input: string | URL; init: RequestInit } | undefined {
-  const targetOrigin = safeOrigin(gateway.baseUrl);
-  if (!targetOrigin) {
-    return undefined;
-  }
-
-  const url = toUrl(input);
-  if (!url) {
-    return undefined;
-  }
-  const rewrittenUrl = new URL(url.toString());
-  const target = new URL(targetOrigin);
-  // URL.origin 只有 getter；协议/主机（含端口）有 setter，重写 origin 等价。
-  rewrittenUrl.protocol = target.protocol;
-  rewrittenUrl.host = target.host;
-
+): Promise<ReplayableRequest | undefined> {
   if (typeof Request !== "undefined" && input instanceof Request) {
-    if (input.bodyUsed) {
-      return undefined;
-    }
-    const headers = rewriteAuthHeaders(input.headers, gateway);
+    if (input.bodyUsed) return undefined;
+    const body = await input.arrayBuffer();
     return {
-      input: rewrittenUrl.toString(),
+      input: input.url,
       init: {
-        body: input.body,
+        body,
         cache: input.cache,
         credentials: input.credentials,
-        headers,
+        headers: headerEntriesToObject(input.headers),
         integrity: input.integrity,
         keepalive: input.keepalive,
         method: input.method,
@@ -139,15 +86,100 @@ function rewriteRequest(
       },
     };
   }
+  return { input: input as string | URL, init: { ...init } };
+}
 
-  const headers = mergeHeaders(init?.headers, gateway);
+async function runFailover(
+  input: Parameters<ProviderFetch>[0],
+  init: Parameters<ProviderFetch>[1] | undefined,
+  fetchImpl: ProviderFetch,
+  allGateways: readonly ProviderFallbackGateway[],
+): Promise<Response> {
+  // 先规范化成可重放形式（Request body 预读为 ArrayBuffer）。
+  const replay = await toReplayableRequest(input, init);
+  if (!replay) {
+    // Request 已消费等无法重放场景：原样透传，保持单网关语义。
+    return fetchImpl(input, init);
+  }
+
+  let currentIndex = 0;
+  // 记录每次尝试的失败：最后一次响应/错误在全部网关失败后抛出，
+  // 保持与单网关一致的错误语义（调用方依赖分类器识别）。
+  let lastResponse: Response | undefined;
+  let lastError: unknown;
+
+  for (;;) {
+    const gateway = allGateways[currentIndex];
+    const isPrimaryAttempt = currentIndex === 0;
+    const rewritten = isPrimaryAttempt ? replay : rewriteReplay(replay, gateway);
+    if (!rewritten) {
+      // 备用网关 URL 无法解析：透传原始失败。
+      if (lastError !== undefined) throw lastError;
+      if (lastResponse !== undefined) return lastResponse;
+      return fetchImpl(input, init);
+    }
+
+    try {
+      const response = await fetchImpl(rewritten.input, rewritten.init);
+      if (response.ok || !isSwitchableHttpStatus(response.status)) {
+        return response;
+      }
+      lastResponse = response;
+      await consumeBodyBestEffort(response);
+    } catch (error) {
+      if (!isSwitchableNetworkError(error)) {
+        throw error;
+      }
+      lastError = error;
+    }
+
+    const nextIndex = currentIndex + 1;
+    if (nextIndex >= allGateways.length) {
+      if (lastError !== undefined) throw lastError;
+      if (lastResponse !== undefined) return lastResponse;
+      return fetchImpl(input, init);
+    }
+    currentIndex = nextIndex;
+  }
+}
+
+function rewriteReplay(
+  replay: ReplayableRequest,
+  gateway: ProviderFallbackGateway,
+): ReplayableRequest | undefined {
+  const targetOrigin = safeOrigin(gateway.baseUrl);
+  if (!targetOrigin) {
+    return undefined;
+  }
+
+  const url = toUrl(replay.input);
+  if (!url) {
+    return undefined;
+  }
+  const rewrittenUrl = new URL(url.toString());
+  const target = new URL(targetOrigin);
+  // URL.host setter 会保留原端口（Node 行为），端口残留会把备用网关打成错误端口；
+  // 显式重写 protocol + hostname 并清空 port 才能完整覆盖 origin。
+  rewrittenUrl.protocol = target.protocol;
+  rewrittenUrl.hostname = target.hostname;
+  rewrittenUrl.port = target.port;
+
+  const headers = mergeHeaders(replay.init.headers, gateway);
   return {
     input: rewrittenUrl.toString(),
     init: {
-      ...init,
+      ...replay.init,
       headers,
     },
   };
+}
+
+function headerEntriesToObject(headers: Headers): Record<string, string> {
+  const result: Record<string, string> = {};
+  headers.forEach((value, key) => {
+    result[key] = value;
+  });
+  return result;
 }
 
 function toUrl(input: RequestInfo | URL): URL | undefined {
@@ -167,18 +199,6 @@ function safeOrigin(baseUrl: string): string | undefined {
   } catch {
     return undefined;
   }
-}
-
-function rewriteAuthHeaders(
-  source: Headers,
-  gateway: ProviderFallbackGateway,
-): Record<string, string> {
-  const result: Record<string, string> = {};
-  source.forEach((value, key) => {
-    result[key] = value;
-  });
-  applyGatewayAuth(result, gateway);
-  return result;
 }
 
 function mergeHeaders(

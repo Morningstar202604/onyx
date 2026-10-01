@@ -310,6 +310,8 @@ export async function* runStreamText(input: {
       const streamResult = input.runtime.streamText(options);
       result = streamResult;
       streamIterator = streamResult.fullStream[Symbol.asyncIterator]();
+      // 推理模型 content 恒空时累积思考内容，EOF 后补发为正文（国产模型适配）。
+      let fallbackReasoningText = "";
 
       while (true) {
         const next = await readNextWithStreamIdleTimeout(streamIterator, {
@@ -428,6 +430,9 @@ export async function* runStreamText(input: {
         }
         if (event.visibleEvents.length > 0) {
           for (const visibleEvent of event.visibleEvents) {
+            if (visibleEvent.type === "reasoning_delta") {
+              fallbackReasoningText += visibleEvent.text;
+            }
             const observation = observeVisibleStreamEvent(visibleEvent, Date.now() - startedAt);
             await publishVisibleMilestones(observation);
             streamOutputCommitted = streamOutputCommitted || observation.outputCommitted;
@@ -471,6 +476,19 @@ export async function* runStreamText(input: {
       }
 
       if (!emittedError) {
+        // 推理模型正文恒空（text-delta 0 但 reasoning 非空）：EOF 后把思考内容
+        // 补发为正文，保证调用结果对用户可见；正常模型有 text-delta 时不触发。
+        if (
+          input.request.preserveProviderStreamBoundaries !== true &&
+          diagnostics.textDeltaChars === 0 &&
+          fallbackReasoningText.length > 0
+        ) {
+          const fallbackTextId = `text-${statusContext.requestId}-${attempt}`;
+          emittedEvent = true;
+          yield { type: "text_start", id: fallbackTextId };
+          yield { type: "text_delta", id: fallbackTextId, text: fallbackReasoningText };
+          yield { type: "text_end", id: fallbackTextId };
+        }
         // 自然 EOF 后合成的业务错误会通过 TerminalStreamChunkError 直接离开外层 catch；
         // compact 上下文在普通主链路为空，因此必须在合成现场显式保留 stream 阶段。
         // 先识别 provider business error，再考虑 generic empty；否则额度等

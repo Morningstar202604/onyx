@@ -29,6 +29,7 @@ import { createOfficialCodingPlanGatewayFetch } from "./official-coding-plan-gat
 import { normalizeModelTlsFailure } from "./failure-tls.js";
 import { mergeModelRequestHeaders } from "./model-request-headers.js";
 import { createGatewayFailoverFetch } from "./gateway-failover.js";
+import { createProviderConcurrencyGate } from "./concurrency-limiter.js";
 
 export type AiSdkProviderKind = "openai" | "anthropic" | "openai-compatible";
 
@@ -161,6 +162,9 @@ export class AiSdkModelExecution {
   private readonly logger?: Logger;
   private readonly baseTransport?: ProviderFetch;
   private readonly providerTransports = new Map<string, ProviderFetch>();
+  // 每供应商并发门：同 provider 同时进行中的请求不超过上限（默认 8），超出排队、超时拒绝。
+  // 实例级（每个执行引擎实例一套门），desktop/CLI 各自进程内生效。
+  private readonly providerConcurrencyGate = createProviderConcurrencyGate({ defaultMax: 8 });
 
   constructor(config: AiSdkModelExecutionConfig = {}, options: AiSdkModelExecutionOptions = {}) {
     this.env = config.env ?? process.env;
@@ -277,6 +281,10 @@ export class AiSdkModelExecution {
       baseURL: providerConfig.baseURL ?? "",
       gateways: providerConfig.fallbackGateways ?? [],
       fetch: businessErrorFetch,
+      // 并发与配额：每个请求先 acquire 并发槽位（排队/超时拒绝），再进 failover 循环。
+      concurrencyGate: {
+        acquire: (timeoutMs) => this.providerConcurrencyGate.acquire(providerId, timeoutMs),
+      },
     });
     const optionFetch =
       optionMaps && optionValues
