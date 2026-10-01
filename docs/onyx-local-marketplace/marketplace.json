@@ -1,0 +1,18 @@
+{
+  "name": "onyx-local-demo",
+  "description": "Onyx 本地市场示例：无官方服务器、断网可用。用户可将此目录复制到任意位置，或在 settings → 插件 → 添加市场源 中直接填入本文件路径（支持 .json 文件或目录两种形态）。",
+  "featured": ["my-first-plugin"],
+  "plugins": [
+    {
+      "name": "my-first-plugin",
+      "category": "skill",
+      "description": "跟随《Onyx 插件开发指南》创建的示例技能插件：收到 $mention 时输出演示内容。",
+      "version": "1.0.0",
+      "source": {
+        "type": "directory",
+        "path": "../onyx-plugin-template/skills/my-first-plugin"
+      },
+      "tags": ["skill", "demo", "template"]
+    }
+  ]
+}

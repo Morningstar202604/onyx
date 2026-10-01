@@ -75,9 +75,17 @@ description: "<触发条件描述：何时、对什么任务使用本技能。�
 
 见 `docs/onyx-plugin-template/`（本仓库内可直接照抄的骨架）：一个零运行时的纯技能插件 + 一个带 MCP 运行时的插件骨架。
 
+## 6.5 自建本地市场（断网可用，无需服务器）
+
+市场源支持 **本地 `.json` 文件** 与 **本地目录** 两种形态（`parseMarketplaceSourceInput`），Onyx 不依赖任何远端源：
+
+- 在设置 → 插件 → 添加市场源中直接填入本地 `marketplace.json` 的绝对路径，或含 `marketplace.json` 的目录路径即可，断网可用、不上传任何数据。
+- 仓库已附带示例：`docs/onyx-local-marketplace/marketplace.json`（manifest 格式：顶层 `name`/`description`/`plugins[]`，每条含 `name`/`description`/`version`/`source`/`tags`）。
+- 分发插件时把插件目录与 `marketplace.json` 一起打包/拷贝即可（`source.type: "directory"` 指向相对路径）；远端分发可选 GitHub/Git/HTTP JSON 源（`source: "github" | "git" | "url"`），与本地源同一套安装链路。
+
 ## 7. 边界与已知限制
 
-- **无远端市场**：Onyx 无服务器架构，插件全部本地分发/安装；`source` 为空的市场不会发起远端请求。
+- **无远端市场**：Onyx 无服务器架构，插件全部本地分发/安装；`source` 为空的市场不会发起远端请求。本地文件/目录市场源完整可用（见 §6.5）。
 - **权限体系未落地**（P1）：当前插件按"技能 + 运行时"运行，尚无 per-plugin 权限声明/授权界面；插件可信边界 = 用户安装行为本身。
 - **运行时依赖**：需要 npm 依赖的运行时插件按 npm 包构建；纯技能插件无依赖即可运行。
 - **安装位置**：安装/卸载写 `~/.onyx` 插件目录（agent 进程热更新运行态），Host 不持有副本。
