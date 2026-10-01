@@ -109,6 +109,7 @@ export * from "./zcodeAgentWorkflowParams.js";
 import type {
   ZCodeAgentAddPluginMarketplaceParams,
   ZCodeAgentAutomationIdParams,
+  ZCodeAgentListAllRunsParams,
   ZCodeAgentCancelPluginOperationParams,
   ZCodeAgentConfigurePluginParams,
   ZCodeAgentResetPluginConfigParams,
@@ -683,6 +684,8 @@ export interface IZCodeAgentService {
   restartAutomation(params: ZCodeAgentAutomationIdParams): Promise<void>;
   runAutomationNow(params: ZCodeAgentAutomationIdParams): Promise<ZCodeAgentRunAutomationNowResult>;
   listAutomationRuns(params: ZCodeAgentAutomationIdParams): Promise<ZCodeAutomationRun[]>;
+  /** 跨 workspace 全局运行监控：聚合全部工作区的自动化运行。 */
+  listAllAutomationRuns(params?: ZCodeAgentListAllRunsParams): Promise<ZCodeAutomationRun[]>;
   deleteAutomationRun(params: ZCodeAgentDeleteAutomationRunParams): Promise<void>;
   generateWorkspaceText(
     params: ZCodeAgentGenerateWorkspaceTextParams,

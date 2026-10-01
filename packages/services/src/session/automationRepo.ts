@@ -1448,6 +1448,23 @@ export class AutomationRepo {
     return rows.map(rowToRun);
   }
 
+  /** 跨 workspace 全局运行列表（运行监控视图）：按创建时间倒序，可按 outcome 过滤。 */
+  async listAllRuns(limit: number, outcome?: ZCodeAutomationRunOutcome): Promise<ZCodeAutomationRun[]> {
+    await this.ensureReady();
+    const rows = this.getDatabase()
+      .prepare(
+        `SELECT * FROM automation_runs
+        WHERE (@outcome IS NULL OR outcome = @outcome)
+        ORDER BY created_at DESC
+        LIMIT @limit`,
+      )
+      .all({
+        outcome: outcome ?? null,
+        limit: Math.max(1, Math.min(limit, 200)),
+      }) as unknown as AutomationRunRow[];
+    return rows.map(rowToRun);
+  }
+
   async getRun(runId: string): Promise<ZCodeAutomationRun | null> {
     await this.ensureReady();
     const row = this.getDatabase()

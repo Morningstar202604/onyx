@@ -70,6 +70,12 @@ interface AutomationManagementState {
   // 正在进行的写操作标记，用于禁用对应按钮（如 `automation:delete:<id>`）。
   operationId: string | null;
   runsCache: Record<string, AutomationRunsEntry>;
+  /** 跨 workspace 全局运行监控（所有工作区的自动化运行，倒序）。 */
+  globalRuns: AutomationRunsEntry;
+  loadGlobalRuns: (
+    agentService: IZCodeAgentService,
+    force?: boolean,
+  ) => Promise<void>;
   initialize: (params: {
     workspacePath: string;
     workspaceIdentity?: string;
@@ -181,6 +187,20 @@ export const useAutomationManagementStore = create<AutomationManagementState>((s
   error: null,
   operationId: null,
   runsCache: {},
+  globalRuns: { status: "loading" },
+
+  async loadGlobalRuns(agentService, force = false) {
+    const cached = get().globalRuns;
+    if (!force && cached && cached.status !== "error") return;
+    set({ globalRuns: { status: "loading" } });
+    try {
+      const runs = await agentService.listAllAutomationRuns({ limit: 100 });
+      set({ globalRuns: { status: "loaded", runs } });
+    } catch (error) {
+      logger.error("[automations] load global runs failed", { error: toMessage(error) });
+      set({ globalRuns: { status: "error", error: toMessage(error) } });
+    }
+  },
 
   async initialize({ workspacePath, workspaceIdentity, agentService }) {
     const normalizedIdentity = workspaceIdentity?.trim() || null;

@@ -1,5 +1,6 @@
 import type {
   ZCodeAgentMcpServer,
+  ZCodeAutomationRunOutcome,
   ZCodeAutomationScheduleRule,
   ZCodeMcpListMode,
   ModelSelection,
@@ -145,6 +146,12 @@ export interface ZCodeAgentUpdateAutomationParams extends ZCodeAgentWorkspaceTar
 
 export interface ZCodeAgentAutomationIdParams extends ZCodeAgentWorkspaceTarget {
   automationId: string;
+}
+
+/** 跨 workspace 全局运行监控参数（缺省即聚合全部工作区）。 */
+export interface ZCodeAgentListAllRunsParams {
+  limit?: number;
+  outcome?: ZCodeAutomationRunOutcome;
 }
 
 export interface ZCodeAgentSetAutomationEnabledParams extends ZCodeAgentWorkspaceTarget {

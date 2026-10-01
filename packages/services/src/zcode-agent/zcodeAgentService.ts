@@ -195,6 +195,7 @@ import type {
   ZCodeAgentCreateAutomationParams,
   ZCodeAgentUpdateAutomationParams,
   ZCodeAgentAutomationIdParams,
+  ZCodeAgentListAllRunsParams,
   ZCodeAgentSetAutomationEnabledParams,
   ZCodeAgentDeleteAutomationRunParams,
   ZCodeAgentAttachmentBeginParams,
@@ -4048,6 +4049,10 @@ async function ensureAccountProviderConfigSynced(_params: {
         workspacePath: params.workspacePath,
         workspaceIdentity: params.workspaceIdentity,
       });
+    },
+
+    async listAllAutomationRuns(params?: ZCodeAgentListAllRunsParams) {
+      return automationService.listAllWorkspaceRuns(params);
     },
 
     async deleteAutomationRun(params: ZCodeAgentDeleteAutomationRunParams) {

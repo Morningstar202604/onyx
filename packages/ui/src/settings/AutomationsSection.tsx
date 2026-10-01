@@ -76,6 +76,7 @@ import {
 } from "@/settings/automationFormat.js";
 import { describeAutomationCardSchedule } from "@/settings/automationCardSchedule.js";
 import { AutomationEditView, type AutomationEditSubmit } from "@/settings/AutomationEditView.js";
+import { GlobalRunsView } from "@/settings/GlobalRunsView.js";
 import { AutomationScheduleBadge } from "@/settings/AutomationScheduleBadge.js";
 import {
   AutomationClockIcon,
@@ -571,6 +572,7 @@ export function AutomationsSection({
   const consumePendingCreateDraft = useOffPeakTaskStore((state) => state.consumePendingCreateDraft);
 
   const [refreshing, setRefreshing] = useState(false);
+  const [showGlobalRuns, setShowGlobalRuns] = useState(false);
   const [view, setView] = useState<AutomationsView>({ mode: "list" });
   // tab 与状态筛选同居一个状态：所有 setTab 调用都经 resolveAutomationTabState 归约，
   // tab 一变筛选即回到全部，切走再切回也不会恢复旧筛选。
@@ -1436,6 +1438,19 @@ export function AutomationsSection({
 
       {/* Tab：Scheduled 常驻；Idle 仅在灰度命中或有闲时存量时出现，不再提供 All 混排视图。
          有任务时右上对齐创建（4866-1735）；空态创建入口在大卡内（4889-2013），不重复顶栏按钮。 */}
+      {visibleTabs.length === 0 ? (
+        <div className="mt-6 flex items-center justify-end">
+          <Button
+            type="button"
+            variant={showGlobalRuns ? "default" : "outline"}
+            size="sm"
+            aria-pressed={showGlobalRuns}
+            onClick={() => setShowGlobalRuns((value) => !value)}
+          >
+            {intl.formatMessage({ id: "automations.runs.global.title" })}
+          </Button>
+        </div>
+      ) : null}
       {visibleTabs.length > 0 ? (
         <div className="mt-8 flex items-center justify-between">
           {/* tab 曾与右侧操作组共用 12px 间距，未体现最新设计要求的 8px 紧凑节奏。*/}
@@ -1458,6 +1473,15 @@ export function AutomationsSection({
             ))}
           </div>
           <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant={showGlobalRuns ? "default" : "outline"}
+              size="sm"
+              aria-pressed={showGlobalRuns}
+              onClick={() => setShowGlobalRuns((value) => !value)}
+            >
+              {intl.formatMessage({ id: "automations.runs.global.title" })}
+            </Button>
             <ControlHintTooltip
               title={intl.formatMessage({
                 id: refreshing ? "automations.refreshing" : "automations.refresh",
@@ -1520,7 +1544,11 @@ export function AutomationsSection({
         </div>
       ) : null}
 
-      {loading && automations.length === 0 && offPeakTasks.length === 0 ? (
+      {showGlobalRuns ? (
+        <div className="mt-5 flex flex-col gap-4">
+          <GlobalRunsView agentService={zcodeAgentService} />
+        </div>
+      ) : loading && automations.length === 0 && offPeakTasks.length === 0 ? (
         <div className="mt-8 flex h-40 items-center justify-center">
           <Spinner className="size-5" />
         </div>

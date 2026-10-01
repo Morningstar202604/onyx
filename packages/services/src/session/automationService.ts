@@ -1,7 +1,9 @@
+/* eslint-disable max-lines -- 自动化服务聚合面持续扩展，接近既有上限 */
 import type {
   ZCodeAutomation,
   ZCodeAutomationCreateParams,
   ZCodeAutomationRun,
+  ZCodeAutomationRunOutcome,
   ZCodeAutomationScheduleRule,
   ZCodeAutomationUpdateParams,
 } from "@onyx/shared";
@@ -462,6 +464,12 @@ export class AutomationService {
     scope?: AutomationWorkspaceScope,
   ): Promise<ZCodeAutomationRun[]> {
     return this.repo.listRuns(automationId, resolveScopeKey(scope));
+  }
+
+  async listAllWorkspaceRuns(
+    options?: { limit?: number; outcome?: ZCodeAutomationRunOutcome },
+  ): Promise<ZCodeAutomationRun[]> {
+    return this.repo.listAllRuns(options?.limit ?? 50, options?.outcome);
   }
   async deleteRun(runId: string, scope?: AutomationWorkspaceScope): Promise<void> {
     return this.repo.deleteRun(runId, resolveScopeKey(scope));
